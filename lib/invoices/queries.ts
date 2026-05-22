@@ -1,0 +1,112 @@
+import { getDb, invoices, invoiceItems, clients, users } from "@/lib/db";
+import { eq, and } from "drizzle-orm";
+
+export type InvoiceDetail = {
+  invoice: {
+    id: string;
+    number: string;
+    date: string;
+    dueDate: string | null;
+    currency: string;
+    exchangeRateMKD: number;
+    subtotal: number;
+    ddvRate: number;
+    ddvAmount: number;
+    total: number;
+    totalMKD: number;
+    status: string;
+    notes: string | null;
+    paidAt: string | null;
+  };
+  items: {
+    id: string;
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    total: number;
+  }[];
+  client: {
+    name: string;
+    email: string | null;
+    taxId: string | null;
+    country: string;
+    address: string | null;
+    contactPerson: string | null;
+  };
+  user: {
+    name: string;
+    businessName: string | null;
+    taxNumber: string | null;
+    address: string | null;
+    bankAccount: string | null;
+    bankName: string | null;
+  };
+};
+
+export async function getInvoiceDetail(
+  id: string,
+  userId: string
+): Promise<InvoiceDetail | null> {
+  const db = getDb();
+
+  const [row] = await db
+    .select({
+      invoice: invoices,
+      client: clients,
+      user: users,
+    })
+    .from(invoices)
+    .innerJoin(clients, eq(invoices.clientId, clients.id))
+    .innerJoin(users, eq(invoices.userId, users.id))
+    .where(and(eq(invoices.id, id), eq(invoices.userId, userId)))
+    .limit(1);
+
+  if (!row) return null;
+
+  const items = await db
+    .select()
+    .from(invoiceItems)
+    .where(eq(invoiceItems.invoiceId, id));
+
+  return {
+    invoice: {
+      id: row.invoice.id,
+      number: row.invoice.number,
+      date: row.invoice.date,
+      dueDate: row.invoice.dueDate,
+      currency: row.invoice.currency,
+      exchangeRateMKD: row.invoice.exchangeRateMKD,
+      subtotal: row.invoice.subtotal,
+      ddvRate: row.invoice.ddvRate,
+      ddvAmount: row.invoice.ddvAmount,
+      total: row.invoice.total,
+      totalMKD: row.invoice.totalMKD,
+      status: row.invoice.status,
+      notes: row.invoice.notes,
+      paidAt: row.invoice.paidAt,
+    },
+    items: items.map((item) => ({
+      id: item.id,
+      description: item.description,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      total: item.total,
+    })),
+    client: {
+      name: row.client.name,
+      email: row.client.email,
+      taxId: row.client.taxId,
+      country: row.client.country,
+      address: row.client.address,
+      contactPerson: row.client.contactPerson,
+    },
+    user: {
+      name: row.user.name,
+      businessName: row.user.businessName,
+      taxNumber: row.user.taxNumber,
+      address: row.user.address,
+      bankAccount: row.user.bankAccount,
+      bankName: row.user.bankName,
+    },
+  };
+}

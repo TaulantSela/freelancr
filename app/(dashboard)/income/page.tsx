@@ -1,0 +1,442 @@
+import { getSession } from "@/lib/auth/session";
+import { getDb, invoices, clients } from "@/lib/db";
+import { eq, and, gte } from "drizzle-orm";
+import {
+  getDDVStatus,
+  getNextQuarterlyDeadline,
+  calculateIncomeTax,
+  formatMKD,
+  DDV_THRESHOLD_MKD,
+} from "@/lib/tax/calculator";
+import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { AlertTriangle, Calendar, CheckCircle2, Info } from "lucide-react";
+import { getTranslations } from "@/lib/i18n/server";
+import { formatMessage } from "@/lib/i18n/format";
+
+export default async function IncomePage() {
+  const session = await getSession();
+  if (!session) return null;
+
+  const { t } = await getTranslations();
+  const year = new Date().getFullYear();
+  const yearStart = `${year}-01-01`;
+
+  // All paid invoices this year
+  const paidInvoices = await getDb()
+    .select({
+      id: invoices.id,
+      number: invoices.number,
+      date: invoices.date,
+      currency: invoices.currency,
+      total: invoices.total,
+      totalMKD: invoices.totalMKD,
+      exchangeRateMKD: invoices.exchangeRateMKD,
+      clientName: clients.name,
+    })
+    .from(invoices)
+    .leftJoin(clients, eq(invoices.clientId, clients.id))
+    .where(
+      and(
+        eq(invoices.userId, session.userId),
+        eq(invoices.status, "paid"),
+        gte(invoices.date, yearStart)
+      )
+    )
+    .orderBy(invoices.date);
+
+  const annualIncomeMKD = paidInvoices.reduce((s, i) => s + i.totalMKD, 0);
+  const ddvStatus = getDDVStatus(annualIncomeMKD);
+  const deadline = getNextQuarterlyDeadline();
+  const taxCalc = calculateIncomeTax(annualIncomeMKD);
+
+  const ddvBadgeLabels = {
+    safe: t.dashboard.ddvSafe,
+    warning: t.dashboard.ddvWarning,
+    critical: t.dashboard.ddvCritical,
+    exceeded: t.dashboard.ddvExceeded,
+  };
+
+  const alertItems = [
+    { label: t.income.alert70, threshold: DDV_THRESHOLD_MKD * 0.7, reached: annualIncomeMKD >= DDV_THRESHOLD_MKD * 0.7 },
+    { label: t.income.alert85, threshold: DDV_THRESHOLD_MKD * 0.85, reached: annualIncomeMKD >= DDV_THRESHOLD_MKD * 0.85 },
+    { label: t.income.alert100, threshold: DDV_THRESHOLD_MKD, reached: annualIncomeMKD >= DDV_THRESHOLD_MKD },
+  ];
+
+  // Income by currency
+  const byCurrency: Record<string, number> = {};
+  for (const inv of paidInvoices) {
+    byCurrency[inv.currency] = (byCurrency[inv.currency] ?? 0) + inv.total;
+  }
+
+  // Income by client
+  const byClient: Record<string, { name: string; totalMKD: number; invoiceCount: number }> = {};
+  for (const inv of paidInvoices) {
+    const name = inv.clientName ?? "Unknown";
+    if (!byClient[name]) byClient[name] = { name, totalMKD: 0, invoiceCount: 0 };
+    byClient[name].totalMKD += inv.totalMKD;
+    byClient[name].invoiceCount++;
+  }
+  const clientBreakdown = Object.values(byClient).sort((a, b) => b.totalMKD - a.totalMKD);
+
+  // Running total (cumulative MKD by month)
+  const monthlyIncome: Record<string, number> = {};
+  for (const inv of paidInvoices) {
+    const month = inv.date.slice(0, 7); // YYYY-MM
+    monthlyIncome[month] = (monthlyIncome[month] ?? 0) + inv.totalMKD;
+  }
+
+  const ddvColors = {
+    safe: "bg-emerald-500",
+    warning: "bg-yellow-500",
+    critical: "bg-orange-500",
+    exceeded: "bg-red-500",
+  };
+
+  const allMonths = Array.from({ length: 12 }, (_, i) => {
+    const m = String(i + 1).padStart(2, "0");
+    return `${year}-${m}`;
+  });
+
+  let runningTotal = 0;
+
+  return (
+    <div className="p-6 max-w-5xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-xl font-semibold">{t.income.title}</h1>
+        <p className="text-sm text-muted-foreground">
+          {formatMessage(t.income.subtitle, { year })}
+        </p>
+      </div>
+
+      {/* Top stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-5">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+              {t.income.grossIncome}
+            </div>
+            <div className="text-lg font-mono font-semibold">{formatMKD(annualIncomeMKD)}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              {formatMessage(t.income.invoicesPaid, { count: paidInvoices.length })}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+              {t.income.estTax}
+            </div>
+            <div className="text-lg font-mono font-semibold text-red-400">
+              {formatMKD(taxCalc.totalTax)}
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              {(taxCalc.effectiveRate * 100).toFixed(1)}% {t.income.effectiveRate}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+              {t.income.netIncome}
+            </div>
+            <div className="text-lg font-mono font-semibold text-emerald-400">
+              {formatMKD(annualIncomeMKD - taxCalc.totalTax)}
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">{t.income.afterTax}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+              {t.income.ddvThresholdPct}
+            </div>
+            <div className="text-lg font-mono font-semibold">
+              {ddvStatus.percentage.toFixed(1)}%
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              {formatMKD(ddvStatus.remaining)} {t.dashboard.remaining}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* DDV Tracker */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center justify-between">
+              {t.income.ddvMonitor}
+              <Badge
+                variant={ddvStatus.alertLevel === "safe" ? "outline" : "destructive"}
+                className="text-xs font-normal"
+              >
+                {ddvBadgeLabels[ddvStatus.alertLevel]}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground">{t.income.currentAnnual}</span>
+                <span className="font-mono text-sm">{formatMKD(annualIncomeMKD)}</span>
+              </div>
+              <div className="h-3 bg-muted rounded-full overflow-hidden">
+                <div
+                  className={cn("h-full rounded-full transition-all", ddvColors[ddvStatus.alertLevel])}
+                  style={{ width: `${Math.min(ddvStatus.percentage, 100)}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
+                <span>{ddvStatus.percentage.toFixed(1)}%</span>
+                <span>{formatMKD(DDV_THRESHOLD_MKD)}</span>
+              </div>
+            </div>
+
+            <div className="space-y-2 text-sm">
+              {alertItems.map((item) => (
+                <div key={item.label} className="flex items-center gap-3">
+                  {item.reached ? (
+                    <div className="h-4 w-4 rounded-full bg-red-500 shrink-0" />
+                  ) : (
+                    <div className="h-4 w-4 rounded-full border border-muted-foreground shrink-0" />
+                  )}
+                  <span className={item.reached ? "text-foreground" : "text-muted-foreground"}>
+                    {item.label}
+                  </span>
+                  <span className="ml-auto font-mono text-xs text-muted-foreground">
+                    {formatMKD(item.threshold)}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {ddvStatus.alertLevel !== "safe" && (
+              <div className="flex items-start gap-2 text-xs bg-yellow-500/10 text-yellow-400 rounded px-3 py-2">
+                <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                <span>
+                  {ddvStatus.alertLevel === "exceeded"
+                    ? t.income.ddvExceededMsg
+                    : formatMessage(t.income.ddvWarningMsg, {
+                        remaining: formatMKD(ddvStatus.remaining),
+                      })}
+                </span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">
+              {formatMessage(t.income.taxBreakdown, { year })}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{t.income.grossIncome}</span>
+                <span className="font-mono">{formatMKD(annualIncomeMKD)}</span>
+              </div>
+              <Separator />
+              {taxCalc.breakdown.length === 0 && (
+                <div className="text-xs text-muted-foreground py-1">{t.income.noIncome}</div>
+              )}
+              {taxCalc.breakdown.map((b, i) => (
+                <div key={i} className="flex justify-between items-center">
+                  <div>
+                    <span className="text-muted-foreground">
+                      {formatMessage(t.income.bracketOn, { bracket: b.bracket })}{" "}
+                    </span>
+                    <span className="font-mono text-xs">{formatMKD(b.amount)}</span>
+                  </div>
+                  <span className="font-mono text-red-400">{formatMKD(b.tax)}</span>
+                </div>
+              ))}
+              <Separator />
+              <div className="flex justify-between font-medium">
+                <span>{t.income.totalEstTax}</span>
+                <span className="font-mono text-red-400">{formatMKD(taxCalc.totalTax)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{t.income.netIncome}</span>
+                <span className="font-mono text-emerald-400">
+                  {formatMKD(annualIncomeMKD - taxCalc.totalTax)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{t.income.effectiveRate}</span>
+                <span className="font-mono">{(taxCalc.effectiveRate * 100).toFixed(2)}%</span>
+              </div>
+            </div>
+
+            <div className="bg-muted/50 rounded px-3 py-2 text-xs text-muted-foreground flex items-start gap-2">
+              <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              <span>{t.income.taxNote}</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            {formatMessage(t.income.quarterlyDeadlines, { year })}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid sm:grid-cols-4 gap-3">
+            {[
+              { quarter: "Q1", deadline: `30 Apr ${year}`, date: new Date(`${year}-04-30`) },
+              { quarter: "Q2", deadline: `31 Jul ${year}`, date: new Date(`${year}-07-31`) },
+              { quarter: "Q3", deadline: `31 Oct ${year}`, date: new Date(`${year}-10-31`) },
+              { quarter: "Q4", deadline: `31 Jan ${year + 1}`, date: new Date(`${year + 1}-01-31`) },
+            ].map((q) => {
+              const now = new Date();
+              const isPast = q.date < now;
+              const daysUntil = Math.ceil((q.date.getTime() - now.getTime()) / 86400000);
+              const isNext = !isPast && q.quarter === deadline.quarter;
+              return (
+                <div
+                  key={q.quarter}
+                  className={cn(
+                    "rounded-lg border px-4 py-3 text-sm",
+                    isPast
+                      ? "border-border bg-muted/20"
+                      : isNext
+                      ? "border-yellow-500/40 bg-yellow-500/5"
+                      : "border-border bg-card"
+                  )}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">{q.quarter}</span>
+                    {isPast ? (
+                      <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                    ) : isNext ? (
+                      <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                    ) : (
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground mb-1">{q.deadline}</div>
+                  {!isPast && (
+                    <div
+                      className={cn(
+                        "text-xs font-medium",
+                        daysUntil <= 14 ? "text-yellow-400" : "text-muted-foreground"
+                      )}
+                    >
+                      {formatMessage(t.income.daysAway, { days: daysUntil })}
+                    </div>
+                  )}
+                  {isPast && (
+                    <div className="text-xs text-muted-foreground">{t.income.passed}</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">
+            {formatMessage(t.income.monthlyBreakdown, { year })}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-0">
+            {allMonths.map((month, i) => {
+              const income = monthlyIncome[month] ?? 0;
+              runningTotal += income;
+              const monthLabel = new Date(month + "-01").toLocaleDateString("en-GB", {
+                month: "long",
+                year: "numeric",
+              });
+              const isFuture = new Date(month + "-01") > new Date();
+              return (
+                <div key={month}>
+                  <div className="flex items-center gap-4 py-2">
+                    <span className="text-sm text-muted-foreground w-28">{monthLabel}</span>
+                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full"
+                        style={{
+                          width:
+                            annualIncomeMKD > 0
+                              ? `${(income / annualIncomeMKD) * 100}%`
+                              : "0%",
+                        }}
+                      />
+                    </div>
+                    <span
+                      className={cn(
+                        "font-mono text-sm w-40 text-right",
+                        isFuture && !income ? "text-muted-foreground/40" : ""
+                      )}
+                    >
+                      {income > 0 ? formatMKD(income) : "—"}
+                    </span>
+                    <span className="font-mono text-xs text-muted-foreground w-40 text-right">
+                      {runningTotal > 0 ? formatMKD(runningTotal) : "—"}
+                    </span>
+                  </div>
+                  {i < 11 && <Separator />}
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex justify-between pt-3 border-t border-border text-sm font-medium mt-2">
+            <span>{t.income.annualTotal}</span>
+            <span className="font-mono">{formatMKD(annualIncomeMKD)}</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {clientBreakdown.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">{t.income.byClient}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {clientBreakdown.map((client) => (
+                <div key={client.name} className="space-y-1">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>{client.name}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground">
+                        {client.invoiceCount} {t.income.invShort}
+                      </span>
+                      <span className="font-mono">{formatMKD(client.totalMKD)}</span>
+                      <span className="text-xs text-muted-foreground w-8 text-right">
+                        {annualIncomeMKD > 0
+                          ? ((client.totalMKD / annualIncomeMKD) * 100).toFixed(0) + "%"
+                          : "—"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary/70 rounded-full"
+                      style={{
+                        width:
+                          annualIncomeMKD > 0
+                            ? `${(client.totalMKD / annualIncomeMKD) * 100}%`
+                            : "0%",
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}

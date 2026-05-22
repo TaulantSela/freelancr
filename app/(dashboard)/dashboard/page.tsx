@@ -1,0 +1,390 @@
+import { getSession } from "@/lib/auth/session";
+import { getDb, invoices, clients } from "@/lib/db";
+import { eq, sum, count, and, gte } from "drizzle-orm";
+import {
+  getDDVStatus,
+  getNextQuarterlyDeadline,
+  calculateIncomeTax,
+  formatMKD,
+  formatCurrency,
+  DDV_THRESHOLD_MKD,
+} from "@/lib/tax/calculator";
+import { formatDate, cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  AlertTriangle,
+  TrendingUp,
+  FileText,
+  Users,
+  Plus,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  CircleDollarSign,
+} from "lucide-react";
+import { getTranslations } from "@/lib/i18n/server";
+import { formatMessage } from "@/lib/i18n/format";
+import type { Dictionary } from "@/lib/i18n/types";
+
+type InvoiceStatus = keyof Dictionary["invoices"]["status"];
+
+export default async function DashboardPage() {
+  const session = await getSession();
+  if (!session) return null;
+
+  const { t } = await getTranslations();
+  const year = new Date().getFullYear();
+  const yearStart = `${year}-01-01`;
+
+  const [annualStats] = await getDb()
+    .select({ totalMKD: sum(invoices.totalMKD), totalInvoices: count() })
+    .from(invoices)
+    .where(
+      and(
+        eq(invoices.userId, session.userId),
+        eq(invoices.status, "paid"),
+        gte(invoices.date, yearStart)
+      )
+    );
+
+  const annualIncomeMKD = Number(annualStats?.totalMKD ?? 0);
+
+  const [outstandingStats] = await getDb()
+    .select({ cnt: count() })
+    .from(invoices)
+    .where(and(eq(invoices.userId, session.userId), eq(invoices.status, "sent")));
+
+  const recentInvoices = await getDb()
+    .select({
+      id: invoices.id,
+      number: invoices.number,
+      date: invoices.date,
+      total: invoices.total,
+      currency: invoices.currency,
+      status: invoices.status,
+      clientName: clients.name,
+    })
+    .from(invoices)
+    .leftJoin(clients, eq(invoices.clientId, clients.id))
+    .where(eq(invoices.userId, session.userId))
+    .orderBy(invoices.createdAt)
+    .limit(5);
+
+  const [clientCount] = await getDb()
+    .select({ cnt: count() })
+    .from(clients)
+    .where(eq(clients.userId, session.userId));
+
+  const ddvStatus = getDDVStatus(annualIncomeMKD);
+  const deadline = getNextQuarterlyDeadline();
+  const taxCalc = calculateIncomeTax(annualIncomeMKD);
+
+  const statusColors: Record<string, string> = {
+    paid: "text-emerald-400",
+    sent: "text-blue-400",
+    overdue: "text-red-400",
+    draft: "text-zinc-400",
+    cancelled: "text-zinc-500",
+  };
+
+  const ddvColors = {
+    safe: "bg-emerald-500",
+    warning: "bg-yellow-500",
+    critical: "bg-orange-500",
+    exceeded: "bg-red-500",
+  };
+
+  const ddvBadge = {
+    safe: { label: t.dashboard.ddvSafe, variant: "outline" as const },
+    warning: { label: t.dashboard.ddvWarning, variant: "outline" as const },
+    critical: { label: t.dashboard.ddvCritical, variant: "destructive" as const },
+    exceeded: { label: t.dashboard.ddvExceeded, variant: "destructive" as const },
+  };
+
+  const checklistDone = [true, true, false, false, false, false];
+
+  return (
+    <div className="p-6 max-w-5xl mx-auto space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold">{t.dashboard.title}</h1>
+          <p className="text-sm text-muted-foreground">
+            {formatMessage(t.dashboard.welcome, { name: session.name, year })}
+          </p>
+        </div>
+        <Link href="/invoices/new">
+          <Button size="sm" className="gap-2">
+            <Plus className="h-4 w-4" /> {t.dashboard.newInvoice}
+          </Button>
+        </Link>
+      </div>
+
+      {ddvStatus.alertLevel !== "safe" && (
+        <div
+          className={cn(
+            "flex items-start gap-3 rounded-lg border px-4 py-3 text-sm",
+            ddvStatus.alertLevel === "exceeded"
+              ? "bg-red-500/10 border-red-500/30 text-red-400"
+              : "bg-yellow-500/10 border-yellow-500/30 text-yellow-400"
+          )}
+        >
+          <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+          <div>
+            {ddvStatus.alertLevel === "exceeded"
+              ? t.dashboard.ddvAlertExceeded
+              : formatMessage(t.dashboard.ddvAlertWarning, {
+                  pct: ddvStatus.percentage.toFixed(1),
+                  remaining: formatMKD(ddvStatus.remaining),
+                })}
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-5">
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                {t.dashboard.annualIncome}
+              </span>
+            </div>
+            <div className="text-xl font-mono font-semibold">{formatMKD(annualIncomeMKD)}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              {formatMessage(t.dashboard.paidInvoicesYear, { year })}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5">
+            <div className="flex items-center gap-2 mb-1">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                {t.dashboard.outstanding}
+              </span>
+            </div>
+            <div className="text-xl font-mono font-semibold">{outstandingStats?.cnt ?? 0}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">{t.dashboard.awaitingPayment}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5">
+            <div className="flex items-center gap-2 mb-1">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                {t.dashboard.clients}
+              </span>
+            </div>
+            <div className="text-xl font-mono font-semibold">{clientCount?.cnt ?? 0}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">{t.dashboard.activeClients}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5">
+            <div className="flex items-center gap-2 mb-1">
+              <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                {t.dashboard.estTax}
+              </span>
+            </div>
+            <div className="text-xl font-mono font-semibold">{formatMKD(taxCalc.totalTax)}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              {(taxCalc.effectiveRate * 100).toFixed(1)}% {t.dashboard.effectiveRate}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center justify-between">
+              {t.dashboard.ddvMonitor}
+              <Badge variant={ddvBadge[ddvStatus.alertLevel].variant} className="text-xs font-normal">
+                {ddvBadge[ddvStatus.alertLevel].label}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground">{t.dashboard.annualIncomeMkd}</span>
+                <span className="font-mono text-sm">{formatMKD(annualIncomeMKD)}</span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className={cn("h-full rounded-full transition-all", ddvColors[ddvStatus.alertLevel])}
+                  style={{ width: `${Math.min(ddvStatus.percentage, 100)}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <span>{ddvStatus.percentage.toFixed(1)}%</span>
+                <span>
+                  {formatMKD(ddvStatus.remaining)} {t.dashboard.remaining}
+                </span>
+              </div>
+            </div>
+            <Separator />
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{t.dashboard.ddvThreshold}</span>
+                <span className="font-mono text-xs">{formatMKD(DDV_THRESHOLD_MKD)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{t.dashboard.ddvStatus}</span>
+                <span className="text-xs">
+                  {ddvStatus.isRegistered ? t.dashboard.mustRegister : t.dashboard.notRequired}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{t.dashboard.eFakturaDeadline}</span>
+                <span className="text-xs text-yellow-400">{t.landing.eFakturaAlert}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">{t.dashboard.taxSummary}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {formatMessage(t.dashboard.grossIncome, { year })}
+                </span>
+                <span className="font-mono text-xs">{formatMKD(annualIncomeMKD)}</span>
+              </div>
+              {taxCalc.breakdown.map((b, i) => (
+                <div key={i} className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {formatMessage(t.dashboard.bracketTax, { bracket: b.bracket })}
+                  </span>
+                  <span className="font-mono text-xs">{formatMKD(b.tax)}</span>
+                </div>
+              ))}
+              <Separator />
+              <div className="flex justify-between font-medium">
+                <span>{t.dashboard.totalEstTax}</span>
+                <span className="font-mono text-xs">{formatMKD(taxCalc.totalTax)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{t.dashboard.netIncome}</span>
+                <span className="font-mono text-xs text-emerald-400">
+                  {formatMKD(annualIncomeMKD - taxCalc.totalTax)}
+                </span>
+              </div>
+            </div>
+            <Separator />
+            <div className="flex items-center gap-3 bg-muted/50 rounded-lg px-3 py-2">
+              <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+              <div>
+                <div className="text-xs font-medium">
+                  {formatMessage(t.dashboard.nextDeadline, { quarter: deadline.quarter })}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {formatMessage(t.dashboard.daysAway, {
+                    date: deadline.deadline,
+                    days: deadline.daysUntil,
+                  })}
+                </div>
+              </div>
+              {deadline.daysUntil <= 30 && (
+                <AlertTriangle className="h-4 w-4 text-yellow-500 ml-auto shrink-0" />
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader className="pb-2 flex-row items-center justify-between">
+          <CardTitle className="text-sm">{t.dashboard.recentInvoices}</CardTitle>
+          <Link href="/invoices">
+            <Button variant="ghost" size="sm" className="text-xs text-muted-foreground h-7">
+              {t.common.viewAll}
+            </Button>
+          </Link>
+        </CardHeader>
+        <CardContent>
+          {recentInvoices.length === 0 ? (
+            <div className="text-center py-8">
+              <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground mb-3">{t.dashboard.noInvoices}</p>
+              <Link href="/invoices/new">
+                <Button size="sm" className="gap-2">
+                  <Plus className="h-4 w-4" /> {t.dashboard.createFirst}
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-0">
+              {recentInvoices.map((inv, i) => {
+                const statusKey = inv.status as InvoiceStatus;
+                const statusLabel = t.invoices.status[statusKey] ?? inv.status;
+                return (
+                  <div key={inv.id}>
+                    <div className="flex items-center gap-4 py-2.5">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium font-mono">{inv.number}</span>
+                          <Badge
+                            variant="outline"
+                            className={cn("text-xs border-0 px-1.5", statusColors[inv.status])}
+                          >
+                            {statusLabel}
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-muted-foreground">{inv.clientName}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-mono">
+                          {formatCurrency(inv.total, inv.currency)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">{formatDate(inv.date)}</div>
+                      </div>
+                    </div>
+                    {i < recentInvoices.length - 1 && <Separator />}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-yellow-500" />
+            {t.dashboard.eFakturaChecklist}
+            <Badge variant="outline" className="text-xs text-yellow-500 border-yellow-500/30 ml-1">
+              {t.landing.eFakturaAlert}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-2">
+            {t.dashboard.checklistItems.map((text, i) => (
+              <div key={text} className="flex items-center gap-3 text-sm py-1">
+                {checklistDone[i] ? (
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                ) : (
+                  <div className="h-4 w-4 rounded-full border border-muted-foreground shrink-0" />
+                )}
+                <span className={checklistDone[i] ? "text-muted-foreground line-through" : ""}>
+                  {text}
+                </span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

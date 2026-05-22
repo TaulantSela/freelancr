@@ -1,0 +1,118 @@
+"use client";
+
+import { useActionState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { updateProfile } from "@/lib/actions/settings";
+import { Loader2 } from "lucide-react";
+import type { User } from "@/lib/db/schema";
+import { useTranslations } from "@/lib/i18n/client";
+import { formatMessage } from "@/lib/i18n/format";
+
+type State = { success?: boolean; error?: string } | null;
+
+async function updateProfileAction(_prev: State, formData: FormData): Promise<State> {
+  const result = await updateProfile(formData);
+  if (result && "error" in result) return result;
+  return { success: true };
+}
+
+export function SettingsForm({ user }: { user: User }) {
+  const t = useTranslations();
+  const [state, action, pending] = useActionState(updateProfileAction, null);
+
+  return (
+    <form action={action} className="space-y-5">
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="name">{t.settings.fullName}</Label>
+          <Input id="name" name="name" defaultValue={user.name} required />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="businessName">{t.settings.businessName}</Label>
+          <Input
+            id="businessName"
+            name="businessName"
+            defaultValue={user.businessName ?? ""}
+            placeholder={t.settings.businessNamePlaceholder}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="businessType">{t.settings.businessType}</Label>
+        <select
+          id="businessType"
+          name="businessType"
+          defaultValue={user.businessType ?? "personal"}
+          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+        >
+          {t.settings.businessTypes.map((bt) => (
+            <option key={bt.value} value={bt.value} className="bg-card">
+              {bt.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="taxNumber">
+            {t.settings.taxNumber}
+            <Badge variant="outline" className="ml-2 text-xs font-normal">
+              {t.settings.taxNumberBadge}
+            </Badge>
+          </Label>
+          <Input
+            id="taxNumber"
+            name="taxNumber"
+            defaultValue={user.taxNumber ?? ""}
+            placeholder="4012345678901"
+            className="font-mono"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="address">{t.settings.address}</Label>
+          <Input id="address" name="address" defaultValue={user.address ?? ""} />
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="bankAccount">{t.settings.bankAccount}</Label>
+          <Input
+            id="bankAccount"
+            name="bankAccount"
+            defaultValue={user.bankAccount ?? ""}
+            className="font-mono"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="bankName">{t.settings.bankName}</Label>
+          <Input id="bankName" name="bankName" defaultValue={user.bankName ?? ""} />
+        </div>
+      </div>
+
+      {state?.error && (
+        <p className="text-sm text-destructive bg-destructive/10 rounded px-3 py-2">
+          {state.error}
+        </p>
+      )}
+      {state?.success && (
+        <p className="text-sm text-emerald-500 bg-emerald-500/10 rounded px-3 py-2">
+          {t.settings.saved}
+        </p>
+      )}
+
+      <Button type="submit" size="sm" disabled={pending} className="gap-2">
+        {pending && <Loader2 className="h-4 w-4 animate-spin" />}
+        {t.settings.saveChanges}
+      </Button>
+    </form>
+  );
+}
