@@ -257,7 +257,7 @@ export default async function LandingPage() {
             <span>{t.common.appName}</span>
           </div>
           <span>{t.landing.footerTagline}</span>
-          <div>© 2026 Freelancr.mk</div>
+          <div>© 2026 Freelancr</div>
         </div>
       </footer>
     </div>

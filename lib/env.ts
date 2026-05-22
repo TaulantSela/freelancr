@@ -6,7 +6,7 @@ export function getSessionSecret(): Uint8Array {
   }
 
   return new TextEncoder().encode(
-    secret ?? "freelancr-mk-dev-secret-change-in-production"
+    secret ?? "freelancr-dev-secret-change-in-production"
   );
 }
 

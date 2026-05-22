@@ -2,12 +2,12 @@ import type { Dictionary } from "../types";
 
 export const sq: Dictionary = {
   meta: {
-    title: "Freelancr.mk — Platformë faturimi dhe tatimesh për freelancerët",
+    title: "Freelancr — Platformë faturimi dhe tatimesh për freelancerët",
     description:
       "Platforma e vetme për faturim dhe përputhshmëri e ndërtuar për freelancerët e Maqedonisë së Veriut. Fatura shumëvalutore, monitorim i pragut TVSH, kujtesa tatimore tremujore.",
   },
   common: {
-    appName: "Freelancr.mk",
+    appName: "Freelancr",
     cancel: "Anulo",
     save: "Ruaj",
     delete: "Fshi",
@@ -61,7 +61,7 @@ export const sq: Dictionary = {
     badge: "Ndërtuar për Maqedoninë e Veriut · Fatura MKD + EUR + USD",
     heroTitle: "Platforma e faturimit që e kupton freelancerin maqedonas",
     heroSubtitle:
-      "Ndalo faturimin në Word dhe ndjekjen e të ardhurave në Excel. Freelancr.mk menaxhon fatura shumëvalutore, monitorimin e pragut TVSH, kujtesat tatimore tremujore dhe gatishmërinë për e-Faktura — gjithçka në një vend.",
+      "Ndalo faturimin në Word dhe ndjekjen e të ardhurave në Excel. Freelancr menaxhon fatura shumëvalutore, monitorimin e pragut TVSH, kujtesat tatimore tremujore dhe gatishmërinë për e-Faktura — gjithçka në një vend.",
     startFree: "Fillo falas",
     signInAccount: "Hyr në llogarinë tënde",
     eFakturaAlert: "Tetor 2026:",
@@ -75,7 +75,7 @@ export const sq: Dictionary = {
     },
     featuresTitle: "Gjithçka që i nevojitet freelancerit maqedonas",
     featuresSubtitle:
-      "Mjetet globale nuk dinë çfarë është TVSH. Excel-i yt nuk dërgon kujtesa tatimore. Freelancr.mk bën të dyja.",
+      "Mjetet globale nuk dinë çfarë është TVSH. Excel-i yt nuk dërgon kujtesa tatimore. Freelancr bën të dyja.",
     features: [
       {
         title: "Faturim shumëvalutor",
@@ -317,7 +317,7 @@ export const sq: Dictionary = {
       mkdEquivalent: "Ekuivalenti MKD",
       exchangeRate: "1 {currency} = {rate} MKD (NBRM afërsisht)",
       notes: "Shënime",
-      footer: "Gjeneruar nga Freelancr.mk",
+      footer: "Gjeneruar nga Freelancr",
     },
     form: {
       client: "Klienti",

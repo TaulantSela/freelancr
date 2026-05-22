@@ -1,4 +1,4 @@
-# Freelancr.mk
+# Freelancr
 
 > The invoicing and tax compliance platform built for North Macedonia's 50,000+ freelancers.
 
@@ -56,7 +56,7 @@ npm run vercel-build                 # migrations + next build
 vercel deploy --prod
 ```
 
-Live: [https://freelancr-mk.vercel.app](https://freelancr-mk.vercel.app)
+Live: [https://freelancr.vercel.app](https://freelancr.vercel.app)
 
 Open [http://localhost:3000](http://localhost:3000).
 
