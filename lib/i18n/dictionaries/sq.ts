@@ -79,7 +79,7 @@ export const sq: Dictionary = {
     features: [
       {
         title: "Faturim shumëvalutor",
-        desc: "Krijo fatura në MKD, EUR ose USD. Ekuivalenti MKD llogaritet automatikisht sipas kursit zyrtar NBRM.",
+        desc: "Krijo fatura në MKD, EUR ose USD. Ekuivalenti MKD llogaritet automatikisht sipas një kursi të përafërt të integruar.",
       },
       {
         title: "Monitorim i pragut TVSH",
@@ -280,7 +280,7 @@ export const sq: Dictionary = {
     drafts: "Drafte",
     emptyTitle: "Ende nuk ka fatura",
     emptyDesc:
-      "Krijo faturën e parë. Mbështet MKD, EUR dhe USD me konvertim automatik NBRM për qëllime tatimore.",
+      "Krijo faturën e parë. Mbështet MKD, EUR dhe USD me konvertim automatik në MKD sipas një kursi të përafërt të integruar.",
     createFirst: "Krijo faturën e parë",
     colNumber: "Numri",
     colClient: "Klienti",
@@ -315,7 +315,7 @@ export const sq: Dictionary = {
       ddv: "TVSH",
       grandTotal: "Totali",
       mkdEquivalent: "Ekuivalenti MKD",
-      exchangeRate: "1 {currency} = {rate} MKD (NBRM afërsisht)",
+      exchangeRate: "1 {currency} = {rate} MKD (kurs i përafërt)",
       notes: "Shënime",
       footer: "Gjeneruar nga Freelancr",
     },
@@ -325,7 +325,7 @@ export const sq: Dictionary = {
       invoiceDate: "Data e faturës",
       dueDate: "Afati i pagesës",
       lineItems: "Artikujt",
-      nbrmRate: "1 {currency} = {rate} MKD (NBRM afërsisht)",
+      approximateRate: "1 {currency} = {rate} MKD (kurs i përafërt)",
       description: "Përshkrimi",
       qty: "Sas.",
       unitPrice: "Çmimi njësi ({currency})",

@@ -207,7 +207,7 @@ export type Dictionary = {
       invoiceDate: string;
       dueDate: string;
       lineItems: string;
-      nbrmRate: string;
+      approximateRate: string;
       description: string;
       qty: string;
       unitPrice: string;

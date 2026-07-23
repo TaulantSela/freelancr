@@ -147,7 +147,7 @@ export function NewInvoiceForm({
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium">{f.lineItems}</Label>
           <span className="text-xs text-muted-foreground">
-            {formatMessage(f.nbrmRate, { currency, rate: String(rate) })}
+            {formatMessage(f.approximateRate, { currency, rate: String(rate) })}
           </span>
         </div>
 

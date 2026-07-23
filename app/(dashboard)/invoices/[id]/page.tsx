@@ -122,7 +122,7 @@ export default async function InvoiceDetailPage({
               <div>
                 <p className="text-xs text-muted-foreground">{t.invoices.detail.exchangeRate}</p>
                 <p className="font-medium font-mono text-xs">
-                  {formatMessage(t.invoices.form.nbrmRate, {
+                  {formatMessage(t.invoices.form.approximateRate, {
                     currency: invoice.currency,
                     rate: String(invoice.exchangeRateMKD),
                   })}

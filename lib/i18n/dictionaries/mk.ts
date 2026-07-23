@@ -79,7 +79,7 @@ export const mk: Dictionary = {
     features: [
       {
         title: "Повеќевалутно фактурирање",
-        desc: "Креирајте фактури во MKD, EUR или USD. MKD еквивалентот се пресметува автоматски според NBRM стапката.",
+        desc: "Креирајте фактури во MKD, EUR или USD. MKD еквивалентот се пресметува автоматски според вграден приближен курс.",
       },
       {
         title: "Следење на ДДВ праг",
@@ -280,7 +280,7 @@ export const mk: Dictionary = {
     drafts: "Нацрти",
     emptyTitle: "Сè уште нема фактури",
     emptyDesc:
-      "Креирајте ја вашата прва фактура. Поддржува MKD, EUR и USD со автоматска NBRM конверзија за даночни цели.",
+      "Креирајте ја вашата прва фактура. Поддржува MKD, EUR и USD со автоматска конверзија во MKD по вграден приближен курс.",
     createFirst: "Креирај прва фактура",
     colNumber: "Број",
     colClient: "Клиент",
@@ -315,7 +315,7 @@ export const mk: Dictionary = {
       ddv: "ДДВ",
       grandTotal: "Вкупно",
       mkdEquivalent: "MKD еквивалент",
-      exchangeRate: "1 {currency} = {rate} MKD (NBRM прибл.)",
+      exchangeRate: "1 {currency} = {rate} MKD (приближен курс)",
       notes: "Белешки",
       footer: "Генерирано од Freelancr",
     },
@@ -325,7 +325,7 @@ export const mk: Dictionary = {
       invoiceDate: "Датум на фактура",
       dueDate: "Рок на плаќање",
       lineItems: "Ставки",
-      nbrmRate: "1 {currency} = {rate} MKD (NBRM прибл.)",
+      approximateRate: "1 {currency} = {rate} MKD (приближен курс)",
       description: "Опис",
       qty: "Кол.",
       unitPrice: "Единечна цена ({currency})",
