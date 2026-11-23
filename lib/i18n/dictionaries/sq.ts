@@ -276,6 +276,10 @@ export const sq: Dictionary = {
     businessName: "Emri i biznesit / kompanisë",
     businessNamePlaceholder: "Emri i studios ose kompanisë tënde",
     taxNumber: "Numri tatimor (EDB)",
+    vatRegistered: "I regjistruar për TVSH",
+    vatRegisteredHint:
+      "TVSH-në në faturë mund ta tregojnë vetëm tatimpaguesit e regjistruar për TVSH (Ligji për TVSH, neni 51 paragrafi 3); kush e tregon pa qenë i regjistruar, e detyrohet shumën e treguar (neni 55). Shënoje këtë vetëm nëse të ka regjistruar UJP.",
+    vatNumber: "Numri i TVSH-së",
     address: "Adresa",
     bankAccount: "Llogaria bankare (IBAN)",
     bankName: "Emri i bankës",
@@ -290,6 +294,7 @@ export const sq: Dictionary = {
     errors: {
       nameRequired: "Emri është i detyrueshëm",
       advanceInvalid: "Shkruaj akontimin mujor si shumë në MKD, ose lëre bosh.",
+      vatNumberRequired: "Shkruaj numrin e TVSH-së ose hiq shenjën e regjistrimit për TVSH.",
     },
   },
   tax: {

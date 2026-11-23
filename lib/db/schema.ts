@@ -3,6 +3,7 @@ import {
   text,
   doublePrecision,
   timestamp,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { DEFAULT_TAX_STATUS, TAX_STATUSES } from "../tax/calculator";
 import {
@@ -33,6 +34,14 @@ export const users = pgTable("users", {
   // 1/12 of the tax in last year's annual balance, as the user enters it.
   // Null when not entered.
   monthlyAdvanceMKD: doublePrecision("monthly_advance_mkd"),
+  // Whether UJP has registered the user for VAT (DDV). Only then may an
+  // invoice show VAT (VAT law Art. 51(3)); anyone who shows it without being
+  // registered owes the amount shown (Art. 55). Existing rows: not
+  // registered.
+  vatRegistered: boolean("vat_registered").notNull().default(false),
+  // The VAT number (ДДВ број, e.g. "MK4030000000000"), printed on invoices
+  // when registered.
+  vatNumber: text("vat_number"),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 });
 

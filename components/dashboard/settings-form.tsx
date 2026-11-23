@@ -23,6 +23,7 @@ export function SettingsForm({ user }: { user: User }) {
   const t = useTranslations();
   const [state, action, pending] = useActionState(updateProfileAction, null);
   const [taxStatus, setTaxStatus] = useState<TaxStatus>(user.taxStatus);
+  const [vatRegistered, setVatRegistered] = useState(user.vatRegistered);
 
   return (
     <form action={action} className="space-y-5">
@@ -80,6 +81,37 @@ export function SettingsForm({ user }: { user: User }) {
               className="font-mono sm:w-1/2"
             />
             <p className="text-xs text-muted-foreground">{t.settings.monthlyAdvanceHint}</p>
+          </div>
+        )}
+      </fieldset>
+
+      <fieldset className="space-y-2">
+        <label className="flex items-start gap-3 rounded-md border border-input px-3 py-2 text-sm cursor-pointer has-checked:border-primary has-checked:bg-primary/5">
+          <input
+            type="checkbox"
+            name="vatRegistered"
+            checked={vatRegistered}
+            onChange={(e) => setVatRegistered(e.target.checked)}
+            className="mt-0.5 accent-primary"
+          />
+          <span className="space-y-0.5">
+            <span className="block font-medium">{t.settings.vatRegistered}</span>
+            <span className="block text-xs text-muted-foreground">
+              {t.settings.vatRegisteredHint}
+            </span>
+          </span>
+        </label>
+        {vatRegistered && (
+          <div className="space-y-1.5 pt-2">
+            <Label htmlFor="vatNumber">{t.settings.vatNumber}</Label>
+            <Input
+              id="vatNumber"
+              name="vatNumber"
+              defaultValue={user.vatNumber ?? ""}
+              placeholder="MK4012345678901"
+              required
+              className="font-mono sm:w-1/2"
+            />
           </div>
         )}
       </fieldset>

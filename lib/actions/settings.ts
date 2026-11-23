@@ -7,7 +7,7 @@ import { getSession } from "@/lib/auth/session";
 import { eq } from "drizzle-orm";
 import { isTaxStatus } from "@/lib/tax/calculator";
 
-export type SettingsErrorKey = "nameRequired" | "advanceInvalid";
+export type SettingsErrorKey = "nameRequired" | "advanceInvalid" | "vatNumberRequired";
 
 // "" -> null (not entered); otherwise a non-negative amount in MKD.
 function parseMonthlyAdvance(value: FormDataEntryValue | null): number | null | undefined {
@@ -36,6 +36,15 @@ export async function updateProfile(
     : null;
   if (monthlyAdvanceMKD === undefined) return { errorKey: "advanceInvalid" };
 
+  // A registered user must print their VAT number on invoices. The number
+  // field is only on the form while the box is ticked; when it's unticked,
+  // the stored number stays for if they tick it again.
+  const vatRegistered = formData.get("vatRegistered") === "on";
+  const vatNumber = ((formData.get("vatNumber") as string | null) ?? "")
+    .replace(/\s+/g, "")
+    .toUpperCase();
+  if (vatRegistered && !vatNumber) return { errorKey: "vatNumberRequired" };
+
   await getDb()
     .update(users)
     .set({
@@ -47,6 +56,8 @@ export async function updateProfile(
       bankName: (formData.get("bankName") as string) || null,
       ...(isTaxStatus(taxStatus) ? { taxStatus } : {}),
       ...(formData.has("monthlyAdvanceMKD") ? { monthlyAdvanceMKD } : {}),
+      vatRegistered,
+      ...(formData.has("vatNumber") ? { vatNumber: vatNumber || null } : {}),
     })
     .where(eq(users.id, session.userId));
 

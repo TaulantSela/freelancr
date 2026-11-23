@@ -276,6 +276,10 @@ export const en: Dictionary = {
     businessName: "Business / company name",
     businessNamePlaceholder: "Your studio or company name",
     taxNumber: "Tax number (EDB)",
+    vatRegistered: "Registered for VAT (DDV)",
+    vatRegisteredHint:
+      "Only taxpayers registered for VAT may show VAT on an invoice (VAT law Art. 51(3)); anyone who shows it without being registered owes the amount shown (Art. 55). Tick this only if UJP has registered you.",
+    vatNumber: "VAT number",
     address: "Address",
     bankAccount: "Bank account (IBAN)",
     bankName: "Bank name",
@@ -290,6 +294,7 @@ export const en: Dictionary = {
     errors: {
       nameRequired: "Name is required",
       advanceInvalid: "Enter the monthly advance as an amount in MKD, or leave it empty.",
+      vatNumberRequired: "Enter your VAT number, or untick VAT registration.",
     },
   },
   tax: {

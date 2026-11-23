@@ -243,6 +243,9 @@ export type Dictionary = {
     businessName: string;
     businessNamePlaceholder: string;
     taxNumber: string;
+    vatRegistered: string;
+    vatRegisteredHint: string;
+    vatNumber: string;
     address: string;
     bankAccount: string;
     bankName: string;
@@ -253,7 +256,7 @@ export type Dictionary = {
     memberSince: string;
     monthlyAdvance: string;
     monthlyAdvanceHint: string;
-    errors: { nameRequired: string; advanceInvalid: string };
+    errors: { nameRequired: string; advanceInvalid: string; vatNumberRequired: string };
   };
   tax: {
     statusLabel: string;
