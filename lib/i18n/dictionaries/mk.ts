@@ -134,7 +134,7 @@ export const mk: Dictionary = {
     editBreadcrumb: "Уреди",
     form: {
       name: "Име на компанија / клиент",
-      contactPerson: "Кontakt лице",
+      contactPerson: "Контакт лице",
       email: "Е-пошта",
       taxId: "ДДВ / Даночен број",
       country: "Држава",
@@ -195,7 +195,7 @@ export const mk: Dictionary = {
     detail: {
       from: "Од",
       billTo: "За",
-      exchangeRate: "Devizен курс",
+      exchangeRate: "Девизен курс",
       paidOn: "Платена на",
     },
     pdf: {
