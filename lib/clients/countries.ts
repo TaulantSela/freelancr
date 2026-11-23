@@ -36,6 +36,17 @@ export function isCountryCode(value: unknown): value is CountryCode {
   );
 }
 
+// A country's name in the given language, e.g. "DE" -> "Германија" in mk.
+// Falls back to the code (older rows can hold "OTHER").
+export function countryName(code: string, locale: Locale): string {
+  try {
+    const name = new Intl.DisplayNames([locale], { type: "region", fallback: "none" }).of(code);
+    return name ?? code;
+  } catch {
+    return code;
+  }
+}
+
 // The options for a country select, North Macedonia first and the rest in
 // alphabetical order for the language. Built on the server, so the names
 // don't depend on the browser's own copy of the country names.

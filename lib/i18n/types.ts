@@ -183,6 +183,20 @@ export type Dictionary = {
       notes: string;
       footer: string;
       draft: string;
+      number: string;
+      supplyDate: string;
+      placeOfIssue: string;
+      taxNumber: string;
+      vatNumber: string;
+      clientTaxId: string;
+      notVatRegistered: string;
+      payment: string;
+      bank: string;
+      iban: string;
+      bic: string;
+      accountNumber: string;
+      signatory: string;
+      signature: string;
     };
     form: {
       client: string;

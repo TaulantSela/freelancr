@@ -23,11 +23,11 @@ export async function GET(
   }
 
   // The client's invoice language, not the language the app is in.
-  const t = getDictionary(resolveInvoiceLanguage(data.client));
-  const labels = t.invoices.pdf;
+  const lang = resolveInvoiceLanguage(data.client);
+  const labels = getDictionary(lang).invoices.pdf;
 
   const buffer = await renderToBuffer(
-    <InvoicePdfDocument data={data} labels={labels} />
+    <InvoicePdfDocument data={data} labels={labels} lang={lang} />
   );
 
   return new NextResponse(new Uint8Array(buffer), {

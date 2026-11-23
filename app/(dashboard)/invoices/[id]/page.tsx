@@ -14,6 +14,8 @@ import { DownloadPdfButton } from "@/components/invoices/download-pdf-button";
 import { IssueInvoiceButton } from "@/components/invoices/issue-invoice-button";
 import { CancelInvoiceButton } from "@/components/invoices/cancel-invoice-button";
 import { getTranslations } from "@/lib/i18n/server";
+import { LOCALE_LABELS } from "@/lib/i18n/config";
+import { resolveInvoiceLanguage } from "@/lib/clients/config";
 import { formatMessage } from "@/lib/i18n/format";
 
 export default async function InvoiceDetailPage({
@@ -35,6 +37,9 @@ export default async function InvoiceDetailPage({
   const ddvPct = Math.round(invoice.ddvRate * 100);
   const isDraft = invoice.status === "draft";
   const title = invoice.number ?? t.invoices.status.draft;
+  // Labels for the issuer's details, in the app's language.
+  const pdf = t.invoices.pdf;
+  const invoiceLanguage = resolveInvoiceLanguage(client);
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
@@ -88,17 +93,36 @@ export default async function InvoiceDetailPage({
               {user.name !== fromName && (
                 <p className="text-sm text-muted-foreground">{user.name}</p>
               )}
-              {user.taxNumber && (
-                <p className="text-sm text-muted-foreground">{user.taxNumber}</p>
-              )}
               {user.address && (
                 <p className="text-sm text-muted-foreground">{user.address}</p>
               )}
-              {user.bankAccount && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  {user.bankName && `${user.bankName}: `}
-                  {user.bankAccount}
+              {user.taxNumber && (
+                <p className="text-sm text-muted-foreground">
+                  {pdf.taxNumber}: {user.taxNumber}
                 </p>
+              )}
+              {user.vatRegistered && user.vatNumber ? (
+                <p className="text-sm text-muted-foreground">
+                  {pdf.vatNumber}: {user.vatNumber}
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground">{pdf.notVatRegistered}</p>
+              )}
+              {(user.bank.iban || user.bank.accountNumber) && (
+                <div className="text-sm text-muted-foreground mt-1">
+                  {user.bank.bankName && <p>{user.bank.bankName}</p>}
+                  {user.bank.iban && (
+                    <p className="font-mono text-xs">
+                      {pdf.iban}: {user.bank.iban}
+                      {user.bank.bic && ` · ${pdf.bic}: ${user.bank.bic}`}
+                    </p>
+                  )}
+                  {user.bank.accountNumber && (
+                    <p className="font-mono text-xs">
+                      {pdf.accountNumber}: {user.bank.accountNumber}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
             <div>
@@ -140,6 +164,16 @@ export default async function InvoiceDetailPage({
               <p className="text-xs text-muted-foreground">{t.invoices.form.currency}</p>
               <p className="font-medium">{invoice.currency}</p>
             </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{t.clients.form.invoiceLanguage}</p>
+              <p className="font-medium">{LOCALE_LABELS[invoiceLanguage]}</p>
+            </div>
+            {user.placeOfIssue && (
+              <div>
+                <p className="text-xs text-muted-foreground">{pdf.placeOfIssue}</p>
+                <p className="font-medium">{user.placeOfIssue}</p>
+              </div>
+            )}
             {invoice.currency !== "MKD" && (
               <div>
                 <p className="text-xs text-muted-foreground">{t.invoices.detail.exchangeRate}</p>

@@ -1,5 +1,6 @@
 import { getDb, invoices, invoiceItems, clients, users } from "@/lib/db";
 import { eq, and } from "drizzle-orm";
+import { resolveBankDetails, type BankDetails } from "@/lib/profile";
 
 export type InvoiceDetail = {
   invoice: {
@@ -42,9 +43,13 @@ export type InvoiceDetail = {
     name: string;
     businessName: string | null;
     taxNumber: string | null;
+    vatRegistered: boolean;
+    vatNumber: string | null;
     address: string | null;
-    bankAccount: string | null;
-    bankName: string | null;
+    placeOfIssue: string | null;
+    // Who signs the invoice: the signatory from Settings, or the user.
+    signatory: string;
+    bank: BankDetails;
   };
 };
 
@@ -112,9 +117,12 @@ export async function getInvoiceDetail(
       name: row.user.name,
       businessName: row.user.businessName,
       taxNumber: row.user.taxNumber,
+      vatRegistered: row.user.vatRegistered,
+      vatNumber: row.user.vatNumber,
       address: row.user.address,
-      bankAccount: row.user.bankAccount,
-      bankName: row.user.bankName,
+      placeOfIssue: row.user.placeOfIssue,
+      signatory: row.user.signatoryName || row.user.name,
+      bank: resolveBankDetails(row.user),
     },
   };
 }
