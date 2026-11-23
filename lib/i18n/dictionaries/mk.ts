@@ -349,7 +349,6 @@ export const mk: Dictionary = {
     fullName: "Име и презиме",
     businessName: "Име на бизнис / компанија",
     businessNamePlaceholder: "Име на вашиот студио или компанија",
-    businessType: "Бизнис структура",
     taxNumber: "Даночен број (ЕДБ)",
     address: "Адреса",
     bankAccount: "Банкарска сметка (IBAN)",
@@ -361,11 +360,6 @@ export const mk: Dictionary = {
     plan: "План",
     freePlan: "Бесплатно",
     memberSince: "Член од",
-    businessTypes: [
-      { value: "personal", label: "Личен приход (физичко лице)" },
-      { value: "doo", label: "ДОО (друштво со ограничена одговорност)" },
-      { value: "trade", label: "Занает / трговија" },
-    ],
   },
   tax: {
     statusLabel: "Како сте регистрирани за данок?",

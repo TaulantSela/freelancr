@@ -29,7 +29,6 @@ await db.insert(users).values({
   passwordHash,
   name: "Aleksandar Jovanov",
   businessName: "AJ Studio",
-  businessType: "doo",
   taxNumber: "4012345678901",
   address: "Ul. Makedonija 12, Skopje 1000",
   bankAccount: "MK07 3000 0001 2345 678",

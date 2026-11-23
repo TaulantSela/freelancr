@@ -267,7 +267,6 @@ export type Dictionary = {
     fullName: string;
     businessName: string;
     businessNamePlaceholder: string;
-    businessType: string;
     taxNumber: string;
     address: string;
     bankAccount: string;
@@ -279,7 +278,6 @@ export type Dictionary = {
     plan: string;
     freePlan: string;
     memberSince: string;
-    businessTypes: { value: string; label: string }[];
   };
   tax: {
     statusLabel: string;

@@ -349,7 +349,6 @@ export const sq: Dictionary = {
     fullName: "Emri i plotë",
     businessName: "Emri i biznesit / kompanisë",
     businessNamePlaceholder: "Emri i studios ose kompanisë tënde",
-    businessType: "Struktura e biznesit",
     taxNumber: "Numri tatimor (EDB)",
     address: "Adresa",
     bankAccount: "Llogaria bankare (IBAN)",
@@ -361,11 +360,6 @@ export const sq: Dictionary = {
     plan: "Plani",
     freePlan: "Falas",
     memberSince: "Anëtar që",
-    businessTypes: [
-      { value: "personal", label: "Të ardhura personale" },
-      { value: "doo", label: "DOO (shoqëri me përgjegjësi të kufizuar)" },
-      { value: "trade", label: "Zanat / tregti" },
-    ],
   },
   tax: {
     statusLabel: "Si je regjistruar për tatime?",

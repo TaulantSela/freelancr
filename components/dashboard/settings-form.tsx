@@ -42,22 +42,6 @@ export function SettingsForm({ user }: { user: User }) {
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="businessType">{t.settings.businessType}</Label>
-        <select
-          id="businessType"
-          name="businessType"
-          defaultValue={user.businessType ?? "personal"}
-          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-        >
-          {t.settings.businessTypes.map((bt) => (
-            <option key={bt.value} value={bt.value} className="bg-card">
-              {bt.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
       <fieldset className="space-y-2">
         <legend className="text-sm leading-none font-medium">{t.tax.statusLabel}</legend>
         <p className="text-xs text-muted-foreground">{t.tax.statusHint}</p>

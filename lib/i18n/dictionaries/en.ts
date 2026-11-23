@@ -349,7 +349,6 @@ export const en: Dictionary = {
     fullName: "Full name",
     businessName: "Business / company name",
     businessNamePlaceholder: "Your studio or company name",
-    businessType: "Business structure",
     taxNumber: "Tax number (EDB)",
     address: "Address",
     bankAccount: "Bank account (IBAN)",
@@ -361,11 +360,6 @@ export const en: Dictionary = {
     plan: "Plan",
     freePlan: "Free",
     memberSince: "Member since",
-    businessTypes: [
-      { value: "personal", label: "Personal income" },
-      { value: "doo", label: "DOO (limited liability company)" },
-      { value: "trade", label: "Trade / craft" },
-    ],
   },
   tax: {
     statusLabel: "How are you registered for tax?",

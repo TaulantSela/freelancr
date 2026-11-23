@@ -12,6 +12,8 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash").notNull(),
   name: text("name").notNull(),
   businessName: text("business_name"),
+  // No longer asked for or read: the tax status below replaced it. Kept
+  // because migrations here only ever add columns.
   businessType: text("business_type").default("personal"),
   taxNumber: text("tax_number"),
   address: text("address"),

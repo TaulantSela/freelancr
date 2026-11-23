@@ -24,7 +24,6 @@ export async function updateProfile(
     .set({
       name,
       businessName: (formData.get("businessName") as string) || null,
-      businessType: (formData.get("businessType") as string) || "personal",
       taxNumber: (formData.get("taxNumber") as string) || null,
       address: (formData.get("address") as string) || null,
       bankAccount: (formData.get("bankAccount") as string) || null,
