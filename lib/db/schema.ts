@@ -79,7 +79,12 @@ export const invoices = pgTable("invoices", {
     .notNull()
     .references(() => clients.id),
   number: text("number").notNull(),
+  // Date of issue, "YYYY-MM-DD".
   date: text("date").notNull(),
+  // Date of supply ("ден на извршениот промет", VAT law Art. 53(10) point 4),
+  // "YYYY-MM-DD". Null only for rows written by older code; read it as
+  // coalesce(supply_date, date).
+  supplyDate: text("supply_date"),
   dueDate: text("due_date"),
   currency: text("currency").notNull().default("EUR"),
   exchangeRateMKD: doublePrecision("exchange_rate_mkd").notNull().default(1),

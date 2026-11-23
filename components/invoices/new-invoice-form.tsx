@@ -31,11 +31,17 @@ type LineItem = {
 export function NewInvoiceForm({
   clients,
   vatRegistered,
+  today,
+  dueDefault,
 }: {
   clients: { id: string; name: string; currency: string }[];
   // Only a VAT-registered user gets the DDV rate choice; the action forces
   // 0 for everyone else anyway.
   vatRegistered: boolean;
+  // "YYYY-MM-DD" in North Macedonia, from the server: the default invoice
+  // date, and the default due date 30 days later.
+  today: string;
+  dueDefault: string;
 }) {
   const t = useTranslations();
   const f = t.invoices.form;
@@ -44,6 +50,10 @@ export function NewInvoiceForm({
   ]);
   const [currency, setCurrency] = useState(clients[0]?.currency ?? "EUR");
   const [ddvRate, setDdvRate] = useState(0);
+  const [date, setDate] = useState(today);
+  // The date of supply follows the invoice date until it's changed by hand.
+  const [supplyDate, setSupplyDate] = useState(today);
+  const [supplyDateEdited, setSupplyDateEdited] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -52,9 +62,6 @@ export function NewInvoiceForm({
     { label: f.reducedDdv, value: DDV_RATE_REDUCED },
     { label: f.standardDdv, value: DDV_RATE_STANDARD },
   ];
-
-  const today = new Date().toISOString().split("T")[0];
-  const dueDefault = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
 
   const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   const ddvAmount = subtotal * ddvRate;
@@ -92,7 +99,6 @@ export function NewInvoiceForm({
     startTransition(async () => {
       const result = await createInvoice(fd);
       if (result?.errorKey) toast.error(f[result.errorKey]);
-      else if (result?.error) toast.error(result.error);
     });
   }
 
@@ -139,7 +145,34 @@ export function NewInvoiceForm({
           <Label htmlFor="date">
             {f.invoiceDate} <span className="text-destructive">*</span>
           </Label>
-          <Input id="date" name="date" type="date" defaultValue={today} required />
+          <Input
+            id="date"
+            name="date"
+            type="date"
+            value={date}
+            onChange={(e) => {
+              setDate(e.target.value);
+              if (!supplyDateEdited) setSupplyDate(e.target.value);
+            }}
+            required
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="supplyDate">
+            {f.supplyDate} <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="supplyDate"
+            name="supplyDate"
+            type="date"
+            value={supplyDate}
+            onChange={(e) => {
+              setSupplyDate(e.target.value);
+              setSupplyDateEdited(true);
+            }}
+            required
+          />
+          <p className="text-xs text-muted-foreground">{f.supplyDateHint}</p>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="dueDate">{f.dueDate}</Label>

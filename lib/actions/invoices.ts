@@ -8,12 +8,15 @@ import { generateId, generateInvoiceNumber } from "@/lib/utils";
 import { getRateToMKD, isDdvRate, isSupportedCurrency } from "@/lib/tax/calculator";
 import { eq, and } from "drizzle-orm";
 
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
 export async function createInvoice(formData: FormData) {
   const session = await getSession();
   if (!session) redirect("/sign-in");
 
   const clientId = formData.get("clientId") as string;
   const date = formData.get("date") as string;
+  const supplyDate = (formData.get("supplyDate") as string) || date;
   const dueDate = formData.get("dueDate") as string;
   const currency = formData.get("currency") as string;
   const notes = formData.get("notes") as string;
@@ -22,8 +25,14 @@ export async function createInvoice(formData: FormData) {
   const items: { description: string; quantity: number; unitPrice: number }[] =
     JSON.parse(itemsJson);
 
-  if (!clientId || !date || items.length === 0) {
-    return { error: "Client, date, and at least one item are required" };
+  if (
+    !clientId ||
+    !DATE_PATTERN.test(date) ||
+    !DATE_PATTERN.test(supplyDate) ||
+    (dueDate && !DATE_PATTERN.test(dueDate)) ||
+    items.length === 0
+  ) {
+    return { errorKey: "requiredFields" as const };
   }
 
   if (!isSupportedCurrency(currency)) {
@@ -52,7 +61,7 @@ export async function createInvoice(formData: FormData) {
     .where(and(eq(clients.id, clientId), eq(clients.userId, session.userId)))
     .limit(1);
   if (!ownClient) {
-    return { error: "Client, date, and at least one item are required" };
+    return { errorKey: "requiredFields" as const };
   }
 
   const existingInvoices = await getDb()
@@ -76,6 +85,7 @@ export async function createInvoice(formData: FormData) {
     clientId,
     number,
     date,
+    supplyDate,
     dueDate: dueDate || null,
     currency,
     exchangeRateMKD: rate,

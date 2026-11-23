@@ -214,6 +214,9 @@ export const mk: Dictionary = {
       client: "Клиент",
       currency: "Валута",
       invoiceDate: "Датум на фактура",
+      supplyDate: "Датум на промет",
+      supplyDateHint:
+        "Кога е извршена услугата или испорачана стоката; обично истиот ден како фактурата.",
       dueDate: "Рок на плаќање",
       lineItems: "Ставки",
       approximateRate: "1 {currency} = {rate} MKD (приближен курс)",
@@ -238,6 +241,7 @@ export const mk: Dictionary = {
       submit: "Креирај фактура",
       fillItems: "Пополнете ги сите ставки со опис и цена",
       currencyUnsupported: "Оваа валута не е поддржана. Изберете една од понудените валути.",
+      requiredFields: "Изберете клиент, внесете ги датумите и додајте барем една ставка.",
     },
     status: {
       draft: "Нацрт",

@@ -182,6 +182,8 @@ export type Dictionary = {
       client: string;
       currency: string;
       invoiceDate: string;
+      supplyDate: string;
+      supplyDateHint: string;
       dueDate: string;
       lineItems: string;
       approximateRate: string;
@@ -204,6 +206,7 @@ export type Dictionary = {
       submit: string;
       fillItems: string;
       currencyUnsupported: string;
+      requiredFields: string;
     };
     status: {
       draft: string;

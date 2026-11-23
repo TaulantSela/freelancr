@@ -43,6 +43,13 @@
       "when": 1795457758420,
       "tag": "0005_user_vat_registration",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795457877352,
+      "tag": "0006_invoice_supply_date",
+      "breakpoints": true
     }
   ]
 }

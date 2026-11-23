@@ -214,6 +214,9 @@ export const en: Dictionary = {
       client: "Client",
       currency: "Currency",
       invoiceDate: "Invoice date",
+      supplyDate: "Date of supply",
+      supplyDateHint:
+        "When the work was done or the goods delivered; usually the invoice date.",
       dueDate: "Due date",
       lineItems: "Line items",
       approximateRate: "1 {currency} = {rate} MKD (approximate rate)",
@@ -238,6 +241,7 @@ export const en: Dictionary = {
       submit: "Create invoice",
       fillItems: "Fill in all line items with a description and price",
       currencyUnsupported: "This currency isn't supported. Choose one of the listed currencies.",
+      requiredFields: "Choose a client, set the dates and add at least one line item.",
     },
     status: {
       draft: "Draft",

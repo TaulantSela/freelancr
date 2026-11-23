@@ -8,6 +8,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { NewInvoiceForm } from "@/components/invoices/new-invoice-form";
 import { getTranslations } from "@/lib/i18n/server";
+import { addDays, toSkopjeDate } from "@/lib/tax/calculator";
 
 export default async function NewInvoicePage() {
   const session = await getSession();
@@ -19,6 +20,8 @@ export default async function NewInvoicePage() {
     .select({ id: clients.id, name: clients.name, currency: clients.currency })
     .from(clients)
     .where(eq(clients.userId, session.userId));
+
+  const today = toSkopjeDate(new Date());
 
   const [user] = await getDb()
     .select({ vatRegistered: users.vatRegistered })
@@ -51,7 +54,12 @@ export default async function NewInvoicePage() {
               </Link>
             </div>
           ) : (
-            <NewInvoiceForm clients={clientList} vatRegistered={user?.vatRegistered ?? false} />
+            <NewInvoiceForm
+              clients={clientList}
+              vatRegistered={user?.vatRegistered ?? false}
+              today={today}
+              dueDefault={addDays(today, 30)}
+            />
           )}
         </CardContent>
       </Card>

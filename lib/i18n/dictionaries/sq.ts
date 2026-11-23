@@ -214,6 +214,8 @@ export const sq: Dictionary = {
       client: "Klienti",
       currency: "Monedha",
       invoiceDate: "Data e faturës",
+      supplyDate: "Data e furnizimit",
+      supplyDateHint: "Kur u krye shërbimi ose u dorëzua malli; zakonisht data e faturës.",
       dueDate: "Afati i pagesës",
       lineItems: "Artikujt",
       approximateRate: "1 {currency} = {rate} MKD (kurs i përafërt)",
@@ -238,6 +240,7 @@ export const sq: Dictionary = {
       submit: "Krijo faturë",
       fillItems: "Plotëso të gjithë artikujt me përshkrim dhe çmim",
       currencyUnsupported: "Kjo monedhë nuk mbështetet. Zgjidh një nga monedhat e listuara.",
+      requiredFields: "Zgjidh klientin, vendos datat dhe shto të paktën një artikull.",
     },
     status: {
       draft: "Draft",

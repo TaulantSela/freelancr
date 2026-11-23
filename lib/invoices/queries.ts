@@ -6,6 +6,8 @@ export type InvoiceDetail = {
     id: string;
     number: string;
     date: string;
+    // The date of supply; the invoice date for rows saved without one.
+    supplyDate: string;
     dueDate: string | null;
     currency: string;
     exchangeRateMKD: number;
@@ -75,6 +77,7 @@ export async function getInvoiceDetail(
       id: row.invoice.id,
       number: row.invoice.number,
       date: row.invoice.date,
+      supplyDate: row.invoice.supplyDate ?? row.invoice.date,
       dueDate: row.invoice.dueDate,
       currency: row.invoice.currency,
       exchangeRateMKD: row.invoice.exchangeRateMKD,

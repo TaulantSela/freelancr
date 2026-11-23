@@ -108,6 +108,10 @@ export default async function InvoiceDetailPage({
               <p className="text-xs text-muted-foreground">{t.invoices.form.invoiceDate}</p>
               <p className="font-medium">{formatDate(invoice.date)}</p>
             </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{t.invoices.form.supplyDate}</p>
+              <p className="font-medium">{formatDate(invoice.supplyDate)}</p>
+            </div>
             {invoice.dueDate && (
               <div>
                 <p className="text-xs text-muted-foreground">{t.invoices.form.dueDate}</p>

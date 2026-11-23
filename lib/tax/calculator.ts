@@ -428,6 +428,12 @@ export function getOwedToUjp(
   };
 }
 
+// "YYYY-MM-DD" plus a number of days, e.g. ("2026-12-20", 30) -> "2027-01-19".
+export function addDays(date: string, days: number): string {
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+}
+
 // Whole days from one "YYYY-MM-DD" date to another; negative if `to` is
 // earlier.
 export function daysBetween(from: string, to: string): number {
