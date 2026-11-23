@@ -93,10 +93,10 @@ export const en: Dictionary = {
       "Your supplies in North Macedonia this year are over the 2,000,000 MKD DDV threshold. Once you pass it, you have to apply for DDV registration by the 15th of the next month (VAT law Art. 51(11)). Talk to your accountant.",
     ddvAlertWarning:
       "Your supplies in North Macedonia are at {pct}% of the DDV threshold: {remaining} left before you must register for DDV.",
-    annualIncome: "Annual income",
-    paidInvoicesYear: "Paid invoices, {year}",
+    receivedIn: "Received in {year}",
+    paymentsCount: "{count} payment(s)",
     outstanding: "Outstanding",
-    awaitingPayment: "invoices awaiting payment",
+    awaitingPayment: "{count} invoice(s) awaiting payment",
     ddvMonitor: "DDV Threshold Monitor",
     ddvSafe: "Safe",
     ddvWarning: "Warning",
@@ -117,6 +117,13 @@ export const en: Dictionary = {
     recentInvoices: "Recent Invoices",
     noInvoices: "No invoices yet",
     createFirst: "Create first invoice",
+    owedLateMonths: "{count} month(s) late",
+    owedSoFarNote: "{month} so far · pay by {date}",
+    owedNothingShort: "Nothing to pay",
+    notFiledBy: "The calculation wasn't filed by {date}",
+    notPaidBy: "The tax wasn't paid by {date}",
+    alreadyPaidYear: "Already paid for you in {year}",
+    balanceLeft: "{amount} to pay",
   },
   clients: {
     title: "Clients",
@@ -270,13 +277,6 @@ export const en: Dictionary = {
       fillItems: "Fill in all line items with a description and price",
       currencyUnsupported: "This currency isn't supported. Choose one of the listed currencies.",
       requiredFields: "Choose a client, set the dates and add at least one line item.",
-    },
-    status: {
-      draft: "Draft",
-      sent: "Issued",
-      paid: "Paid",
-      overdue: "Overdue",
-      cancelled: "Cancelled",
     },
     standing: {
       draft: "Draft",
@@ -593,7 +593,7 @@ export const en: Dictionary = {
     basedOn: "Deadlines for: {status}.",
     changeInSettings: "Change in Settings",
     noUpcoming:
-      "No tax deadline coming up. Once a client abroad or a private person in North Macedonia pays an invoice and you mark it paid, that month's deadlines show up here.",
+      "No tax deadline coming up. Once you record a payment from a client abroad or a private person in North Macedonia, that month's deadlines show up here.",
     noneInYear:
       "None yet. Deadlines show up for each month in which a client abroad or a private person in North Macedonia paid you.",
     then: "Then: {label}, {date}",
@@ -605,9 +605,11 @@ export const en: Dictionary = {
       soFar: "{month} so far",
       fileAndPay: "File the calculation (е-ПДД) by {reportBy}, pay by {payBy}",
       nothing:
-        "Nothing to pay yet. When a client abroad or a private person in North Macedonia pays an invoice and you mark it paid, the tax on it (10%) shows up here.",
+        "Nothing to pay. When you record a payment from a client abroad or a private person in North Macedonia, the tax on it shows up here.",
       note:
-        "Approximate: 10% of what these clients paid, at the exchange rate stored on each invoice. UJP converts at the National Bank's (NBRSM) middle rate on the day the money arrived, which the app doesn't use yet, and income from author's rights is taxed after deemed costs (Personal Income Tax law, Art. 40), so this can be more than you owe. The calculation UJP approves is the real figure.",
+        "Worked out from the payments you recorded, each converted at the National Bank's middle rate on the day it arrived, as UJP does. The calculation UJP approves is the final figure: pay the amount on its payment order (ПП53).",
+      noteApproximate:
+        "Approximate: some of these payments use a rate other than the National Bank's for their day (the invoice's rate, or one typed in). Switch them to the National Bank's rates on the Payments page. The calculation UJP approves is the final figure.",
       groupAmount: "Tax: {amount}",
       advanceTile: "Advance due by {date}",
       advanceHint:

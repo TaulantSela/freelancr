@@ -14,7 +14,7 @@ export const DDV_THRESHOLD_MKD = 2_000_000;
 // 274/2022). PwC Worldwide Tax Summaries (reviewed 23 July 2026) lists the
 // same flat 10% for self-employment income:
 // https://taxsummaries.pwc.com/north-macedonia/individual/taxes-on-personal-income
-// getMonthlyTaxOwed() below applies it to the gross amount clients paid.
+// lib/tax/payments.ts applies it to each self-reported payment.
 export const PERSONAL_INCOME_TAX_RATE = 0.1;
 
 // How a user is registered for tax, which decides their UJP deadlines. They
@@ -220,7 +220,6 @@ function compareDeadlines(a: TaxDeadline, b: TaxDeadline): number {
 }
 
 const MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 function pad2(n: number): string {
   return String(n).padStart(2, "0");
@@ -283,7 +282,7 @@ export function getTaxDeadlinesForTaxYear(
   return deadlines.sort(compareDeadlines);
 }
 
-// The Income & Tax page's list for `year`: every deadline due from 1 January
+// The Payments page's list for `year`: every deadline due from 1 January
 // of `year`, which covers the last of the previous tax year (December's
 // report or advance, the annual balance) and all of `year`'s own, including
 // the ones that fall early the next year.
@@ -369,158 +368,6 @@ export function toSkopjeDate(moment: Date): string {
     parts[part.type] = part.value;
   }
   return `${parts.year}-${parts.month}-${parts.day}`;
-}
-
-export type PaidInvoiceDates = {
-  // When the invoice was marked paid: an ISO timestamp in UTC (the demo data
-  // stores a plain date). The app sets it whenever the status becomes paid,
-  // so null would mean the row was marked paid some other way.
-  paidAt: string | null;
-  // The invoice date, "YYYY-MM-DD".
-  date: string;
-};
-
-// The date an invoice's income was received. The app records payment only by
-// the moment the invoice is marked paid (paidAt), so that's the best date it
-// has; an invoice without one falls back to its invoice date.
-export function getPaymentDate(invoice: PaidInvoiceDates): string {
-  const { paidAt } = invoice;
-  if (paidAt) {
-    if (DATE_PATTERN.test(paidAt)) return paidAt;
-    const moment = new Date(paidAt);
-    if (!Number.isNaN(moment.getTime())) return toSkopjeDate(moment);
-  }
-  return invoice.date.slice(0, 10);
-}
-
-// Whether the freelancer reports the income tax on what a client pays, rather
-// than the client withholding it (Personal Income Tax law, "ЗДЛД"):
-// - a client outside North Macedonia: income from abroad (Art. 87(1) point 3);
-// - a private person in North Macedonia: income from occasional services to
-//   natural persons (Art. 87(1) point 6), since only a payer that keeps
-//   business books withholds (Art. 80(1));
-// - a company in North Macedonia keeps business books and withholds the tax
-//   when it pays (Art. 80(1)), so its invoices are not self-reported.
-// Both self-reported kinds have the same deadlines: the calculation by the
-// 10th of the next month (Art. 88(1) points 4 and 7), the tax by the 15th
-// (Art. 93(1)).
-export function isSelfReportedIncome(client: {
-  clientCountry: string;
-  clientType: string;
-}): boolean {
-  return client.clientCountry !== "MK" || client.clientType === "person";
-}
-
-// The months ("YYYY-MM") in which self-reported income was received (a paid
-// invoice to a client abroad or to a private person in North Macedonia),
-// oldest first. A company in North Macedonia withholds the tax itself, so its
-// invoices don't add a month.
-export function getSelfReportedIncomeMonths(
-  paidInvoices: readonly (PaidInvoiceDates & {
-    clientCountry: string;
-    clientType: string;
-  })[]
-): string[] {
-  const months = new Set<string>();
-  for (const invoice of paidInvoices) {
-    if (!isSelfReportedIncome(invoice)) continue;
-    months.add(getPaymentDate(invoice).slice(0, 7));
-  }
-  return [...months].sort();
-}
-
-// ---------------------------------------------------------------------------
-// What's owed to UJP (not registered for an activity)
-//
-// For each month in which self-reported income was received, the tax is 10%
-// of it (ЗДЛД Art. 11(1), Art. 87(2)), with the calculation due by the 10th
-// of the following month (Art. 88(1) points 4 and 7) and the tax by the 15th
-// (Art. 93(1)). It's an approximation, and the UI says so:
-// - it converts at the rate stored on each invoice, while UJP uses the
-//   National Bank's (NBRSM) middle rate on the day the income was received
-//   (Art. 93(2));
-// - it taxes the gross amount, while income from author's rights is taxed
-//   after deemed costs of 20-50% (Art. 40), so it can overstate the tax;
-// - UJP's approved calculation is the real figure (Art. 88(4)).
-// A registered self-employed person pays a monthly advance instead: 1/12 of
-// the tax in last year's annual balance (Art. 94(1)), which the app can't
-// work out; they enter it in Settings.
-// ---------------------------------------------------------------------------
-
-export type SelfReportedPayment = PaidInvoiceDates & {
-  clientCountry: string;
-  clientType: string;
-  // The invoice's amount before VAT, in MKD at the rate stored on the
-  // invoice: subtotal x exchange rate.
-  amountMKD: number;
-};
-
-export type MonthlyTaxOwed = {
-  // "YYYY-MM": the month the income was received in (Skopje time).
-  month: string;
-  // Self-reported income received that month, in MKD.
-  incomeMKD: number;
-  // 10% of it, rounded to the deni.
-  taxMKD: number;
-  // "YYYY-MM-DD": submit the calculation (е-ПДД) by this date...
-  reportBy: string;
-  // ...and pay the tax by this one.
-  payBy: string;
-};
-
-function roundToDeni(amount: number): number {
-  return Math.round(amount * 100) / 100;
-}
-
-// The tax on one month's self-reported income and its two deadlines.
-export function taxOwedForMonth(month: string, incomeMKD: number): MonthlyTaxOwed {
-  const next = followingMonth(month);
-  return {
-    month,
-    incomeMKD: roundToDeni(incomeMKD),
-    taxMKD: roundToDeni(incomeMKD * PERSONAL_INCOME_TAX_RATE),
-    reportBy: `${next}-${pad2(ABROAD_REPORT_DAY)}`,
-    payBy: `${next}-${pad2(ABROAD_PAYMENT_DAY)}`,
-  };
-}
-
-// One entry per month with self-reported income, oldest first. Invoices to
-// companies in North Macedonia are left out: those companies withhold the tax.
-export function getMonthlyTaxOwed(
-  payments: readonly SelfReportedPayment[]
-): MonthlyTaxOwed[] {
-  const byMonth = new Map<string, number>();
-  for (const payment of payments) {
-    if (!isSelfReportedIncome(payment)) continue;
-    const month = getPaymentDate(payment).slice(0, 7);
-    byMonth.set(month, (byMonth.get(month) ?? 0) + payment.amountMKD);
-  }
-  return [...byMonth.keys()]
-    .sort()
-    .map((month) => taxOwedForMonth(month, byMonth.get(month)!));
-}
-
-export type OwedToUjp = {
-  // Last month's tax while it isn't due yet (until the 15th), if there was
-  // any self-reported income last month; otherwise null.
-  due: MonthlyTaxOwed | null;
-  // This month's tax so far, due next month. Zero if nothing yet.
-  current: MonthlyTaxOwed;
-};
-
-// What the dashboard shows on `today` ("YYYY-MM-DD"): the payment coming up
-// for last month, and this month's running amount.
-export function getOwedToUjp(
-  payments: readonly SelfReportedPayment[],
-  today: string
-): OwedToUjp {
-  const monthly = getMonthlyTaxOwed(payments);
-  const currentMonth = today.slice(0, 7);
-  return {
-    due: monthly.find((m) => m.month < currentMonth && m.payBy >= today) ?? null,
-    current:
-      monthly.find((m) => m.month === currentMonth) ?? taxOwedForMonth(currentMonth, 0),
-  };
 }
 
 // "YYYY-MM-DD" plus a number of days, e.g. ("2026-12-20", 30) -> "2027-01-19".

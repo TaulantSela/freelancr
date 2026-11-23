@@ -70,8 +70,8 @@ export type Dictionary = {
     newInvoice: string;
     ddvAlertExceeded: string;
     ddvAlertWarning: string;
-    annualIncome: string;
-    paidInvoicesYear: string;
+    receivedIn: string;
+    paymentsCount: string;
     outstanding: string;
     awaitingPayment: string;
     ddvMonitor: string;
@@ -93,6 +93,13 @@ export type Dictionary = {
     recentInvoices: string;
     noInvoices: string;
     createFirst: string;
+    owedLateMonths: string;
+    owedSoFarNote: string;
+    owedNothingShort: string;
+    notFiledBy: string;
+    notPaidBy: string;
+    alreadyPaidYear: string;
+    balanceLeft: string;
   };
   clients: {
     title: string;
@@ -233,13 +240,6 @@ export type Dictionary = {
       fillItems: string;
       currencyUnsupported: string;
       requiredFields: string;
-    };
-    status: {
-      draft: string;
-      sent: string;
-      paid: string;
-      overdue: string;
-      cancelled: string;
     };
     standing: {
       draft: string;
@@ -506,6 +506,7 @@ export type Dictionary = {
       fileAndPay: string;
       nothing: string;
       note: string;
+      noteApproximate: string;
       groupAmount: string;
       advanceTile: string;
       advanceHint: string;

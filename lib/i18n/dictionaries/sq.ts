@@ -93,10 +93,10 @@ export const sq: Dictionary = {
       "Furnizimet e tua në Maqedoninë e Veriut këtë vit e kanë kaluar pragun e TVSH-së prej 2.000.000 MKD. Pasi e kalon, kërkesa për regjistrim për TVSH dorëzohet deri më 15 të muajit pasues (Ligji për TVSH, neni 51 paragrafi 11). Fol me kontabilistin.",
     ddvAlertWarning:
       "Furnizimet e tua në Maqedoninë e Veriut janë në {pct}% të pragut të TVSH-së: mbeten {remaining} para regjistrimit të detyrueshëm për TVSH.",
-    annualIncome: "Të ardhurat vjetore",
-    paidInvoicesYear: "Fatura të paguara, {year}",
+    receivedIn: "Pranuar në {year}",
+    paymentsCount: "{count} pagesë(a)",
     outstanding: "Të papaguara",
-    awaitingPayment: "fatura në pritje pagese",
+    awaitingPayment: "{count} faturë(a) në pritje pagese",
     ddvMonitor: "Monitor i pragut TVSH",
     ddvSafe: "Sigurt",
     ddvWarning: "Paralajmërim",
@@ -117,6 +117,13 @@ export const sq: Dictionary = {
     recentInvoices: "Faturat e fundit",
     noInvoices: "Ende nuk ka fatura",
     createFirst: "Krijo faturën e parë",
+    owedLateMonths: "Muaj me vonesë: {count}",
+    owedSoFarNote: "Deri tani në muajin {month} · paguaj deri më {date}",
+    owedNothingShort: "S'ka asgjë për të paguar",
+    notFiledBy: "Llogaritja nuk u dorëzua deri më {date}",
+    notPaidBy: "Tatimi nuk u pagua deri më {date}",
+    alreadyPaidYear: "Paguar tashmë në emrin tënd në {year}",
+    balanceLeft: "Mbeten {amount}",
   },
   clients: {
     title: "Klientët",
@@ -269,13 +276,6 @@ export const sq: Dictionary = {
       fillItems: "Plotëso të gjithë artikujt me përshkrim dhe çmim",
       currencyUnsupported: "Kjo monedhë nuk mbështetet. Zgjidh një nga monedhat e listuara.",
       requiredFields: "Zgjidh klientin, vendos datat dhe shto të paktën një artikull.",
-    },
-    status: {
-      draft: "Draft",
-      sent: "Lëshuar",
-      paid: "Paguar",
-      overdue: "Vonuar",
-      cancelled: "Anuluar",
     },
     standing: {
       draft: "Draft",
@@ -595,7 +595,7 @@ export const sq: Dictionary = {
     basedOn: "Afatet për: {status}.",
     changeInSettings: "Ndrysho te Cilësimet",
     noUpcoming:
-      "Nuk ka afat tatimor të afërt. Kur një klient nga jashtë ose një person fizik në Maqedoninë e Veriut paguan një faturë dhe e shënon si të paguar, afatet e atij muaji shfaqen këtu.",
+      "Nuk ka afat tatimor të afërt. Kur regjistron një pagesë nga një klient jashtë vendit ose nga një person fizik në Maqedoninë e Veriut, afatet e atij muaji shfaqen këtu.",
     noneInYear:
       "Ende asnjë. Afatet shfaqen për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut.",
     then: "Pastaj: {label}, {date}",
@@ -608,9 +608,11 @@ export const sq: Dictionary = {
       fileAndPay:
         "Dorëzo llogaritjen (е-ПДД) deri më {reportBy}, paguaj deri më {payBy}",
       nothing:
-        "Ende s'ka asgjë për të paguar. Kur një klient nga jashtë ose një person fizik në Maqedoninë e Veriut paguan një faturë dhe e shënon si të paguar, tatimi mbi të (10%) shfaqet këtu.",
+        "S'ka asgjë për të paguar. Kur regjistron një pagesë nga një klient jashtë vendit ose nga një person fizik në Maqedoninë e Veriut, tatimi mbi të shfaqet këtu.",
       note:
-        "Përafërsisht: 10% e asaj që kanë paguar këta klientë, me kursin e ruajtur në çdo faturë. UJP konverton me kursin mesatar të Bankës Popullore (NBRSM) në ditën kur arritën paratë, të cilin aplikacioni ende nuk e përdor, dhe të ardhurat nga të drejtat e autorit tatohen pas shpenzimeve të normuara (Ligji për tatimin mbi të ardhurat personale, neni 40), ndaj shuma mund të jetë më e madhe se sa detyrohesh. Shuma e vërtetë është ajo në llogaritjen që e miraton UJP.",
+        "Llogaritur nga pagesat që ke regjistruar, secila me kursin mesatar të Bankës Popullore në ditën kur arriti, ashtu siç konverton UJP. Shuma përfundimtare është ajo në llogaritjen që e miraton UJP: paguaj shumën nga urdhëresa e pagesës (ПП53).",
+      noteApproximate:
+        "Përafërsisht: disa nga këto pagesa përdorin kurs tjetër nga ai i Bankës Popullore për ditën e tyre (kursin e faturës ose një të shkruar me dorë). Kaloji në kurset e Bankës Popullore te faqja „Pagesat”. Shuma përfundimtare është ajo në llogaritjen që e miraton UJP.",
       groupAmount: "Tatimi: {amount}",
       advanceTile: "Akontimi deri më {date}",
       advanceHint:
