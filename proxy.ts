@@ -5,6 +5,11 @@ import { getSessionSecret } from "@/lib/env";
 
 const SESSION_COOKIE = "freelancr_session";
 
+// Checks the session token's signature only; pages check it against the
+// database (lib/auth/session.ts), which can end a session this lets
+// through. Signed-in visitors to /sign-in and /sign-up are sent on by the
+// (auth) layout, which can tell a current session from a stale one; doing
+// it here would bounce a stale one back and forth.
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -13,17 +18,7 @@ export async function proxy(request: NextRequest) {
 
   const token = request.cookies.get(SESSION_COOKIE)?.value;
 
-  if (isPublic) {
-    if (token && (pathname === "/sign-in" || pathname === "/sign-up")) {
-      try {
-        await jwtVerify(token, getSessionSecret());
-        return NextResponse.redirect(new URL("/dashboard", request.url));
-      } catch {
-        // Invalid token, let them through
-      }
-    }
-    return NextResponse.next();
-  }
+  if (isPublic) return NextResponse.next();
 
   if (!token) {
     return NextResponse.redirect(new URL("/sign-in", request.url));

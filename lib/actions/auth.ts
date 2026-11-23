@@ -6,7 +6,7 @@ import { getDb, users } from "@/lib/db";
 import { createSession, deleteSession, getSession } from "@/lib/auth/session";
 import { BCRYPT_COST, MIN_PASSWORD_LENGTH } from "@/lib/auth/password";
 import { generateId } from "@/lib/utils";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { AuthErrorKey } from "@/lib/i18n/format";
 
 export async function signUp(formData: FormData) {
@@ -34,7 +34,7 @@ export async function signUp(formData: FormData) {
 
   await getDb().insert(users).values({ id, email, passwordHash, name });
 
-  await createSession({ userId: id, email, name });
+  await createSession({ userId: id, email, name, sv: 0 });
   redirect("/dashboard");
 }
 
@@ -58,7 +58,12 @@ export async function signIn(formData: FormData) {
     return { errorKey: "invalidCredentials" as AuthErrorKey };
   }
 
-  await createSession({ userId: user.id, email: user.email, name: user.name });
+  await createSession({
+    userId: user.id,
+    email: user.email,
+    name: user.name,
+    sv: user.sessionVersion,
+  });
   redirect("/dashboard");
 }
 
@@ -68,8 +73,9 @@ export type ChangePasswordState =
   | null;
 
 // Changes the signed-in user's password: the current one has to match, and
-// the new one follows the sign-up rules (length, bcrypt cost). Other
-// sessions stay signed in (sessions are signed cookies, not stored).
+// the new one follows the sign-up rules (length, bcrypt cost). It bumps the
+// session version, which signs out every other session; this one gets a
+// fresh token.
 export async function changePassword(
   _prev: ChangePasswordState,
   formData: FormData
@@ -95,10 +101,20 @@ export async function changePassword(
     return { errorKey: "wrongCurrent" };
   }
 
-  await getDb()
+  const [updated] = await getDb()
     .update(users)
-    .set({ passwordHash: await bcrypt.hash(next, BCRYPT_COST) })
-    .where(eq(users.id, session.userId));
+    .set({
+      passwordHash: await bcrypt.hash(next, BCRYPT_COST),
+      sessionVersion: sql`${users.sessionVersion} + 1`,
+    })
+    .where(eq(users.id, session.userId))
+    .returning({ sessionVersion: users.sessionVersion });
+  await createSession({
+    userId: session.userId,
+    email: session.email,
+    name: session.name,
+    sv: updated.sessionVersion,
+  });
   return { changed: true };
 }
 

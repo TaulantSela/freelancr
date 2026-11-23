@@ -70,6 +70,9 @@ export const users = pgTable("users", {
   // per-visitor sandboxes): it can't change its password, reset it, send
   // email or get reminders.
   isDemo: boolean("is_demo").notNull().default(false),
+  // Carried in the session token as `sv`; a password change or reset bumps
+  // it, which ends every session issued before (lib/auth/session.ts).
+  sessionVersion: integer("session_version").notNull().default(0),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 });
 
