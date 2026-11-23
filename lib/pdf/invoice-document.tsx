@@ -8,25 +8,18 @@ import {
 } from "@react-pdf/renderer";
 import type { InvoiceDetail } from "@/lib/invoices/queries";
 
+// Noto Sans, the full font: Latin (with ë, ç, č, š, ...), Cyrillic and Greek
+// in one file per weight. react-pdf uses one file per family and weight, so
+// registering the per-script subset files under one family drew every
+// Cyrillic invoice with Latin glyphs (unreadable). Pinned to a release of
+// Google's Noto fonts.
+const NOTO_SANS =
+  "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io@NotoSans-v2.013/fonts/NotoSans/unhinted/ttf";
 Font.register({
   family: "NotoSans",
   fonts: [
-    {
-      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans@latest/latin-400-normal.ttf",
-      fontWeight: 400,
-    },
-    {
-      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans@latest/latin-700-normal.ttf",
-      fontWeight: 700,
-    },
-    {
-      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans@latest/cyrillic-400-normal.ttf",
-      fontWeight: 400,
-    },
-    {
-      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans@latest/cyrillic-700-normal.ttf",
-      fontWeight: 700,
-    },
+    { src: `${NOTO_SANS}/NotoSans-Regular.ttf`, fontWeight: 400 },
+    { src: `${NOTO_SANS}/NotoSans-Bold.ttf`, fontWeight: 700 },
   ],
 });
 
@@ -46,7 +39,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: 700,
-    marginBottom: 4,
+    lineHeight: 1.2,
+    marginBottom: 6,
   },
   subtitle: {
     fontSize: 10,
