@@ -3,6 +3,7 @@ import { getDb, invoices, clients } from "@/lib/db";
 import { eq, and, gte } from "drizzle-orm";
 import {
   getDDVStatus,
+  getLocalSupplies,
   getTaxCalendar,
   groupTaxDeadlines,
   getSelfReportedIncomeMonths,
@@ -13,7 +14,11 @@ import {
   formatMKD,
   DDV_THRESHOLD_MKD,
 } from "@/lib/tax/calculator";
-import { getTaxProfile, getPaidInvoicesForDeadlines } from "@/lib/tax/queries";
+import {
+  getTaxProfile,
+  getPaidInvoicesForDeadlines,
+  getInvoicesForThreshold,
+} from "@/lib/tax/queries";
 import {
   formatTaxDate,
   formatTaxPeriod,
@@ -61,14 +66,21 @@ export default async function IncomePage() {
     .orderBy(invoices.date);
 
   const annualIncomeMKD = paidInvoices.reduce((s, i) => s + i.totalMKD, 0);
-  const ddvStatus = getDDVStatus(annualIncomeMKD);
 
   // UJP deadlines due from 1 January, for how the user is registered for tax.
   // When not registered, they follow the month each invoice was paid in,
   // which can differ from the invoice date the breakdowns below use, and each
   // month's group shows 10% of that month's self-reported income.
   const today = toSkopjeDate(new Date());
-  const { taxStatus, monthlyAdvanceMKD } = await getTaxProfile(session.userId);
+  const { taxStatus, monthlyAdvanceMKD, vatRegistered } = await getTaxProfile(session.userId);
+
+  // The DDV threshold: this year's supplies in North Macedonia only, hidden
+  // once registered for VAT or while there are none (see getLocalSupplies).
+  const localSupplies = vatRegistered
+    ? { totalMKD: 0, count: 0 }
+    : getLocalSupplies(await getInvoicesForThreshold(session.userId, year), year);
+  const showDdv = !vatRegistered && localSupplies.count > 0;
+  const ddvStatus = getDDVStatus(localSupplies.totalMKD);
   const notRegistered = taxStatus === "paid_from_abroad";
   const payments = notRegistered
     ? await getPaidInvoicesForDeadlines(session.userId, year)
@@ -90,9 +102,9 @@ export default async function IncomePage() {
   };
 
   const alertItems = [
-    { label: t.income.alert70, threshold: DDV_THRESHOLD_MKD * 0.7, reached: annualIncomeMKD >= DDV_THRESHOLD_MKD * 0.7 },
-    { label: t.income.alert85, threshold: DDV_THRESHOLD_MKD * 0.85, reached: annualIncomeMKD >= DDV_THRESHOLD_MKD * 0.85 },
-    { label: t.income.alert100, threshold: DDV_THRESHOLD_MKD, reached: annualIncomeMKD >= DDV_THRESHOLD_MKD },
+    { label: t.income.alert70, threshold: DDV_THRESHOLD_MKD * 0.7, reached: localSupplies.totalMKD >= DDV_THRESHOLD_MKD * 0.7 },
+    { label: t.income.alert85, threshold: DDV_THRESHOLD_MKD * 0.85, reached: localSupplies.totalMKD >= DDV_THRESHOLD_MKD * 0.85 },
+    { label: t.income.alert100, threshold: DDV_THRESHOLD_MKD, reached: ddvStatus.mustRegister },
   ];
 
   // Income by currency
@@ -142,7 +154,7 @@ export default async function IncomePage() {
       </div>
 
       {/* Top stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className={cn("grid grid-cols-2 gap-4", showDdv && "md:grid-cols-3")}>
         <Card>
           <CardContent className="pt-5">
             <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
@@ -185,23 +197,25 @@ export default async function IncomePage() {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-5">
-            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-              {t.income.ddvThresholdPct}
-            </div>
-            <div className="text-lg font-mono font-semibold">
-              {ddvStatus.percentage.toFixed(1)}%
-            </div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              {formatMKD(ddvStatus.remaining)} {t.dashboard.remaining}
-            </div>
-          </CardContent>
-        </Card>
+        {showDdv && (
+          <Card>
+            <CardContent className="pt-5">
+              <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                {t.income.ddvThresholdPct}
+              </div>
+              <div className="text-lg font-mono font-semibold">
+                {ddvStatus.percentage.toFixed(1)}%
+              </div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                {formatMKD(ddvStatus.remaining)} {t.dashboard.remaining}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      <div className="grid gap-4">
-        {/* DDV Tracker */}
+      {/* DDV Tracker */}
+      {showDdv && (
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center justify-between">
@@ -218,7 +232,7 @@ export default async function IncomePage() {
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-muted-foreground">{t.income.currentAnnual}</span>
-                <span className="font-mono text-sm">{formatMKD(annualIncomeMKD)}</span>
+                <span className="font-mono text-sm">{formatMKD(localSupplies.totalMKD)}</span>
               </div>
               <div className="h-3 bg-muted rounded-full overflow-hidden">
                 <div
@@ -250,6 +264,8 @@ export default async function IncomePage() {
               ))}
             </div>
 
+            <p className="text-xs text-muted-foreground">{t.dashboard.ddvLocalOnly}</p>
+
             {ddvStatus.alertLevel !== "safe" && (
               <div className="flex items-start gap-2 text-xs bg-yellow-500/10 text-yellow-400 rounded px-3 py-2">
                 <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
@@ -264,7 +280,7 @@ export default async function IncomePage() {
             )}
           </CardContent>
         </Card>
-      </div>
+      )}
 
       <Card>
         <CardHeader className="pb-2">

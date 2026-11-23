@@ -68,7 +68,7 @@ export const sq: Dictionary = {
       },
       {
         title: "Monitorim i pragut TVSH",
-        desc: "Ndjekje në kohë reale kundrejt pragut 2.000.000 MKD me alarme në 70%, 85% dhe 100%.",
+        desc: "Ndjek faturat për klientët në Maqedoninë e Veriut kundrejt pragut 2.000.000 MKD, me alarme në 70%, 85% dhe 100%. Shërbimet për klientët jashtë vendit nuk numërohen.",
       },
       {
         title: "Kalendar i afateve tatimore",
@@ -90,9 +90,9 @@ export const sq: Dictionary = {
     welcome: "Mirë se u ktheve, {name}. Ja përmbledhja jote për {year}.",
     newInvoice: "Faturë e re",
     ddvAlertExceeded:
-      "Ke tejkaluar pragun vjetor TVSH prej 2.000.000 MKD. Mund të duhet regjistrim TVSH.",
+      "Furnizimet e tua në Maqedoninë e Veriut këtë vit e kanë kaluar pragun e TVSH-së prej 2.000.000 MKD. Pasi e kalon, kërkesa për regjistrim për TVSH dorëzohet deri më 15 të muajit pasues (Ligji për TVSH, neni 51 paragrafi 11). Fol me kontabilistin.",
     ddvAlertWarning:
-      "Je në {pct}% të pragut TVSH. {remaining} mbeten para regjistrimit të detyrueshëm TVSH.",
+      "Furnizimet e tua në Maqedoninë e Veriut janë në {pct}% të pragut të TVSH-së: mbeten {remaining} para regjistrimit të detyrueshëm për TVSH.",
     annualIncome: "Të ardhurat vjetore",
     paidInvoicesYear: "Fatura të paguara, {year}",
     outstanding: "Të papaguara",
@@ -102,12 +102,14 @@ export const sq: Dictionary = {
     ddvWarning: "Paralajmërim",
     ddvCritical: "Kritik — vepro",
     ddvExceeded: "Pragu tejkaluar",
-    annualIncomeMkd: "Të ardhurat vjetore (MKD)",
+    localSupplies: "Furnizimet në Maqedoninë e Veriut, {year}",
     ddvThreshold: "Pragu TVSH",
     remaining: "mbeten",
     ddvStatus: "Statusi aktual",
     mustRegister: "Duhet regjistrim TVSH",
     notRequired: "Ende nuk kërkohet",
+    ddvLocalOnly:
+      "Numërohen faturat për klientët në Maqedoninë e Veriut sipas datës së furnizimit, të paguara ose jo. Shërbimet për klientët jashtë vendit kryhen jashtë (Ligji për TVSH, neni 14-а), ndaj nuk numërohen në prag.",
     nextDeadline: "Afati i ardhshëm tatimor",
     daysAway: "{date} — për {days} ditë",
     dueToday: "{date} — sot",
@@ -257,12 +259,12 @@ export const sq: Dictionary = {
     invoicesPaid: "{count} fatura të paguara",
     ddvThresholdPct: "Pragu TVSH",
     ddvMonitor: "Monitor i pragut TVSH",
-    currentAnnual: "Të ardhurat vjetore aktuale",
+    currentAnnual: "Furnizimet në Maqedoninë e Veriut këtë vit",
     alert70: "Alarm 70%",
     alert85: "Alarm 85% (kritik)",
     alert100: "100% — kërkohet regjistrim TVSH",
     ddvExceededMsg:
-      "Ke tejkaluar pragun TVSH. Konsulto kontabilistin për regjistrim të detyrueshëm TVSH.",
+      "E ke kaluar pragun e TVSH-së. Dorëzo kërkesën për regjistrim për TVSH deri më 15 të muajit pas atij në të cilin e kalove (Ligji për TVSH, neni 51 paragrafi 11); fol me kontabilistin.",
     ddvWarningMsg: "Me këtë ritëm mund ta arrish pragun para fundvitit. {remaining} mbeten.",
     taxDeadlines: "Afatet tatimore {year}",
     passed: "Kaluar",

@@ -68,7 +68,7 @@ export const en: Dictionary = {
       },
       {
         title: "DDV threshold monitoring",
-        desc: "Real-time tracking against the 2,000,000 MKD threshold with alerts at 70%, 85%, and 100%.",
+        desc: "Tracks your invoices to clients in North Macedonia against the 2,000,000 MKD threshold, with alerts at 70%, 85% and 100%. Services to clients abroad don't count.",
       },
       {
         title: "Tax deadline calendar",
@@ -90,9 +90,9 @@ export const en: Dictionary = {
     welcome: "Welcome back, {name}. Here's your freelance overview for {year}.",
     newInvoice: "New invoice",
     ddvAlertExceeded:
-      "You have exceeded the 2,000,000 MKD annual DDV threshold. You may need to register for DDV.",
+      "Your supplies in North Macedonia this year are over the 2,000,000 MKD DDV threshold. Once you pass it, you have to apply for DDV registration by the 15th of the next month (VAT law Art. 51(11)). Talk to your accountant.",
     ddvAlertWarning:
-      "You are at {pct}% of the DDV threshold. {remaining} remaining before mandatory DDV registration.",
+      "Your supplies in North Macedonia are at {pct}% of the DDV threshold: {remaining} left before you must register for DDV.",
     annualIncome: "Annual income",
     paidInvoicesYear: "Paid invoices, {year}",
     outstanding: "Outstanding",
@@ -102,12 +102,14 @@ export const en: Dictionary = {
     ddvWarning: "Warning",
     ddvCritical: "Critical — act soon",
     ddvExceeded: "Threshold exceeded",
-    annualIncomeMkd: "Annual income (MKD)",
+    localSupplies: "Supplies in North Macedonia, {year}",
     ddvThreshold: "DDV threshold",
     remaining: "remaining",
     ddvStatus: "Current status",
     mustRegister: "Must register for DDV",
     notRequired: "Not required yet",
+    ddvLocalOnly:
+      "Counts invoices to clients in North Macedonia by date of supply, paid or not. Services to clients abroad are supplied abroad (VAT law Art. 14-а), so they don't count toward the threshold.",
     nextDeadline: "Next tax deadline",
     daysAway: "{date} — {days} days away",
     dueToday: "{date} — today",
@@ -258,12 +260,12 @@ export const en: Dictionary = {
     invoicesPaid: "{count} invoices paid",
     ddvThresholdPct: "DDV threshold",
     ddvMonitor: "DDV Threshold Monitor",
-    currentAnnual: "Current annual income",
+    currentAnnual: "Supplies in North Macedonia this year",
     alert70: "70% alert",
     alert85: "85% alert (critical)",
     alert100: "100% — DDV registration required",
     ddvExceededMsg:
-      "You have exceeded the DDV threshold. Contact your accountant about mandatory DDV registration.",
+      "You're over the DDV threshold. Apply for DDV registration by the 15th of the month after the one you passed it in (VAT law Art. 51(11)); talk to your accountant.",
     ddvWarningMsg: "At this rate, you may reach the threshold before year end. {remaining} remaining.",
     taxDeadlines: "Tax deadlines {year}",
     passed: "Passed",

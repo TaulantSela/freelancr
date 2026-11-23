@@ -79,12 +79,13 @@ export type Dictionary = {
     ddvWarning: string;
     ddvCritical: string;
     ddvExceeded: string;
-    annualIncomeMkd: string;
+    localSupplies: string;
     ddvThreshold: string;
     remaining: string;
     ddvStatus: string;
     mustRegister: string;
     notRequired: string;
+    ddvLocalOnly: string;
     nextDeadline: string;
     daysAway: string;
     dueToday: string;

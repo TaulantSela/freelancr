@@ -1,6 +1,8 @@
 // North Macedonia tax constants (2026)
 
-// DDV (VAT) threshold in MKD per year
+// DDV (VAT) registration threshold: total turnover over 2,000,000 MKD in a
+// calendar year (VAT law, "ЗДДВ", Art. 51(1)). See getLocalSupplies() for
+// what counts toward it.
 export const DDV_THRESHOLD_MKD = 2_000_000;
 
 // MK personal income tax (2026): a flat 10%, with no brackets (Personal
@@ -48,23 +50,66 @@ export function isDdvRate(value: number): boolean {
   return (DDV_RATES as readonly number[]).includes(value);
 }
 
-export function getDDVStatus(annualIncomeMKD: number): {
+// Invoice statuses that count as issued: numbered and sent to the client,
+// whether paid or not. Drafts and cancelled invoices are neither.
+export const ISSUED_STATUSES = ["sent", "paid", "overdue"] as const;
+
+export type ThresholdInvoice = {
+  clientCountry: string;
+  status: string;
+  // Date of supply, "YYYY-MM-DD"; null on rows saved before it existed.
+  supplyDate: string | null;
+  // Invoice date, "YYYY-MM-DD", used when there's no date of supply.
+  date: string;
+  totalMKD: number;
+};
+
+// What counts toward the DDV threshold in `year`. "Total turnover" is the
+// turnover taxable under Art. 2(1), i.e. supplies made in North Macedonia
+// (Art. 51(2)). A service to a taxable person abroad is supplied where that
+// person is established (Art. 14-а(2)), and so are most services a freelancer
+// sells to private persons abroad (Art. 14-а(6): consulting, engineering,
+// data processing, electronic services, copyright and the like), so they
+// don't count. The app takes "supplied in North Macedonia" to mean "invoiced
+// to a client in North Macedonia": every issued, not cancelled invoice to a
+// client there, paid or not, by its date of supply in the year.
+export function getLocalSupplies(
+  invoices: readonly ThresholdInvoice[],
+  year: number
+): { totalMKD: number; count: number } {
+  let totalMKD = 0;
+  let count = 0;
+  for (const invoice of invoices) {
+    if (invoice.clientCountry !== "MK") continue;
+    if (!(ISSUED_STATUSES as readonly string[]).includes(invoice.status)) continue;
+    const supplied = invoice.supplyDate ?? invoice.date;
+    if (!supplied.startsWith(`${year}-`)) continue;
+    totalMKD += invoice.totalMKD;
+    count++;
+  }
+  return { totalMKD, count };
+}
+
+export function getDDVStatus(localSuppliesMKD: number): {
   percentage: number;
-  isRegistered: boolean;
+  // Over the threshold: registration is due (Art. 51(1), (11)).
+  mustRegister: boolean;
   alertLevel: "safe" | "warning" | "critical" | "exceeded";
   remaining: number;
 } {
-  const percentage = (annualIncomeMKD / DDV_THRESHOLD_MKD) * 100;
-  const remaining = DDV_THRESHOLD_MKD - annualIncomeMKD;
+  const percentage = (localSuppliesMKD / DDV_THRESHOLD_MKD) * 100;
+  const remaining = DDV_THRESHOLD_MKD - localSuppliesMKD;
+  // The law says "exceeded" (надминал), so exactly 2,000,000 isn't over.
+  const mustRegister = localSuppliesMKD > DDV_THRESHOLD_MKD;
 
   let alertLevel: "safe" | "warning" | "critical" | "exceeded" = "safe";
-  if (percentage >= 100) alertLevel = "exceeded";
+  if (mustRegister) alertLevel = "exceeded";
   else if (percentage >= 85) alertLevel = "critical";
   else if (percentage >= 70) alertLevel = "warning";
 
   return {
     percentage: Math.min(percentage, 100),
-    isRegistered: annualIncomeMKD >= DDV_THRESHOLD_MKD,
+    mustRegister,
     alertLevel,
     remaining: Math.max(0, remaining),
   };

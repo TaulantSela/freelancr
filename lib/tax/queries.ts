@@ -5,24 +5,59 @@ import {
   isTaxStatus,
   type SelfReportedPayment,
   type TaxStatus,
+  type ThresholdInvoice,
 } from "./calculator";
 
 export type TaxProfile = {
   taxStatus: TaxStatus;
   // Registered self-employed: the monthly advance they entered in Settings.
   monthlyAdvanceMKD: number | null;
+  // Registered for VAT: the DDV threshold no longer applies to them.
+  vatRegistered: boolean;
 };
 
 export async function getTaxProfile(userId: string): Promise<TaxProfile> {
   const [row] = await getDb()
-    .select({ taxStatus: users.taxStatus, monthlyAdvanceMKD: users.monthlyAdvanceMKD })
+    .select({
+      taxStatus: users.taxStatus,
+      monthlyAdvanceMKD: users.monthlyAdvanceMKD,
+      vatRegistered: users.vatRegistered,
+    })
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
   return {
     taxStatus: row && isTaxStatus(row.taxStatus) ? row.taxStatus : DEFAULT_TAX_STATUS,
     monthlyAdvanceMKD: row?.monthlyAdvanceMKD ?? null,
+    vatRegistered: row?.vatRegistered ?? false,
   };
+}
+
+// Invoices whose date of supply (or, without one, invoice date) is in `year`,
+// with the client's country; getLocalSupplies() picks the ones that count
+// toward the DDV threshold.
+export async function getInvoicesForThreshold(
+  userId: string,
+  year: number
+): Promise<ThresholdInvoice[]> {
+  const supplied = sql`coalesce(${invoices.supplyDate}, ${invoices.date})`;
+  return getDb()
+    .select({
+      clientCountry: clients.country,
+      status: invoices.status,
+      supplyDate: invoices.supplyDate,
+      date: invoices.date,
+      totalMKD: invoices.totalMKD,
+    })
+    .from(invoices)
+    .innerJoin(clients, eq(invoices.clientId, clients.id))
+    .where(
+      and(
+        eq(invoices.userId, userId),
+        sql`${supplied} >= ${`${year}-01-01`}`,
+        sql`${supplied} < ${`${year + 1}-01-01`}`
+      )
+    );
 }
 
 // Paid invoices that can lead to a deadline, or tax owed, in `year`: the ones

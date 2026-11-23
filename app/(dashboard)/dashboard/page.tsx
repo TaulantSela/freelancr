@@ -3,6 +3,7 @@ import { getDb, invoices, clients } from "@/lib/db";
 import { eq, sum, count, and, gte } from "drizzle-orm";
 import {
   getDDVStatus,
+  getLocalSupplies,
   getUpcomingTaxDeadlines,
   getSelfReportedIncomeMonths,
   getOwedToUjp,
@@ -12,7 +13,11 @@ import {
   formatCurrency,
   DDV_THRESHOLD_MKD,
 } from "@/lib/tax/calculator";
-import { getTaxProfile, getPaidInvoicesForDeadlines } from "@/lib/tax/queries";
+import {
+  getTaxProfile,
+  getPaidInvoicesForDeadlines,
+  getInvoicesForThreshold,
+} from "@/lib/tax/queries";
 import { formatTaxDate, formatTaxPeriod, taxDeadlineLabel } from "@/lib/tax/labels";
 import { formatDate, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -77,14 +82,22 @@ export default async function DashboardPage() {
     .orderBy(invoices.createdAt)
     .limit(5);
 
-  const ddvStatus = getDDVStatus(annualIncomeMKD);
-
   // The next UJP deadline for how the user is registered for tax. When not
   // registered, only months with self-reported income (a client abroad or a
   // private person in North Macedonia paid) have deadlines, and the tax owed
   // is 10% of that income (approximate; see getOwedToUjp).
   const today = toSkopjeDate(new Date());
-  const { taxStatus, monthlyAdvanceMKD } = await getTaxProfile(session.userId);
+  const { taxStatus, monthlyAdvanceMKD, vatRegistered } = await getTaxProfile(session.userId);
+
+  // The DDV threshold counts this year's supplies in North Macedonia only
+  // (getLocalSupplies). It doesn't apply once registered for VAT, and
+  // there's nothing to show without a local supply.
+  const thisYear = Number(today.slice(0, 4));
+  const localSupplies = vatRegistered
+    ? { totalMKD: 0, count: 0 }
+    : getLocalSupplies(await getInvoicesForThreshold(session.userId, thisYear), thisYear);
+  const showDdv = !vatRegistered && localSupplies.count > 0;
+  const ddvStatus = getDDVStatus(localSupplies.totalMKD);
   const notRegistered = taxStatus === "paid_from_abroad";
   const payments = notRegistered
     ? await getPaidInvoicesForDeadlines(session.userId, Number(today.slice(0, 4)))
@@ -154,7 +167,7 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {ddvStatus.alertLevel !== "safe" && (
+      {showDdv && ddvStatus.alertLevel !== "safe" && (
         <div
           className={cn(
             "flex items-start gap-3 rounded-lg border px-4 py-3 text-sm",
@@ -238,7 +251,7 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className={cn("grid gap-4", showDdv && "md:grid-cols-2")}>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center justify-between">
@@ -352,49 +365,54 @@ export default async function DashboardPage() {
             )}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm flex items-center justify-between">
-              {t.dashboard.ddvMonitor}
-              <Badge variant={ddvBadge[ddvStatus.alertLevel].variant} className="text-xs font-normal">
-                {ddvBadge[ddvStatus.alertLevel].label}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">{t.dashboard.annualIncomeMkd}</span>
-                <span className="font-mono text-sm">{formatMKD(annualIncomeMKD)}</span>
+        {showDdv && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center justify-between">
+                {t.dashboard.ddvMonitor}
+                <Badge variant={ddvBadge[ddvStatus.alertLevel].variant} className="text-xs font-normal">
+                  {ddvBadge[ddvStatus.alertLevel].label}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-muted-foreground">
+                    {formatMessage(t.dashboard.localSupplies, { year: thisYear })}
+                  </span>
+                  <span className="font-mono text-sm">{formatMKD(localSupplies.totalMKD)}</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className={cn("h-full rounded-full transition-all", ddvColors[ddvStatus.alertLevel])}
+                    style={{ width: `${Math.min(ddvStatus.percentage, 100)}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>{ddvStatus.percentage.toFixed(1)}%</span>
+                  <span>
+                    {formatMKD(ddvStatus.remaining)} {t.dashboard.remaining}
+                  </span>
+                </div>
               </div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className={cn("h-full rounded-full transition-all", ddvColors[ddvStatus.alertLevel])}
-                  style={{ width: `${Math.min(ddvStatus.percentage, 100)}%` }}
-                />
+              <Separator />
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t.dashboard.ddvThreshold}</span>
+                  <span className="font-mono text-xs">{formatMKD(DDV_THRESHOLD_MKD)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t.dashboard.ddvStatus}</span>
+                  <span className="text-xs">
+                    {ddvStatus.mustRegister ? t.dashboard.mustRegister : t.dashboard.notRequired}
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>{ddvStatus.percentage.toFixed(1)}%</span>
-                <span>
-                  {formatMKD(ddvStatus.remaining)} {t.dashboard.remaining}
-                </span>
-              </div>
-            </div>
-            <Separator />
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t.dashboard.ddvThreshold}</span>
-                <span className="font-mono text-xs">{formatMKD(DDV_THRESHOLD_MKD)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t.dashboard.ddvStatus}</span>
-                <span className="text-xs">
-                  {ddvStatus.isRegistered ? t.dashboard.mustRegister : t.dashboard.notRequired}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              <p className="text-xs text-muted-foreground">{t.dashboard.ddvLocalOnly}</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <Card>
