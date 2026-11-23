@@ -483,6 +483,74 @@ export type Dictionary = {
       };
     };
   };
+  exports: {
+    paymentsCsv: string;
+    invoicesCsv: string;
+    creditNotesCsv: string;
+    yearLabel: string;
+    invoiceRateSources: {
+      nbrsm: string;
+      approximate: string;
+    };
+    payments: {
+      received_on: string;
+      client: string;
+      client_country: string;
+      invoice_number: string;
+      currency: string;
+      amount_credited: string;
+      fees: string;
+      tax_withheld: string;
+      rate_to_mkd: string;
+      rate_source: string;
+      received_mkd: string;
+      gross_mkd: string;
+      treatment: string;
+      deemed_costs_rate: string;
+      base_mkd: string;
+      tax_mkd: string;
+      credit_mkd: string;
+      owed_mkd: string;
+      already_paid_for_you_mkd: string;
+      ujp_status: string;
+      ujp_reference: string;
+      ujp_folio: string;
+      tax_paid_on: string;
+      channel: string;
+      note: string;
+    };
+    invoices: {
+      number: string;
+      standing: string;
+      date: string;
+      supply_date: string;
+      due_date: string;
+      client: string;
+      client_country: string;
+      currency: string;
+      subtotal: string;
+      ddv_rate: string;
+      ddv_amount: string;
+      total: string;
+      credited: string;
+      paid: string;
+      balance: string;
+      rate_to_mkd: string;
+      rate_source: string;
+      total_mkd: string;
+    };
+    creditNotes: {
+      number: string;
+      date: string;
+      invoice_number: string;
+      client: string;
+      currency: string;
+      amount: string;
+      ddv_amount: string;
+      reason: string;
+      amount_mkd: string;
+    };
+  };
   settings: {
     title: string;
     subtitle: string;

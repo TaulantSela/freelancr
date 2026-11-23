@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AlertTriangle, Info, Paperclip, Plus } from "lucide-react";
+import { AlertTriangle, Download, Info, Paperclip, Plus } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { getTranslations } from "@/lib/i18n/server";
 import { formatMessage } from "@/lib/i18n/format";
@@ -95,22 +95,31 @@ export default async function PaymentsPage({
         </Link>
       </div>
 
-      <nav className="flex flex-wrap gap-1.5" aria-label={p.yearLabel}>
-        {yearOptions.map((y) => (
-          <Link
-            key={y}
-            href={`/payments?year=${y}`}
-            className={cn(
-              "rounded-md border px-2.5 py-1 text-xs",
-              y === year
-                ? "border-primary bg-primary/10 text-foreground"
-                : "border-border text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {y}
-          </Link>
-        ))}
-      </nav>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <nav className="flex flex-wrap gap-1.5" aria-label={p.yearLabel}>
+          {yearOptions.map((y) => (
+            <Link
+              key={y}
+              href={`/payments?year=${y}`}
+              className={cn(
+                "rounded-md border px-2.5 py-1 text-xs",
+                y === year
+                  ? "border-primary bg-primary/10 text-foreground"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {y}
+            </Link>
+          ))}
+        </nav>
+        {rows.length > 0 && (
+          <a href={`/api/export/payments?year=${year}`} download>
+            <Button size="sm" variant="outline" className="h-8 gap-1.5 text-xs">
+              <Download className="h-3.5 w-3.5" /> {t.exports.paymentsCsv}
+            </Button>
+          </a>
+        )}
+      </div>
 
       <Card>
         <CardHeader className="pb-2">

@@ -12,6 +12,7 @@ import { InvoiceStandingBadge } from "@/components/invoices/invoice-standing-bad
 import { getSettledByInvoice } from "@/lib/payments/queries";
 import { invoiceStanding } from "@/lib/payments/settlement";
 import { getCreditedByInvoice } from "@/lib/credit-notes/queries";
+import { InvoiceExportLinks } from "@/components/exports/export-links";
 import { getTranslations } from "@/lib/i18n/server";
 import { formatMessage } from "@/lib/i18n/format";
 
@@ -62,6 +63,10 @@ export default async function InvoicesPage() {
       s + Math.min(i.standing.settled, Math.max(0, i.total - i.standing.credited)) * i.exchangeRateMKD,
     0
   );
+  // The years to export, newest first: this one and any with invoices.
+  const exportYears = [...new Set([Number(today.slice(0, 4)), ...rows.map((r) => Number(r.date.slice(0, 4)))])].sort(
+    (a, b) => b - a
+  );
   const outstandingTotal = counted.reduce((s, i) => s + i.standing.balance * i.exchangeRateMKD, 0);
   const draftCount = invoiceList.filter((i) => i.status === "draft").length;
 
@@ -101,6 +106,8 @@ export default async function InvoicesPage() {
           </CardContent>
         </Card>
       </div>
+
+      {invoiceList.length > 0 && <InvoiceExportLinks years={exportYears} />}
 
       {invoiceList.length === 0 ? (
         <Card>
