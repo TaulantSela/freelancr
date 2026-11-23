@@ -89,7 +89,7 @@ export default function SignInPage() {
             <p className="text-center text-sm text-muted-foreground mt-6">
               {t.auth.noAccount}{" "}
               <Link href="/sign-up" className="text-primary hover:underline">
-                {t.auth.signUpFree}
+                {t.auth.goToSignUp}
               </Link>
             </p>
           </CardContent>

@@ -21,7 +21,6 @@ export type Dictionary = {
   };
   nav: {
     features: string;
-    pricing: string;
     signIn: string;
     getStarted: string;
     dashboard: string;
@@ -42,9 +41,8 @@ export type Dictionary = {
     signUp: string;
     noAccount: string;
     hasAccount: string;
-    signUpFree: string;
+    goToSignUp: string;
     passwordHint: string;
-    freePerks: string[];
     errors: {
       allFieldsRequired: string;
       emailPasswordRequired: string;
@@ -56,23 +54,11 @@ export type Dictionary = {
     badge: string;
     heroTitle: string;
     heroSubtitle: string;
-    startFree: string;
+    createAccount: string;
     signInAccount: string;
     featuresTitle: string;
     featuresSubtitle: string;
     features: { title: string; desc: string }[];
-    pricingTitle: string;
-    pricingSubtitle: string;
-    plans: {
-      name: string;
-      price: string;
-      period: string;
-      eur?: string;
-      description: string;
-      features: string[];
-      cta: string;
-      badge?: string;
-    }[];
     ctaTitle: string;
     ctaSubtitle: string;
     ctaButton: string;
@@ -275,8 +261,6 @@ export type Dictionary = {
     saved: string;
     account: string;
     email: string;
-    plan: string;
-    freePlan: string;
     memberSince: string;
   };
   tax: {

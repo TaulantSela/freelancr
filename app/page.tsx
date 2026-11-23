@@ -9,7 +9,6 @@ import {
   TrendingUp,
   Shield,
   ArrowRight,
-  Check,
   Calendar,
 } from "lucide-react";
 
@@ -31,9 +30,6 @@ export default async function LandingPage() {
           <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
             <Link href="#features" className="hover:text-foreground transition-colors">
               {t.nav.features}
-            </Link>
-            <Link href="#pricing" className="hover:text-foreground transition-colors">
-              {t.nav.pricing}
             </Link>
           </nav>
           <div className="flex items-center gap-3">
@@ -61,7 +57,7 @@ export default async function LandingPage() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/sign-up">
             <Button size="lg" className="gap-2">
-              {t.landing.startFree} <ArrowRight className="h-4 w-4" />
+              {t.landing.createAccount} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
           <Link href="/sign-in">
@@ -90,55 +86,6 @@ export default async function LandingPage() {
               </div>
             );
           })}
-        </div>
-      </section>
-
-      <Separator className="max-w-6xl mx-auto" />
-
-      <section id="pricing" className="max-w-6xl mx-auto px-6 py-20">
-        <div className="text-center mb-14">
-          <h2 className="text-2xl font-semibold mb-3">{t.landing.pricingTitle}</h2>
-          <p className="text-muted-foreground text-sm">{t.landing.pricingSubtitle}</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          {t.landing.plans.map((plan, i) => (
-            <div
-              key={plan.name}
-              className={`rounded-lg border p-6 flex flex-col ${
-                i === 1
-                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
-                  : "border-border bg-card"
-              }`}
-            >
-              {plan.badge && (
-                <Badge className="self-start mb-3 text-xs">{plan.badge}</Badge>
-              )}
-              <div className="mb-1">
-                <span className="text-lg font-semibold">{plan.name}</span>
-              </div>
-              <div className="mb-1">
-                <span className="text-2xl font-bold">{plan.price}</span>
-                <span className="text-muted-foreground text-sm ml-1">/{plan.period}</span>
-              </div>
-              {plan.eur && (
-                <div className="text-xs text-muted-foreground mb-3">{plan.eur}</div>
-              )}
-              <p className="text-sm text-muted-foreground mb-5">{plan.description}</p>
-              <ul className="space-y-2 flex-1 mb-6">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span className="text-muted-foreground">{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/sign-up">
-                <Button className="w-full" variant={i === 1 ? "default" : "outline"}>
-                  {plan.cta}
-                </Button>
-              </Link>
-            </div>
-          ))}
         </div>
       </section>
 

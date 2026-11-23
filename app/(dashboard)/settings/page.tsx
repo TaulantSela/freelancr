@@ -3,7 +3,6 @@ import { getDb, users } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { SettingsForm } from "@/components/dashboard/settings-form";
 import { getTranslations } from "@/lib/i18n/server";
 
@@ -45,10 +44,6 @@ export default async function SettingsPage() {
           <div className="flex justify-between">
             <span className="text-muted-foreground">{t.settings.email}</span>
             <span className="font-mono text-xs">{user.email}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">{t.settings.plan}</span>
-            <Badge variant="outline" className="text-xs">{t.settings.freePlan}</Badge>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">{t.settings.memberSince}</span>
