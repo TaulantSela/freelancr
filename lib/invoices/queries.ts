@@ -13,6 +13,10 @@ export type InvoiceDetail = {
     dueDate: string | null;
     currency: string;
     exchangeRateMKD: number;
+    // "nbrsm" when the rate is the National Bank's; anything else (null on
+    // older invoices) was the fixed approximate rate.
+    rateSource: string | null;
+    rateDate: string | null;
     subtotal: number;
     ddvRate: number;
     ddvAmount: number;
@@ -87,6 +91,8 @@ export async function getInvoiceDetail(
       dueDate: row.invoice.dueDate,
       currency: row.invoice.currency,
       exchangeRateMKD: row.invoice.exchangeRateMKD,
+      rateSource: row.invoice.rateSource,
+      rateDate: row.invoice.rateDate,
       subtotal: row.invoice.subtotal,
       ddvRate: row.invoice.ddvRate,
       ddvAmount: row.invoice.ddvAmount,

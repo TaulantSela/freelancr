@@ -2,10 +2,16 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getDb, clients, invoices, invoiceItems, users } from "@/lib/db";
+import { getDb, clients, invoices, invoiceItems, payments, users } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId } from "@/lib/utils";
-import { getRateToMKD, isDdvRate, isSupportedCurrency } from "@/lib/tax/calculator";
+import {
+  getRateToMKD,
+  isDdvRate,
+  isSupportedCurrency,
+  toSkopjeDate,
+} from "@/lib/tax/calculator";
+import { getRateToMkd } from "@/lib/rates/queries";
 import { issueDraftInvoice } from "@/lib/invoices/numbering";
 import { updateDraftInvoice, type DraftLineItem, type DraftValues } from "@/lib/invoices/drafts";
 import { eq, and, inArray, sql } from "drizzle-orm";
@@ -32,6 +38,20 @@ function parseItems(json: FormDataEntryValue | null): DraftLineItem[] | null {
     items.push({ description, quantity, unitPrice });
   }
   return items;
+}
+
+// The rate an invoice converts at: the NBRSM middle rate on the date of
+// supply, the day the VAT liability arises (VAT law Art. 20, Art. 31(1)), or
+// today's while the supply date is still ahead. If the National Bank can't
+// be reached, the fixed approximate rate, flagged as such.
+async function invoiceRate(currency: string, supplyDate: string) {
+  const today = toSkopjeDate(new Date());
+  const rateDate = supplyDate < today ? supplyDate : today;
+  const nbrsm = await getRateToMkd(currency, rateDate, today);
+  if (nbrsm) {
+    return { rate: nbrsm.rate, rateSource: "nbrsm" as const, rateDate: nbrsm.date };
+  }
+  return { rate: getRateToMKD(currency), rateSource: "approximate" as const, rateDate: null };
 }
 
 type InvoiceFormErrorKey =
@@ -97,7 +117,7 @@ async function readInvoiceForm(
   const subtotal = items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
   const ddvAmount = subtotal * ddvRate;
   const total = subtotal + ddvAmount;
-  const rate = getRateToMKD(currency);
+  const { rate, rateSource, rateDate } = await invoiceRate(currency, supplyDate);
 
   return {
     values: {
@@ -107,6 +127,8 @@ async function readInvoiceForm(
       dueDate: dueDate || null,
       currency,
       exchangeRateMKD: rate,
+      rateSource,
+      rateDate,
       subtotal,
       ddvRate,
       ddvAmount,
@@ -184,7 +206,13 @@ export async function issueInvoice(id: string) {
   // like that (VAT law Art. 51(3), Art. 55); anyone else saves the draft
   // again first, which sets the DDV to 0.
   const [draft] = await getDb()
-    .select({ ddvRate: invoices.ddvRate, vatRegistered: users.vatRegistered })
+    .select({
+      ddvRate: invoices.ddvRate,
+      vatRegistered: users.vatRegistered,
+      currency: invoices.currency,
+      supplyDate: invoices.supplyDate,
+      date: invoices.date,
+    })
     .from(invoices)
     .innerJoin(users, eq(invoices.userId, users.id))
     .where(and(eq(invoices.id, id), eq(invoices.userId, session.userId)))
@@ -193,7 +221,18 @@ export async function issueInvoice(id: string) {
     return { errorKey: "ddvNotRegistered" as const };
   }
 
-  const number = await issueDraftInvoice(getDb(), id, session.userId);
+  // The rate is looked up again on issue: the supply date may have passed
+  // since the draft was saved with today's rate. If the National Bank can't
+  // be reached now, the draft keeps the rate it was saved with.
+  const issueRate = draft
+    ? await invoiceRate(draft.currency, draft.supplyDate ?? draft.date)
+    : null;
+  const number = await issueDraftInvoice(
+    getDb(),
+    id,
+    session.userId,
+    issueRate?.rateSource === "nbrsm" ? issueRate : null
+  );
   if (!number) return { errorKey: "notDraft" as const };
 
   revalidatePath("/invoices");
@@ -202,44 +241,16 @@ export async function issueInvoice(id: string) {
   return { number };
 }
 
-// An issued invoice that's still open moves between these from the status
-// menu. A draft only leaves "draft" through issueInvoice(), so it gets a
-// number; cancelling is cancelInvoice(), and is final.
+// An issued invoice that isn't cancelled. Payments are what move it between
+// sent and paid (lib/payments/write.ts); there's no status menu any more.
 const OPEN_STATUSES = ["sent", "paid", "overdue"] as const;
-type OpenStatus = (typeof OPEN_STATUSES)[number];
-
-export async function updateInvoiceStatus(id: string, status: OpenStatus) {
-  const session = await getSession();
-  if (!session) redirect("/sign-in");
-  if (!(OPEN_STATUSES as readonly string[]).includes(status)) return;
-
-  await getDb()
-    .update(invoices)
-    .set({
-      status,
-      // Keeps the payment date when an invoice that's already paid is
-      // marked paid again.
-      paidAt:
-        status === "paid"
-          ? sql`coalesce(${invoices.paidAt}, ${new Date().toISOString()})`
-          : null,
-    })
-    .where(
-      and(
-        eq(invoices.id, id),
-        eq(invoices.userId, session.userId),
-        inArray(invoices.status, OPEN_STATUSES)
-      )
-    );
-
-  revalidatePath("/invoices");
-  revalidatePath(`/invoices/${id}`);
-}
 
 // Cancels an issued invoice. It isn't deleted: invoices have to be kept for
 // five years after the end of their year (VAT law Art. 56(1)), so it stays,
-// marked cancelled, and stops counting as income or toward the DDV
-// threshold. There's no way back and no credit note yet.
+// marked cancelled, and stops counting toward the DDV threshold. There's no
+// way back and no credit note yet. An invoice with payments isn't cancelled:
+// its payments have to be deleted first, so no income is left pointing at a
+// cancelled invoice.
 export async function cancelInvoice(id: string) {
   const session = await getSession();
   if (!session) redirect("/sign-in");
@@ -251,11 +262,19 @@ export async function cancelInvoice(id: string) {
       and(
         eq(invoices.id, id),
         eq(invoices.userId, session.userId),
-        inArray(invoices.status, OPEN_STATUSES)
+        inArray(invoices.status, OPEN_STATUSES),
+        sql`not exists (select 1 from ${payments} where ${payments.invoiceId} = ${invoices.id})`
       )
     )
     .returning({ id: invoices.id });
-  if (cancelled.length === 0) return { errorKey: "notIssued" as const };
+  if (cancelled.length === 0) {
+    const [paid] = await getDb()
+      .select({ id: payments.id })
+      .from(payments)
+      .where(and(eq(payments.invoiceId, id), eq(payments.userId, session.userId)))
+      .limit(1);
+    return { errorKey: paid ? ("hasPayments" as const) : ("notIssued" as const) };
+  }
 
   revalidatePath("/invoices");
   revalidatePath(`/invoices/${id}`);

@@ -26,7 +26,8 @@ export type Dictionary = {
     dashboard: string;
     clients: string;
     invoices: string;
-    incomeTax: string;
+    payments: string;
+    menu: string;
     settings: string;
   };
   auth: {
@@ -70,8 +71,8 @@ export type Dictionary = {
     newInvoice: string;
     ddvAlertExceeded: string;
     ddvAlertWarning: string;
-    annualIncome: string;
-    paidInvoicesYear: string;
+    receivedIn: string;
+    paymentsCount: string;
     outstanding: string;
     awaitingPayment: string;
     ddvMonitor: string;
@@ -93,6 +94,13 @@ export type Dictionary = {
     recentInvoices: string;
     noInvoices: string;
     createFirst: string;
+    owedLateMonths: string;
+    owedSoFarNote: string;
+    owedNothingShort: string;
+    notFiledBy: string;
+    notPaidBy: string;
+    alreadyPaidYear: string;
+    balanceLeft: string;
   };
   clients: {
     title: string;
@@ -127,6 +135,8 @@ export type Dictionary = {
       invoiceLanguage: string;
       invoiceLanguageHint: string;
       looksLikeEmbg: string;
+      deemedCosts: string;
+      deemedCostsHint: string;
     };
     types: { company: string; person: string };
     deleteTitle: string;
@@ -147,7 +157,7 @@ export type Dictionary = {
     colNumber: string;
     colClient: string;
     colAmount: string;
-    colMkd: string;
+    colBalance: string;
     colStatus: string;
     newTitle: string;
     newBreadcrumb: string;
@@ -180,6 +190,7 @@ export type Dictionary = {
       grandTotal: string;
       mkdEquivalent: string;
       exchangeRate: string;
+      exchangeRateNbrsm: string;
       notes: string;
       footer: string;
       draft: string;
@@ -207,6 +218,9 @@ export type Dictionary = {
       dueDate: string;
       lineItems: string;
       approximateRate: string;
+      nbrsmRate: string;
+      rateLoading: string;
+      rateUnavailable: string;
       description: string;
       qty: string;
       unitPrice: string;
@@ -230,12 +244,23 @@ export type Dictionary = {
       currencyUnsupported: string;
       requiredFields: string;
     };
-    status: {
+    standing: {
       draft: string;
-      sent: string;
+      issued: string;
+      partly_paid: string;
       paid: string;
       overdue: string;
       cancelled: string;
+    };
+    payments: {
+      title: string;
+      record: string;
+      none: string;
+      settled: string;
+      balanceDue: string;
+      overpaid: string;
+      settledNote: string;
+      cancelHint: string;
     };
     issue: {
       button: string;
@@ -254,31 +279,158 @@ export type Dictionary = {
       keep: string;
       cancelled: string;
       notIssued: string;
+      hasPayments: string;
       note: string;
     };
   };
-  income: {
+  payments: {
     title: string;
     subtitle: string;
+    newPayment: string;
+    yearLabel: string;
+    yearSummary: string;
+    received: string;
     grossIncome: string;
-    invoicesPaid: string;
-    ddvThresholdPct: string;
-    ddvMonitor: string;
-    currentAnnual: string;
-    alert70: string;
-    alert85: string;
-    alert100: string;
-    ddvExceededMsg: string;
-    ddvWarningMsg: string;
-    taxDeadlines: string;
-    passed: string;
-    daysAway: string;
-    dueToday: string;
-    dueTomorrow: string;
-    monthlyBreakdown: string;
-    annualTotal: string;
+    totalIncomeTax: string;
+    owedPart: string;
+    creditPart: string;
+    alreadyPaidPart: string;
+    notPaidYet: string;
+    annualReturn: string;
+    selfEmployedAdvance: string;
+    selfEmployedNoAdvance: string;
+    conversionNote: string;
+    feesNote: string;
     byClient: string;
-    invShort: string;
+    paymentsCount: string;
+    empty: string;
+    noInvoice: string;
+    feesLine: string;
+    withheldLine: string;
+    selfReportedGross: string;
+    withheldGross: string;
+    businessGross: string;
+    otherRatesFlag: string;
+    evidenceHint: string;
+    treatments: {
+      business: string;
+      withheld: string;
+      self_reported: string;
+    };
+    treatmentNotes: {
+      business: string;
+      withheld: string;
+      self_reported: string;
+    };
+    ujpStatuses: {
+      nothing: string;
+      to_file: string;
+      filed: string;
+      approved: string;
+      paid: string;
+      late: string;
+    };
+    rateSources: {
+      nbrsm: string;
+      manual: string;
+      invoice: string;
+    };
+    channels: {
+      bank: string;
+      paypal: string;
+      wise: string;
+      payoneer: string;
+      platform: string;
+      cash: string;
+      other: string;
+    };
+    deemedOptions: {
+      "0": string;
+      "0.2": string;
+      "0.3": string;
+      "0.4": string;
+      "0.5": string;
+    };
+    calendar: {
+      title: string;
+      passed: string;
+      daysAway: string;
+      dueToday: string;
+      dueTomorrow: string;
+    };
+    monthActions: {
+      calculationNumber: string;
+      folioNumber: string;
+      paidOn: string;
+      markFiled: string;
+      markApproved: string;
+      markPaid: string;
+      marked: string;
+      useNbrsmRates: string;
+      ratesUpdated: string;
+      errors: {
+        monthInvalid: string;
+        dateInvalid: string;
+        dateFuture: string;
+        nothingToMark: string;
+        unavailable: string;
+      };
+    };
+    form: {
+      newTitle: string;
+      editTitle: string;
+      needClient: string;
+      invoice: string;
+      noInvoice: string;
+      balanceHint: string;
+      client: string;
+      clientHint: string;
+      receivedOn: string;
+      receivedOnHint: string;
+      currency: string;
+      amount: string;
+      amountHint: string;
+      fees: string;
+      feesHint: string;
+      taxWithheldLocal: string;
+      taxWithheldLocalHint: string;
+      taxWithheldAbroad: string;
+      taxWithheldAbroadHint: string;
+      taxWithheldAtSource: string;
+      rate: string;
+      rateNbrsm: string;
+      rateLoading: string;
+      rateUnavailable: string;
+      manualRate: string;
+      deemedCosts: string;
+      deemedCostsHint: string;
+      channel: string;
+      note: string;
+      previewReceived: string;
+      previewGross: string;
+      previewTax: string;
+      previewCredit: string;
+      previewOwed: string;
+      previewAlreadyPaid: string;
+      submit: string;
+      delete: string;
+      deleteTitle: string;
+      deleteDesc: string;
+      errors: {
+        dateInvalid: string;
+        dateFuture: string;
+        amountInvalid: string;
+        feesInvalid: string;
+        withheldInvalid: string;
+        withheldNotAllowed: string;
+        currencyInvalid: string;
+        clientInvalid: string;
+        invoiceInvalid: string;
+        rateRequired: string;
+        deemedInvalid: string;
+        notFound: string;
+      };
+    };
   };
   settings: {
     title: string;
@@ -331,6 +483,8 @@ export type Dictionary = {
       advance: string;
       annualReturn: string;
       annualPayment: string;
+      returnConfirm: string;
+      returnPay: string;
     };
     actions: {
       report: string;
@@ -338,8 +492,10 @@ export type Dictionary = {
       advance: string;
       annualReturn: string;
       annualPayment: string;
+      returnConfirm: string;
+      returnPay: string;
     };
-    groups: { income: string; advance: string; annual: string };
+    groups: { income: string; advance: string; annual: string; return: string };
     basedOn: string;
     changeInSettings: string;
     noUpcoming: string;
@@ -354,6 +510,7 @@ export type Dictionary = {
       fileAndPay: string;
       nothing: string;
       note: string;
+      noteApproximate: string;
       groupAmount: string;
       advanceTile: string;
       advanceHint: string;

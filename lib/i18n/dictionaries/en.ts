@@ -27,7 +27,8 @@ export const en: Dictionary = {
     dashboard: "Dashboard",
     clients: "Clients",
     invoices: "Invoices",
-    incomeTax: "Income & Tax",
+    payments: "Payments",
+    menu: "Menu",
     settings: "Settings",
   },
   auth: {
@@ -64,7 +65,7 @@ export const en: Dictionary = {
     features: [
       {
         title: "Multi-currency invoicing",
-        desc: "Create invoices in MKD, EUR, or USD. The MKD equivalent is calculated automatically using a built-in approximate rate.",
+        desc: "Create invoices in MKD, EUR, or USD. The MKD equivalent is calculated automatically at the National Bank's middle rate.",
       },
       {
         title: "DDV threshold monitoring",
@@ -93,10 +94,10 @@ export const en: Dictionary = {
       "Your supplies in North Macedonia this year are over the 2,000,000 MKD DDV threshold. Once you pass it, you have to apply for DDV registration by the 15th of the next month (VAT law Art. 51(11)). Talk to your accountant.",
     ddvAlertWarning:
       "Your supplies in North Macedonia are at {pct}% of the DDV threshold: {remaining} left before you must register for DDV.",
-    annualIncome: "Annual income",
-    paidInvoicesYear: "Paid invoices, {year}",
+    receivedIn: "Received in {year}",
+    paymentsCount: "{count} payment(s)",
     outstanding: "Outstanding",
-    awaitingPayment: "invoices awaiting payment",
+    awaitingPayment: "{count} invoice(s) awaiting payment",
     ddvMonitor: "DDV Threshold Monitor",
     ddvSafe: "Safe",
     ddvWarning: "Warning",
@@ -109,7 +110,7 @@ export const en: Dictionary = {
     mustRegister: "Must register for DDV",
     notRequired: "Not required yet",
     ddvLocalOnly:
-      "Counts invoices to clients in North Macedonia by date of supply, paid or not. Services to clients abroad are supplied abroad (VAT law Art. 14-а), so they don't count toward the threshold.",
+      "Counts invoices to clients in North Macedonia by date of supply, paid or not, and their payments without an invoice by the day received. Services to clients abroad are supplied abroad (VAT law Art. 14-а), so they don't count toward the threshold.",
     nextDeadline: "Next tax deadline",
     daysAway: "{date} — {days} days away",
     dueToday: "{date} — today",
@@ -117,6 +118,13 @@ export const en: Dictionary = {
     recentInvoices: "Recent Invoices",
     noInvoices: "No invoices yet",
     createFirst: "Create first invoice",
+    owedLateMonths: "{count} month(s) late",
+    owedSoFarNote: "{month} so far · pay by {date}",
+    owedNothingShort: "Nothing to pay",
+    notFiledBy: "The calculation wasn't filed by {date}",
+    notPaidBy: "The tax wasn't paid by {date}",
+    alreadyPaidYear: "Already paid for you in {year}",
+    balanceLeft: "{amount} to pay",
   },
   clients: {
     title: "Clients",
@@ -154,6 +162,9 @@ export const en: Dictionary = {
       invoiceLanguageHint: "The language of this client's invoice PDFs, whatever language you use the app in.",
       looksLikeEmbg:
         "That looks like a personal ID number (ЕМБГ). Enter the company's tax number, or leave it empty.",
+      deemedCosts: "Deemed costs (author's rights only)",
+      deemedCostsHint:
+        "Only income from author's and related rights is taxed after deemed costs (Personal Income Tax law Art. 40): 50% for sculpture, tapestry, ceramics and stained glass; 40% for art photography, painting, graphic works, industrial design, costume and fashion design, stage design, music and film works, and restoration; 30% for scientific, professional and journalistic works and for performing serious music, ballet, opera or acting; 20% for translations, lectures and other author's works. Most freelance work (software, consulting, most services) is income from work (Art. 14), with no deemed costs: leave it at 0%. New payments from this client start with this rate.",
     },
     types: {
       company: "Company",
@@ -164,7 +175,7 @@ export const en: Dictionary = {
       "This will permanently delete this client. This action cannot be undone.",
     deleteBlockedTitle: "Can't delete {name}",
     deleteBlockedDesc:
-      "{name} has {count} invoice(s). Clients with invoices can't be deleted, because the invoices are part of your income and tax records.",
+      "{name} has {count} invoice(s) or payment(s). Clients with invoices or payments can't be deleted, because they're part of your income and tax records.",
   },
   invoices: {
     title: "Invoices",
@@ -175,12 +186,12 @@ export const en: Dictionary = {
     drafts: "Drafts",
     emptyTitle: "No invoices yet",
     emptyDesc:
-      "Create your first invoice. Supports MKD, EUR, and USD with automatic conversion to MKD at a built-in approximate rate.",
+      "Create your first invoice. Supports MKD, EUR, and USD with automatic conversion to MKD at the National Bank's middle rate.",
     createFirst: "Create first invoice",
     colNumber: "Number",
     colClient: "Client",
     colAmount: "Amount",
-    colMkd: "MKD equiv.",
+    colBalance: "Balance",
     colStatus: "Status",
     newTitle: "Create invoice",
     newBreadcrumb: "New invoice",
@@ -213,6 +224,7 @@ export const en: Dictionary = {
       grandTotal: "Total",
       mkdEquivalent: "MKD equivalent",
       exchangeRate: "1 {currency} = {rate} MKD (approximate rate)",
+      exchangeRateNbrsm: "1 {currency} = {rate} MKD (NBRSM middle rate, {date})",
       notes: "Notes",
       footer: "Generated by Freelancr",
       draft: "Draft, not issued",
@@ -241,6 +253,10 @@ export const en: Dictionary = {
       dueDate: "Due date",
       lineItems: "Line items",
       approximateRate: "1 {currency} = {rate} MKD (approximate rate)",
+      nbrsmRate: "1 {currency} = {rate} MKD (National Bank middle rate, {date})",
+      rateLoading: "Looking up the National Bank's rate…",
+      rateUnavailable:
+        "the National Bank's rate couldn't be fetched, so the invoice uses this approximate rate",
       description: "Description",
       qty: "Qty",
       unitPrice: "Unit price ({currency})",
@@ -266,12 +282,24 @@ export const en: Dictionary = {
       currencyUnsupported: "This currency isn't supported. Choose one of the listed currencies.",
       requiredFields: "Choose a client, set the dates and add at least one line item.",
     },
-    status: {
+    standing: {
       draft: "Draft",
-      sent: "Issued",
+      issued: "Issued",
+      partly_paid: "Partly paid",
       paid: "Paid",
       overdue: "Overdue",
       cancelled: "Cancelled",
+    },
+    payments: {
+      title: "Payments",
+      record: "Record payment",
+      none: "No payments recorded yet. Record one when the money reaches your account.",
+      settled: "Paid so far",
+      balanceDue: "Balance due",
+      overpaid: "Overpaid by",
+      settledNote:
+        "Fees the bank or platform took and tax the client withheld count toward the invoice: the client paid them, even though they didn't reach your account.",
+      cancelHint: "To cancel this invoice, delete its payments first.",
     },
     issue: {
       button: "Issue invoice",
@@ -288,38 +316,181 @@ export const en: Dictionary = {
       button: "Cancel invoice",
       title: "Cancel {number}?",
       desc:
-        "A cancelled invoice stays in your records, since invoices have to be kept for five years (VAT law Art. 56). It stops counting as income and toward the DDV threshold, and this can't be undone. There are no credit notes yet.",
+        "A cancelled invoice stays in your records, since invoices have to be kept for five years (VAT law Art. 56). It stops counting toward the DDV threshold, and this can't be undone. There are no credit notes yet.",
       confirm: "Cancel invoice",
       keep: "Keep it",
       cancelled: "Invoice cancelled",
       notIssued: "Only issued invoices can be cancelled.",
+      hasPayments: "This invoice has payments recorded. Delete its payments first, then cancel it.",
       note:
         "Cancelled. It stays in your records for the five years invoices have to be kept (VAT law Art. 56).",
     },
   },
-  income: {
-    title: "Income & Tax",
-    subtitle: "Annual overview for {year} — paid invoices only",
-    grossIncome: "Gross income",
-    invoicesPaid: "{count} invoices paid",
-    ddvThresholdPct: "DDV threshold",
-    ddvMonitor: "DDV Threshold Monitor",
-    currentAnnual: "Supplies in North Macedonia this year",
-    alert70: "70% alert",
-    alert85: "85% alert (critical)",
-    alert100: "100% — DDV registration required",
-    ddvExceededMsg:
-      "You're over the DDV threshold. Apply for DDV registration by the 15th of the month after the one you passed it in (VAT law Art. 51(11)); talk to your accountant.",
-    ddvWarningMsg: "At this rate, you may reach the threshold before year end. {remaining} remaining.",
-    taxDeadlines: "Tax deadlines {year}",
-    passed: "Passed",
-    daysAway: "{days} days away",
-    dueToday: "Due today",
-    dueTomorrow: "Due tomorrow",
-    monthlyBreakdown: "Monthly income breakdown ({year})",
-    annualTotal: "Annual total",
-    byClient: "Income by client",
-    invShort: "inv.",
+  payments: {
+    title: "Payments",
+    subtitle:
+      "Money that reached your account in {year}, month by month, and the income tax on it.",
+    newPayment: "Record payment",
+    yearLabel: "Year",
+    yearSummary: "{year} in total",
+    received: "Received",
+    grossIncome: "Income (received plus tax withheld at source)",
+    totalIncomeTax: "Income tax on it",
+    owedPart: "You pay UJP",
+    creditPart: "Paid abroad (credited)",
+    alreadyPaidPart: "Already paid for you",
+    notPaidYet: "Not paid to UJP yet",
+    annualReturn:
+      "UJP sends you the annual tax return (ГДП) for {year}: confirm or correct it by {confirmBy} and pay any difference it shows by {payBy} (Personal Income Tax law Art. 96 and 100).",
+    selfEmployedAdvance:
+      "You're registered self-employed: here, payments only track your income. Your tax is the monthly advance of {amount} by the 15th and the annual balance by 15 March.",
+    selfEmployedNoAdvance:
+      "You're registered self-employed: here, payments only track your income. Your tax is the monthly advance by the 15th and the annual balance by 15 March.",
+    conversionNote:
+      "Each payment converts at the National Bank's middle rate on the day it reached your account, as UJP converts it.",
+    feesNote:
+      "Fees banks or platforms took aren't income: the tax is on what was credited plus any tax withheld at source.",
+    byClient: "By client",
+    paymentsCount: "{count} payment(s)",
+    empty: "No payments recorded in {year}. Record each one when the money reaches your account.",
+    noInvoice: "No invoice",
+    feesLine: "fees {amount}",
+    withheldLine: "withheld {amount}",
+    selfReportedGross: "Income you report yourself",
+    withheldGross: "Income taxed at source",
+    businessGross: "Business income",
+    otherRatesFlag:
+      "Some payments this month use a rate other than the National Bank's for their day (the invoice's rate, or one typed in), so the amounts in MKD here are approximate.",
+    evidenceHint:
+      "Attach proof to the calculation (е-ПДД): the contract or the client's confirmation of the work, and the bank statement (извод) showing the money arrived.",
+    treatments: {
+      business: "Business income",
+      withheld: "Tax withheld by the client",
+      self_reported: "You report it",
+    },
+    treatmentNotes: {
+      business:
+        "You're registered self-employed: this is business income for your annual balance, with no monthly calculation (е-ПДД).",
+      withheld:
+        "A company in North Macedonia pays you 90% and pays the 10% tax to UJP for you (Personal Income Tax law Art. 80). Nothing to file.",
+      self_reported:
+        "A client abroad or a private person in North Macedonia: you file the calculation (е-ПДД) by the 10th of next month and pay the 10% tax by the 15th.",
+    },
+    ujpStatuses: {
+      nothing: "Nothing to file",
+      to_file: "To file",
+      filed: "Filed",
+      approved: "Approved",
+      paid: "Paid",
+      late: "Late",
+    },
+    rateSources: {
+      nbrsm: "National Bank",
+      manual: "rate typed in",
+      invoice: "invoice's rate",
+    },
+    channels: {
+      bank: "Bank transfer",
+      paypal: "PayPal",
+      wise: "Wise",
+      payoneer: "Payoneer",
+      platform: "Platform payout",
+      cash: "Cash",
+      other: "Other",
+    },
+    deemedOptions: {
+      "0": "None (0%): income from work",
+      "0.2": "20%: translations, lectures, other author's works",
+      "0.3": "30%: scientific, professional, journalistic works",
+      "0.4": "40%: art photography, painting, graphics, design, music, film",
+      "0.5": "50%: sculpture, tapestry, ceramics, stained glass",
+    },
+    calendar: {
+      title: "Tax deadlines {year}",
+      passed: "Passed",
+      daysAway: "{days} days away",
+      dueToday: "Due today",
+      dueTomorrow: "Due tomorrow",
+    },
+    monthActions: {
+      calculationNumber: "Calculation no.",
+      folioNumber: "Folio no.",
+      paidOn: "Paid on",
+      markFiled: "Mark filed",
+      markApproved: "Mark approved",
+      markPaid: "Mark paid",
+      marked: "Payments updated: {count}",
+      useNbrsmRates: "Use the National Bank's rates",
+      ratesUpdated: "Payments now at the National Bank's rate: {count}",
+      errors: {
+        monthInvalid: "That month isn't valid.",
+        dateInvalid: "Enter a valid payment date.",
+        dateFuture: "The payment date can't be in the future.",
+        nothingToMark: "No payments in this month to move to that step.",
+        unavailable: "The National Bank's rates couldn't be fetched. Try again later.",
+      },
+    },
+    form: {
+      newTitle: "Record a payment",
+      editTitle: "Edit payment",
+      needClient:
+        "Add a client first: every payment comes from a client (add platforms such as Upwork as clients too).",
+      invoice: "Invoice",
+      noInvoice: "No invoice (a payout or a one-off job)",
+      balanceHint: "{number}: {amount} left to pay",
+      client: "From",
+      clientHint: "Platforms such as Upwork are clients too.",
+      receivedOn: "Received on",
+      receivedOnHint: "The day the money reached your account (the date on your bank statement).",
+      currency: "Currency",
+      amount: "Amount credited",
+      amountHint: "What reached your account.",
+      fees: "Fees",
+      feesHint: "What the bank or platform took on the way.",
+      taxWithheldLocal: "10% the client withheld",
+      taxWithheldLocalHint: "The company paid it to UJP for you (Art. 80).",
+      taxWithheldAbroad: "Tax withheld abroad",
+      taxWithheldAbroadHint:
+        "Credited only up to the 10% due here, and only with the foreign tax authority's certificate. Fees and commissions don't count.",
+      taxWithheldAtSource: "Tax withheld at source",
+      rate: "Exchange rate",
+      rateNbrsm: "1 {currency} = {rate} MKD (National Bank middle rate, {date})",
+      rateLoading: "Looking up the National Bank's rate…",
+      rateUnavailable:
+        "The National Bank's rate for {date} couldn't be fetched. Type the rate from its exchange rate list:",
+      manualRate: "MKD for 1 {currency}",
+      deemedCosts: "Deemed costs",
+      deemedCostsHint:
+        "Only for income from author's rights (Art. 40). Most freelance work is income from work (Art. 14): 0%.",
+      channel: "Received via",
+      note: "Note",
+      previewReceived: "Received",
+      previewGross: "Income",
+      previewTax: "Income tax (10%)",
+      previewCredit: "Paid abroad (credited)",
+      previewOwed: "You pay UJP",
+      previewAlreadyPaid: "Already paid for you",
+      submit: "Save payment",
+      delete: "Delete payment",
+      deleteTitle: "Delete this payment?",
+      deleteDesc:
+        "Its invoice goes back to unpaid or partly paid, and the month's tax changes. This can't be undone.",
+      errors: {
+        dateInvalid: "Enter a valid date for when the money arrived.",
+        dateFuture: "The day the money arrived can't be in the future.",
+        amountInvalid: "Enter the amount credited, more than 0.",
+        feesInvalid: "Fees must be 0 or more.",
+        withheldInvalid: "Tax withheld must be 0 or more.",
+        withheldNotAllowed:
+          "A private person in North Macedonia doesn't withhold tax: leave this empty.",
+        currencyInvalid: "Choose one of the listed currencies (for an invoice, its own currency).",
+        clientInvalid: "Choose one of your clients.",
+        invoiceInvalid: "Choose one of your issued invoices (not a draft or a cancelled one).",
+        rateRequired: "The National Bank's rate couldn't be fetched: type it in.",
+        deemedInvalid: "Choose one of the listed deemed-cost rates.",
+        notFound: "This payment doesn't exist or isn't yours.",
+      },
+    },
   },
   settings: {
     title: "Settings",
@@ -369,7 +540,7 @@ export const en: Dictionary = {
   tax: {
     statusLabel: "How are you registered for tax?",
     statusHint:
-      "This decides which tax deadlines the dashboard and the Income & Tax page show.",
+      "This decides which tax deadlines the dashboard and the Payments page show, and how the tax on new payments is worked out.",
     statuses: {
       paid_from_abroad: "Not registered for an activity",
       self_employed: "Registered self-employed",
@@ -396,7 +567,7 @@ export const en: Dictionary = {
     ],
     rules: {
       paid_from_abroad:
-        "For each month in which a client abroad or a private person in North Macedonia paid you, submit the tax calculation (е-ППД) to UJP by the 10th of the next month and pay the tax by the 15th. Companies in North Macedonia withhold the tax when they pay you, so their invoices don't add a month.",
+        "For each month in which a client abroad or a private person in North Macedonia paid you, submit the tax calculation (е-ПДД) to UJP by the 10th of the next month and pay the tax by the 15th. Companies in North Macedonia withhold the tax when they pay you, so their payments don't add a month.",
       self_employed:
         "Pay an income tax advance by the 15th of each month for the previous month. File the annual tax balance (ПДД-ДБ) and the statement of income and expenses by 15 March of the next year, and pay any difference by 30 March.",
     },
@@ -406,6 +577,8 @@ export const en: Dictionary = {
       advance: "Pay the income tax advance for {period}",
       annualReturn: "File the annual tax balance (ПДД-ДБ) for {period}",
       annualPayment: "Pay any difference from the {period} tax balance",
+      returnConfirm: "Confirm or correct the annual tax return (ГДП) for {period}",
+      returnPay: "Pay the tax from the {period} annual tax return",
     },
     actions: {
       report: "Submit the calculation by {date}",
@@ -413,16 +586,19 @@ export const en: Dictionary = {
       advance: "Pay by {date}",
       annualReturn: "File ПДД-ДБ by {date}",
       annualPayment: "Pay any difference by {date}",
+      returnConfirm: "Confirm or correct it by {date}",
+      returnPay: "Pay by {date}",
     },
     groups: {
       income: "{period} income",
       advance: "Advance for {period}",
       annual: "Annual tax balance {period}",
+      return: "Annual tax return {period}",
     },
     basedOn: "Deadlines for: {status}.",
     changeInSettings: "Change in Settings",
     noUpcoming:
-      "No tax deadline coming up. Once a client abroad or a private person in North Macedonia pays an invoice and you mark it paid, that month's deadlines show up here.",
+      "No tax deadline coming up. Once you record a payment from a client abroad or a private person in North Macedonia, that month's deadlines show up here.",
     noneInYear:
       "None yet. Deadlines show up for each month in which a client abroad or a private person in North Macedonia paid you.",
     then: "Then: {label}, {date}",
@@ -432,12 +608,14 @@ export const en: Dictionary = {
       tileDue: "{month} income · pay by {date}",
       forMonth: "Tax on {month} income",
       soFar: "{month} so far",
-      fileAndPay: "File the calculation (е-ППД) by {reportBy}, pay by {payBy}",
+      fileAndPay: "File the calculation (е-ПДД) by {reportBy}, pay by {payBy}",
       nothing:
-        "Nothing to pay yet. When a client abroad or a private person in North Macedonia pays an invoice and you mark it paid, the tax on it (10%) shows up here.",
+        "Nothing to pay. When you record a payment from a client abroad or a private person in North Macedonia, the tax on it shows up here.",
       note:
-        "Approximate: 10% of what these clients paid, at the exchange rate stored on each invoice. UJP converts at the National Bank's (NBRSM) middle rate on the day the money arrived, which the app doesn't use yet, and income from author's rights is taxed after deemed costs (Personal Income Tax law, Art. 40), so this can be more than you owe. The calculation UJP approves is the real figure.",
-      groupAmount: "Tax ≈ {amount}",
+        "Worked out from the payments you recorded, each converted at the National Bank's middle rate on the day it arrived, as UJP does. The calculation UJP approves is the final figure: pay the amount on its payment order (ПП53).",
+      noteApproximate:
+        "Approximate: some of these payments use a rate other than the National Bank's for their day (the invoice's rate, or one typed in). Switch them to the National Bank's rates on the Payments page. The calculation UJP approves is the final figure.",
+      groupAmount: "Tax: {amount}",
       advanceTile: "Advance due by {date}",
       advanceHint:
         "Enter your monthly advance to see it here. It's 1/12 of the tax in last year's annual tax balance, which the app can't work out: take it from your balance or ask your accountant.",

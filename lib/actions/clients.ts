@@ -2,10 +2,11 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getDb, clients, invoices } from "@/lib/db";
+import { getDb, clients, invoices, payments } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId } from "@/lib/utils";
 import { isSupportedCurrency } from "@/lib/tax/calculator";
+import { isDeemedCostsRate } from "@/lib/payments/config";
 import {
   DEFAULT_CLIENT_TYPE,
   defaultInvoiceLanguage,
@@ -36,6 +37,13 @@ function readInvoiceLanguage(formData: FormData, country: string) {
   return isInvoiceLanguage(value) ? value : defaultInvoiceLanguage(country);
 }
 
+// The deemed costs new payments from this client start with (Personal Income
+// Tax law Art. 40: author's rights only). Anything not on the list is 0.
+function readDeemedCostsRate(formData: FormData): number {
+  const value = Number(formData.get("deemedCostsRate") ?? 0);
+  return isDeemedCostsRate(value) ? value : 0;
+}
+
 export async function createClient(formData: FormData) {
   const session = await getSession();
   if (!session) redirect("/sign-in");
@@ -64,6 +72,7 @@ export async function createClient(formData: FormData) {
     country,
     currency,
     invoiceLanguage: readInvoiceLanguage(formData, country),
+    deemedCostsRate: readDeemedCostsRate(formData),
     address: address || null,
     notes: notes || null,
   });
@@ -96,6 +105,7 @@ export async function updateClient(id: string, formData: FormData) {
       country,
       currency,
       invoiceLanguage: readInvoiceLanguage(formData, country),
+      deemedCostsRate: readDeemedCostsRate(formData),
       address: (formData.get("address") as string) || null,
       notes: (formData.get("notes") as string) || null,
     })
@@ -105,12 +115,19 @@ export async function updateClient(id: string, formData: FormData) {
   redirect("/clients");
 }
 
-async function countClientInvoices(clientId: string, userId: string) {
-  const [row] = await getDb()
-    .select({ value: count() })
-    .from(invoices)
-    .where(and(eq(invoices.clientId, clientId), eq(invoices.userId, userId)));
-  return row?.value ?? 0;
+// Invoices plus payments: both are income records that keep a client.
+async function countClientRecords(clientId: string, userId: string) {
+  const [[invoiceRow], [paymentRow]] = await Promise.all([
+    getDb()
+      .select({ value: count() })
+      .from(invoices)
+      .where(and(eq(invoices.clientId, clientId), eq(invoices.userId, userId))),
+    getDb()
+      .select({ value: count() })
+      .from(payments)
+      .where(and(eq(payments.clientId, clientId), eq(payments.userId, userId))),
+  ]);
+  return (invoiceRow?.value ?? 0) + (paymentRow?.value ?? 0);
 }
 
 // Postgres foreign_key_violation. Drizzle wraps the driver error, so the
@@ -123,30 +140,32 @@ function isForeignKeyViolation(error: unknown): boolean {
   );
 }
 
-function deleteBlocked(invoiceCount: number) {
+function deleteBlocked(recordCount: number) {
   // Refresh the list so the dialog switches to the "can't delete" message.
   revalidatePath("/clients");
-  return { errorKey: "deleteBlocked" as const, invoiceCount };
+  return { errorKey: "deleteBlocked" as const, recordCount };
 }
 
-// Invoices are income records, so invoices.client_id has no ON DELETE
-// action and Postgres refuses to delete a client that still has any.
-// Check first so the user gets a clear message instead of a failed query.
+// Invoices and payments are income records, so invoices.client_id and
+// payments.client_id have no ON DELETE action and Postgres refuses to delete
+// a client that still has any. Check first so the user gets a clear message
+// instead of a failed query.
 export async function deleteClient(id: string) {
   const session = await getSession();
   if (!session) redirect("/sign-in");
 
-  const invoiceCount = await countClientInvoices(id, session.userId);
-  if (invoiceCount > 0) return deleteBlocked(invoiceCount);
+  const recordCount = await countClientRecords(id, session.userId);
+  if (recordCount > 0) return deleteBlocked(recordCount);
 
   try {
     await getDb()
       .delete(clients)
       .where(and(eq(clients.id, id), eq(clients.userId, session.userId)));
   } catch (error) {
-    // An invoice created after the count above still trips the constraint.
+    // An invoice or payment saved after the count above still trips the
+    // constraint.
     if (isForeignKeyViolation(error)) {
-      return deleteBlocked(await countClientInvoices(id, session.userId));
+      return deleteBlocked(await countClientRecords(id, session.userId));
     }
     throw error;
   }

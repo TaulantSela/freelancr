@@ -5,9 +5,17 @@ import {
   timestamp,
   boolean,
   uniqueIndex,
+  index,
+  check,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { DEFAULT_TAX_STATUS, TAX_STATUSES } from "../tax/calculator";
+import {
+  PAYMENT_CHANNELS,
+  PAYMENT_RATE_SOURCES,
+  TAX_TREATMENTS,
+  UJP_STATUSES,
+} from "../payments/config";
 import {
   CLIENT_TYPES,
   DEFAULT_CLIENT_TYPE,
@@ -81,8 +89,17 @@ export const clients = pgTable("clients", {
   address: text("address"),
   contactPerson: text("contact_person"),
   notes: text("notes"),
+  // Deemed costs for author's-rights income (Personal Income Tax law Art.
+  // 40): 0, 0.2, 0.3, 0.4 or 0.5. The default for this client's
+  // self-reported payments; 0 for anything that isn't author's rights.
+  deemedCostsRate: doublePrecision("deemed_costs_rate").notNull().default(0),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-});
+}, (table) => [
+  check(
+    "clients_deemed_costs_rate_allowed",
+    sql`${table.deemedCostsRate} in (0, 0.2, 0.3, 0.4, 0.5)`
+  ),
+]);
 
 export const invoices = pgTable("invoices", {
   id: text("id").primaryKey(),
@@ -104,7 +121,16 @@ export const invoices = pgTable("invoices", {
   supplyDate: text("supply_date"),
   dueDate: text("due_date"),
   currency: text("currency").notNull().default("EUR"),
+  // MKD for one unit of the currency: the NBRSM middle rate on the date of
+  // supply, when the VAT liability arises (VAT law Art. 20, Art. 31(1)), or
+  // today's for a supply date still ahead.
   exchangeRateMKD: doublePrecision("exchange_rate_mkd").notNull().default(1),
+  // "nbrsm", or "approximate" when the National Bank couldn't be reached and
+  // the fixed fallback rate was used. Null on invoices saved before rates
+  // were looked up, which all used the fixed rates.
+  rateSource: text("rate_source", { enum: ["nbrsm", "approximate"] }),
+  // "YYYY-MM-DD": the day of the NBRSM list the rate comes from.
+  rateDate: text("rate_date"),
   subtotal: doublePrecision("subtotal").notNull().default(0),
   ddvRate: doublePrecision("ddv_rate").notNull().default(0),
   ddvAmount: doublePrecision("ddv_amount").notNull().default(0),
@@ -132,8 +158,64 @@ export const invoiceItems = pgTable("invoice_items", {
   total: doublePrecision("total").notNull(),
 });
 
-// Not read or written yet: invoices use the fixed rates in
-// lib/tax/calculator.ts. Kept for caching the National Bank's daily rates.
+// Money a client sent, as it reached the account (lib/payments/config.ts).
+// An invoice is settled by the payments linked to it; a payment without an
+// invoice is a payout (a platform, a one-off job). Amounts are in the
+// payment's currency, which is the invoice's when linked.
+export const payments = pgTable("payments", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  // Who paid. Platforms such as Upwork are clients too.
+  clientId: text("client_id")
+    .notNull()
+    .references(() => clients.id),
+  // Null for a payout without an invoice.
+  invoiceId: text("invoice_id").references(() => invoices.id),
+  // "YYYY-MM-DD": the day the money reached the account, when the income is
+  // realised (Personal Income Tax law Art. 93(2)).
+  receivedOn: text("received_on").notNull(),
+  currency: text("currency").notNull(),
+  // What was credited.
+  amount: doublePrecision("amount").notNull(),
+  // Taken by banks or platforms on the way: it settles the invoice but isn't
+  // income.
+  fees: doublePrecision("fees").notNull().default(0),
+  // Tax the payer withheld at source, in the payment's currency: a local
+  // company's 10% (Art. 80(1)) or tax withheld abroad (Art. 8(4)).
+  taxWithheld: doublePrecision("tax_withheld").notNull().default(0),
+  // MKD for one unit of the currency on received_on.
+  rateToMKD: doublePrecision("rate_to_mkd").notNull(),
+  rateSource: text("rate_source", { enum: PAYMENT_RATE_SOURCES }).notNull(),
+  // Fixed when saved; not editable, and kept if the user's tax status
+  // changes later.
+  taxTreatment: text("tax_treatment", { enum: TAX_TREATMENTS }).notNull(),
+  deemedCostsRate: doublePrecision("deemed_costs_rate").notNull().default(0),
+  channel: text("channel", { enum: PAYMENT_CHANNELS }),
+  note: text("note"),
+  // Self-reported payments only: where the е-ПДД calculation stands, its
+  // number, UJP's folio number and the day the tax was paid.
+  ujpStatus: text("ujp_status", { enum: UJP_STATUSES }),
+  ujpReference: text("ujp_reference"),
+  ujpFolio: text("ujp_folio"),
+  taxPaidOn: text("tax_paid_on"),
+  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+}, (table) => [
+  index("payments_user_id_received_on_idx").on(table.userId, table.receivedOn),
+  index("payments_invoice_id_idx").on(table.invoiceId),
+  check("payments_amount_positive", sql`${table.amount} > 0`),
+  check("payments_fees_not_negative", sql`${table.fees} >= 0`),
+  check("payments_tax_withheld_not_negative", sql`${table.taxWithheld} >= 0`),
+  check("payments_rate_positive", sql`${table.rateToMKD} > 0`),
+  check(
+    "payments_deemed_costs_rate_allowed",
+    sql`${table.deemedCostsRate} in (0, 0.2, 0.3, 0.4, 0.5)`
+  ),
+]);
+
+// The National Bank's middle rates, cached per day and currency
+// (lib/rates/queries.ts).
 export const exchangeRateCache = pgTable("exchange_rate_cache", {
   id: text("id").primaryKey(),
   date: text("date").notNull(),
@@ -151,3 +233,5 @@ export type Invoice = typeof invoices.$inferSelect;
 export type NewInvoice = typeof invoices.$inferInsert;
 export type InvoiceItem = typeof invoiceItems.$inferSelect;
 export type NewInvoiceItem = typeof invoiceItems.$inferInsert;
+export type Payment = typeof payments.$inferSelect;
+export type NewPayment = typeof payments.$inferInsert;

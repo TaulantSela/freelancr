@@ -21,6 +21,8 @@ import { Plus, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "@/lib/i18n/client";
 import { formatMessage } from "@/lib/i18n/format";
+import { formatTaxDate } from "@/lib/tax/labels";
+import { useNbrsmRate } from "@/components/rates/use-nbrsm-rate";
 
 type LineItem = {
   description: string;
@@ -85,8 +87,23 @@ export function InvoiceForm({
   const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   const ddvAmount = subtotal * ddvRate;
   const total = subtotal + ddvAmount;
-  const rate = getRateToMKD(currency);
+  // The NBRSM middle rate on the date of supply (today's while it's still
+  // ahead), as the action will save it; the fixed approximate rate only if the
+  // National Bank can't be reached.
+  const rateDate = supplyDate && supplyDate < today ? supplyDate : today;
+  const nbrsm = useNbrsmRate(currency, rateDate);
+  const rate = nbrsm.status === "ready" ? nbrsm.rate : getRateToMKD(currency);
   const totalMKD = total * rate;
+  const rateLabel =
+    nbrsm.status === "ready"
+      ? formatMessage(f.nbrsmRate, {
+          currency,
+          rate: String(nbrsm.rate),
+          date: formatTaxDate(nbrsm.date, t),
+        })
+      : nbrsm.status === "loading"
+      ? f.rateLoading
+      : `${formatMessage(f.approximateRate, { currency, rate: String(rate) })} · ${f.rateUnavailable}`;
 
   function addItem() {
     setItems((prev) => [...prev, { description: "", quantity: 1, unitPrice: 0 }]);
@@ -210,9 +227,9 @@ export function InvoiceForm({
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium">{f.lineItems}</Label>
-          <span className="text-xs text-muted-foreground">
-            {formatMessage(f.approximateRate, { currency, rate: String(rate) })}
-          </span>
+          {currency !== "MKD" && (
+            <span className="text-xs text-muted-foreground text-right">{rateLabel}</span>
+          )}
         </div>
 
         <div className="grid grid-cols-[1fr_80px_110px_32px] gap-2 text-xs text-muted-foreground uppercase tracking-wider">
@@ -315,7 +332,7 @@ export function InvoiceForm({
           {currency !== "MKD" && (
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>{f.mkdEquivalent}</span>
-              <span className="font-mono text-yellow-400">{formatMKD(totalMKD)}</span>
+              <span className="font-mono">{formatMKD(totalMKD)}</span>
             </div>
           )}
         </div>

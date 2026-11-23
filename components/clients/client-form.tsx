@@ -20,6 +20,7 @@ import {
   type InvoiceLanguage,
 } from "@/lib/clients/config";
 import { LOCALE_LABELS } from "@/lib/i18n/config";
+import { DEEMED_COSTS_RATES, taxTreatmentFor } from "@/lib/payments/config";
 import type { Client } from "@/lib/db/schema";
 
 type State = {
@@ -43,10 +44,14 @@ async function updateClientAction(
 export function ClientForm({
   client,
   countries,
+  taxStatus,
 }: {
   client?: Client;
   // From getCountryOptions(), in the UI language.
   countries: { code: string; name: string }[];
+  // The user's (users.tax_status): it decides whether this client's payments
+  // are self-reported, which is when deemed costs can apply.
+  taxStatus: string;
 }) {
   const t = useTranslations();
   const isEdit = Boolean(client);
@@ -73,6 +78,9 @@ export function ClientForm({
     client ? resolveInvoiceLanguage(client) : defaultInvoiceLanguage(initialCountry)
   );
   const [languagePicked, setLanguagePicked] = useState(isEdit);
+  const [country, setCountry] = useState(initialCountry);
+  const selfReported =
+    country !== "" && taxTreatmentFor(taxStatus, { country, clientType }) === "self_reported";
 
   return (
     <form action={action} className="space-y-5">
@@ -159,6 +167,7 @@ export function ClientForm({
             required
             defaultValue={initialCountry}
             onChange={(e) => {
+              setCountry(e.target.value);
               if (!languagePicked) setInvoiceLanguage(defaultInvoiceLanguage(e.target.value));
             }}
             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
@@ -210,6 +219,27 @@ export function ClientForm({
         </select>
         <p className="text-xs text-muted-foreground">{t.clients.form.invoiceLanguageHint}</p>
       </div>
+
+      {/* Only where the user works out the tax on this client's payments;
+          left out, it's saved as 0. */}
+      {selfReported && (
+        <div className="space-y-1.5">
+          <Label htmlFor="deemedCostsRate">{t.clients.form.deemedCosts}</Label>
+          <select
+            name="deemedCostsRate"
+            id="deemedCostsRate"
+            defaultValue={String(client?.deemedCostsRate ?? 0)}
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:w-1/2"
+          >
+            {DEEMED_COSTS_RATES.map((r) => (
+              <option key={r} value={String(r)} className="bg-card">
+                {t.payments.deemedOptions[String(r) as keyof typeof t.payments.deemedOptions]}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-muted-foreground">{t.clients.form.deemedCostsHint}</p>
+        </div>
+      )}
 
       <div className="space-y-1.5">
         <Label htmlFor="address">{t.clients.form.address}</Label>

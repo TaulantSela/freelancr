@@ -1,11 +1,11 @@
-import { and, eq, sql } from "drizzle-orm";
-import { getDb, invoices, clients, users } from "@/lib/db";
+import { and, eq, gte, isNull, lte, sql } from "drizzle-orm";
+import { getDb, invoices, clients, users, payments } from "@/lib/db";
 import {
   DEFAULT_TAX_STATUS,
   isTaxStatus,
-  type SelfReportedPayment,
   type TaxStatus,
   type ThresholdInvoice,
+  type ThresholdPayout,
 } from "./calculator";
 
 export type TaxProfile = {
@@ -60,36 +60,27 @@ export async function getInvoicesForThreshold(
     );
 }
 
-// Paid invoices that can lead to a deadline, or tax owed, in `year`: the ones
-// paid from December of the year before, whose report is due in January. The
-// bound is a day early because paidAt is stored in UTC, which is behind North
-// Macedonia; getSelfReportedIncomeMonths() and getMonthlyTaxOwed() then work
-// out each exact month.
-export async function getPaidInvoicesForDeadlines(
+// Payments without an invoice received in `year`, with the payer's country;
+// getLocalSupplies() counts the ones from clients in North Macedonia.
+export async function getPayoutsForThreshold(
   userId: string,
   year: number
-): Promise<SelfReportedPayment[]> {
-  const since = `${year - 1}-11-30`;
+): Promise<ThresholdPayout[]> {
   const rows = await getDb()
     .select({
-      paidAt: invoices.paidAt,
-      date: invoices.date,
       clientCountry: clients.country,
-      clientType: clients.clientType,
-      subtotal: invoices.subtotal,
-      exchangeRateMKD: invoices.exchangeRateMKD,
+      receivedOn: payments.receivedOn,
+      valueMKD: sql<number>`(${payments.amount} + ${payments.fees} + ${payments.taxWithheld}) * ${payments.rateToMKD}`,
     })
-    .from(invoices)
-    .innerJoin(clients, eq(invoices.clientId, clients.id))
+    .from(payments)
+    .innerJoin(clients, eq(payments.clientId, clients.id))
     .where(
       and(
-        eq(invoices.userId, userId),
-        eq(invoices.status, "paid"),
-        sql`coalesce(${invoices.paidAt}, ${invoices.date}) >= ${since}`
+        eq(payments.userId, userId),
+        isNull(payments.invoiceId),
+        gte(payments.receivedOn, `${year}-01-01`),
+        lte(payments.receivedOn, `${year}-12-31`)
       )
     );
-  return rows.map(({ subtotal, exchangeRateMKD, ...row }) => ({
-    ...row,
-    amountMKD: subtotal * exchangeRateMKD,
-  }));
+  return rows.map((r) => ({ ...r, valueMKD: Number(r.valueMKD) }));
 }

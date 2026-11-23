@@ -1,12 +1,10 @@
 import { getSession } from "@/lib/auth/session";
 import { getDb, invoices, clients } from "@/lib/db";
-import { eq, sum, count, and, gte, inArray, desc } from "drizzle-orm";
+import { eq, and, inArray, isNotNull, desc } from "drizzle-orm";
 import {
   getDDVStatus,
   getLocalSupplies,
   getUpcomingTaxDeadlines,
-  getSelfReportedIncomeMonths,
-  getOwedToUjp,
   toSkopjeDate,
   daysBetween,
   formatMKD,
@@ -15,10 +13,20 @@ import {
 } from "@/lib/tax/calculator";
 import {
   getTaxProfile,
-  getPaidInvoicesForDeadlines,
   getInvoicesForThreshold,
+  getPayoutsForThreshold,
 } from "@/lib/tax/queries";
 import { formatTaxDate, formatTaxPeriod, taxDeadlineLabel } from "@/lib/tax/labels";
+import { getPaymentsReceived, getPaymentYears, getSettledByInvoice } from "@/lib/payments/queries";
+import { invoiceStanding } from "@/lib/payments/settlement";
+import {
+  deadlineMet,
+  owedToUjp,
+  selfReportedMonths,
+  summarizeMonths,
+  summarizeYear,
+  type MonthSummary,
+} from "@/lib/tax/payments";
 import { formatDate, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,86 +42,104 @@ import {
   Clock,
   CircleDollarSign,
 } from "lucide-react";
+import { InvoiceStandingBadge } from "@/components/invoices/invoice-standing-badge";
 import { getTranslations } from "@/lib/i18n/server";
 import { formatMessage } from "@/lib/i18n/format";
 import type { Dictionary } from "@/lib/i18n/types";
-
-type InvoiceStatus = keyof Dictionary["invoices"]["status"];
 
 export default async function DashboardPage() {
   const session = await getSession();
   if (!session) return null;
 
   const { t } = await getTranslations();
-  const year = new Date().getFullYear();
-  const yearStart = `${year}-01-01`;
-
-  const [annualStats] = await getDb()
-    .select({ totalMKD: sum(invoices.totalMKD), totalInvoices: count() })
-    .from(invoices)
-    .where(
-      and(
-        eq(invoices.userId, session.userId),
-        eq(invoices.status, "paid"),
-        gte(invoices.date, yearStart)
-      )
-    );
-
-  const annualIncomeMKD = Number(annualStats?.totalMKD ?? 0);
-
-  // Issued and not paid yet, overdue or not.
-  const [outstandingStats] = await getDb()
-    .select({ cnt: count() })
-    .from(invoices)
-    .where(
-      and(
-        eq(invoices.userId, session.userId),
-        inArray(invoices.status, ["sent", "overdue"])
-      )
-    );
-
-  const recentInvoices = await getDb()
-    .select({
-      id: invoices.id,
-      number: invoices.number,
-      date: invoices.date,
-      total: invoices.total,
-      currency: invoices.currency,
-      status: invoices.status,
-      clientName: clients.name,
-    })
-    .from(invoices)
-    .leftJoin(clients, eq(invoices.clientId, clients.id))
-    .where(eq(invoices.userId, session.userId))
-    .orderBy(desc(invoices.createdAt))
-    .limit(5);
-
-  // The next UJP deadline for how the user is registered for tax. When not
-  // registered, only months with self-reported income (a client abroad or a
-  // private person in North Macedonia paid) have deadlines, and the tax owed
-  // is 10% of that income (approximate; see getOwedToUjp).
   const today = toSkopjeDate(new Date());
-  const { taxStatus, monthlyAdvanceMKD, vatRegistered } = await getTaxProfile(session.userId);
+  const thisYear = Number(today.slice(0, 4));
+  const yearStart = `${thisYear}-01-01`;
+
+  const [profile, rows, paymentYears, issued, settledByInvoice, recent] = await Promise.all([
+    getTaxProfile(session.userId),
+    // This year's payments, plus earlier self-reported ones UJP isn't paid
+    // for yet: those are still owed.
+    getPaymentsReceived(session.userId, yearStart, today, { includeOlderUnpaid: true }),
+    getPaymentYears(session.userId),
+    getDb()
+      .select({
+        id: invoices.id,
+        status: invoices.status,
+        total: invoices.total,
+        dueDate: invoices.dueDate,
+        exchangeRateMKD: invoices.exchangeRateMKD,
+      })
+      .from(invoices)
+      .where(
+        and(
+          eq(invoices.userId, session.userId),
+          isNotNull(invoices.number),
+          inArray(invoices.status, ["sent", "paid", "overdue"])
+        )
+      ),
+    getSettledByInvoice(session.userId),
+    getDb()
+      .select({
+        id: invoices.id,
+        number: invoices.number,
+        date: invoices.date,
+        dueDate: invoices.dueDate,
+        total: invoices.total,
+        currency: invoices.currency,
+        status: invoices.status,
+        clientName: clients.name,
+      })
+      .from(invoices)
+      .leftJoin(clients, eq(invoices.clientId, clients.id))
+      .where(eq(invoices.userId, session.userId))
+      .orderBy(desc(invoices.createdAt))
+      .limit(5),
+  ]);
+  const { taxStatus, monthlyAdvanceMKD, vatRegistered } = profile;
+  const notRegistered = taxStatus === "paid_from_abroad";
+
+  // What's owed to UJP, from the payments: every self-reported month not
+  // marked paid yet, late ones first.
+  const months = summarizeMonths(rows, today);
+  const owed = owedToUjp(months, today);
+  const openMonths = [...owed.late, owed.due, owed.current].filter(
+    (m): m is MonthSummary => m !== null && m.status !== "nothing" && m.status !== "paid"
+  );
+  const approximate = openMonths.some((m) => m.hasOtherRates);
+  const year = summarizeYear(summarizeMonths(rows.filter((r) => r.receivedOn >= yearStart), today));
+  const yearPayments = rows.filter((r) => r.receivedOn >= yearStart).length;
+
+  // Outstanding: issued invoices with something left to pay, in MKD at each
+  // invoice's rate.
+  const unpaid = issued
+    .map((inv) => ({ inv, standing: invoiceStanding(inv, settledByInvoice.get(inv.id) ?? 0, today) }))
+    .filter(({ standing }) => standing.balance > 0);
+  const outstandingMKD = unpaid.reduce((s, { inv, standing }) => s + standing.balance * inv.exchangeRateMKD, 0);
 
   // The DDV threshold counts this year's supplies in North Macedonia only
   // (getLocalSupplies). It doesn't apply once registered for VAT, and
   // there's nothing to show without a local supply.
-  const thisYear = Number(today.slice(0, 4));
   const localSupplies = vatRegistered
     ? { totalMKD: 0, count: 0 }
-    : getLocalSupplies(await getInvoicesForThreshold(session.userId, thisYear), thisYear);
+    : getLocalSupplies(
+        await getInvoicesForThreshold(session.userId, thisYear),
+        thisYear,
+        await getPayoutsForThreshold(session.userId, thisYear)
+      );
   const showDdv = !vatRegistered && localSupplies.count > 0;
   const ddvStatus = getDDVStatus(localSupplies.totalMKD);
-  const notRegistered = taxStatus === "paid_from_abroad";
-  const payments = notRegistered
-    ? await getPaidInvoicesForDeadlines(session.userId, Number(today.slice(0, 4)))
-    : [];
-  const incomeMonths = getSelfReportedIncomeMonths(payments);
-  const owed = getOwedToUjp(payments, today);
-  // The payment coming up: last month's until the 15th, then this month's.
-  const owedNext = owed.due ?? owed.current;
-  const hasOwed = owed.due !== null || owed.current.incomeMKD > 0;
-  const upcomingDeadlines = getUpcomingTaxDeadlines(taxStatus, today, incomeMonths);
+
+  // The next UJP deadline for how the user is registered for tax, leaving
+  // out what's already done: a month's calculation once it's filed, its
+  // payment once it's paid.
+  const monthByKey = new Map(months.map((m) => [m.month, m]));
+  const upcomingDeadlines = getUpcomingTaxDeadlines(
+    taxStatus,
+    today,
+    selfReportedMonths(rows),
+    paymentYears
+  ).filter((d) => !deadlineMet(d, monthByKey));
   const nextAdvance = upcomingDeadlines.find((d) => d.kind === "advance");
   const [nextDeadline] = upcomingDeadlines;
   // Everything due on the next date (an advance and the annual balance can
@@ -135,14 +161,6 @@ export default async function DashboardPage() {
       { date: formatTaxDate(nextDeadline.dueDate, t), days: daysToNext ?? 0 }
     );
 
-  const statusColors: Record<string, string> = {
-    paid: "text-emerald-400",
-    sent: "text-blue-400",
-    overdue: "text-red-400",
-    draft: "text-zinc-400",
-    cancelled: "text-zinc-500",
-  };
-
   const ddvColors = {
     safe: "bg-emerald-500",
     warning: "bg-yellow-500",
@@ -157,20 +175,42 @@ export default async function DashboardPage() {
     exceeded: { label: t.dashboard.ddvExceeded, variant: "destructive" as const },
   };
 
+  const owedTileNote =
+    owed.late.length > 0
+      ? formatMessage(t.dashboard.owedLateMonths, { count: owed.late.length })
+      : owed.due
+      ? formatMessage(t.tax.owed.tileDue, {
+          month: formatTaxPeriod(owed.due.month, t),
+          date: formatTaxDate(owed.due.payBy, t),
+        })
+      : owed.current && owed.current.unpaidOwedMKD > 0
+      ? formatMessage(t.dashboard.owedSoFarNote, {
+          month: formatTaxPeriod(owed.current.month, t),
+          date: formatTaxDate(owed.current.payBy, t),
+        })
+      : t.dashboard.owedNothingShort;
+
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">{t.dashboard.title}</h1>
           <p className="text-sm text-muted-foreground">
-            {formatMessage(t.dashboard.welcome, { name: session.name, year })}
+            {formatMessage(t.dashboard.welcome, { name: session.name, year: thisYear })}
           </p>
         </div>
-        <Link href="/invoices/new">
-          <Button size="sm" className="gap-2">
-            <Plus className="h-4 w-4" /> {t.dashboard.newInvoice}
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/payments/new">
+            <Button size="sm" variant="outline" className="gap-2">
+              <Plus className="h-4 w-4" /> {t.payments.newPayment}
+            </Button>
+          </Link>
+          <Link href="/invoices/new">
+            <Button size="sm" className="gap-2">
+              <Plus className="h-4 w-4" /> {t.dashboard.newInvoice}
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {showDdv && ddvStatus.alertLevel !== "safe" && (
@@ -194,7 +234,7 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-5">
             <div className="flex items-center gap-2 mb-1">
@@ -205,12 +245,21 @@ export default async function DashboardPage() {
             </div>
             {notRegistered ? (
               <>
-                <div className="text-xl font-mono font-semibold">{formatMKD(owedNext.taxMKD)}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">
-                  {formatMessage(t.tax.owed.tileDue, {
-                    month: formatTaxPeriod(owedNext.month, t),
-                    date: formatTaxDate(owedNext.payBy, t),
-                  })}
+                <div
+                  className={cn(
+                    "text-xl font-mono font-semibold",
+                    owed.late.length > 0 && "text-red-400"
+                  )}
+                >
+                  {formatMKD(owed.totalUnpaidMKD)}
+                </div>
+                <div
+                  className={cn(
+                    "text-xs mt-0.5",
+                    owed.late.length > 0 ? "text-red-400" : "text-muted-foreground"
+                  )}
+                >
+                  {owedTileNote}
                 </div>
               </>
             ) : (
@@ -234,12 +283,12 @@ export default async function DashboardPage() {
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
               <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                {t.dashboard.annualIncome}
+                {formatMessage(t.dashboard.receivedIn, { year: thisYear })}
               </span>
             </div>
-            <div className="text-xl font-mono font-semibold">{formatMKD(annualIncomeMKD)}</div>
+            <div className="text-xl font-mono font-semibold">{formatMKD(year.receivedMKD)}</div>
             <div className="text-xs text-muted-foreground mt-0.5">
-              {formatMessage(t.dashboard.paidInvoicesYear, { year })}
+              {formatMessage(t.dashboard.paymentsCount, { count: yearPayments })}
             </div>
           </CardContent>
         </Card>
@@ -251,8 +300,10 @@ export default async function DashboardPage() {
                 {t.dashboard.outstanding}
               </span>
             </div>
-            <div className="text-xl font-mono font-semibold">{outstandingStats?.cnt ?? 0}</div>
-            <div className="text-xs text-muted-foreground mt-0.5">{t.dashboard.awaitingPayment}</div>
+            <div className="text-xl font-mono font-semibold">{formatMKD(outstandingMKD)}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              {formatMessage(t.dashboard.awaitingPayment, { count: unpaid.length })}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -260,49 +311,26 @@ export default async function DashboardPage() {
       <div className={cn("grid gap-4", showDdv && "md:grid-cols-2")}>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm flex items-center justify-between">
+            <CardTitle className="text-sm flex flex-wrap items-center justify-between gap-2">
               {t.tax.owed.title}
-              {notRegistered && (
-                <Badge variant="outline" className="text-xs font-normal">
-                  {t.tax.owed.approximate}
-                </Badge>
-              )}
+              <span className="flex items-center gap-2">
+                {notRegistered && approximate && (
+                  <Badge variant="outline" className="text-xs font-normal text-amber-400">
+                    {t.tax.owed.approximate}
+                  </Badge>
+                )}
+                <Link
+                  href="/payments"
+                  className="text-xs font-normal text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                >
+                  {t.nav.payments}
+                </Link>
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {notRegistered ? (
-              hasOwed ? (
-                <div className="space-y-2">
-                  <div className="rounded-lg border border-border px-3 py-2.5 space-y-0.5">
-                    <div className="text-xs text-muted-foreground">
-                      {formatMessage(owed.due ? t.tax.owed.forMonth : t.tax.owed.soFar, {
-                        month: formatTaxPeriod(owedNext.month, t),
-                      })}
-                    </div>
-                    <div className="text-xl font-mono font-semibold">
-                      {formatMKD(owedNext.taxMKD)}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {formatMessage(t.tax.owed.fileAndPay, {
-                        reportBy: formatTaxDate(owedNext.reportBy, t),
-                        payBy: formatTaxDate(owedNext.payBy, t),
-                      })}
-                    </div>
-                  </div>
-                  {owed.due && (
-                    <div className="flex justify-between gap-4 text-sm px-3">
-                      <span className="text-muted-foreground">
-                        {formatMessage(t.tax.owed.soFar, {
-                          month: formatTaxPeriod(owed.current.month, t),
-                        })}
-                      </span>
-                      <span className="font-mono text-xs">{formatMKD(owed.current.taxMKD)}</span>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground">{t.tax.owed.nothing}</p>
-              )
+              <OwedToUjpDetails owed={owed} alreadyPaidMKD={year.alreadyPaidForYouMKD} year={thisYear} t={t} />
             ) : (
               <div className="space-y-2">
                 {nextAdvance && (
@@ -366,8 +394,10 @@ export default async function DashboardPage() {
                 <AlertTriangle className="h-4 w-4 text-yellow-500 ml-auto shrink-0" />
               )}
             </div>
-            {notRegistered && hasOwed && (
-              <p className="text-xs text-muted-foreground">{t.tax.owed.note}</p>
+            {notRegistered && openMonths.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                {approximate ? t.tax.owed.noteApproximate : t.tax.owed.note}
+              </p>
             )}
           </CardContent>
         </Card>
@@ -383,7 +413,7 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <div className="flex justify-between text-sm mb-2">
+                <div className="flex justify-between gap-4 text-sm mb-2">
                   <span className="text-muted-foreground">
                     {formatMessage(t.dashboard.localSupplies, { year: thisYear })}
                   </span>
@@ -422,16 +452,19 @@ export default async function DashboardPage() {
       </div>
 
       <Card>
-        <CardHeader className="pb-2 flex-row items-center justify-between">
-          <CardTitle className="text-sm">{t.dashboard.recentInvoices}</CardTitle>
-          <Link href="/invoices">
-            <Button variant="ghost" size="sm" className="text-xs text-muted-foreground h-7">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center justify-between gap-2">
+            {t.dashboard.recentInvoices}
+            <Link
+              href="/invoices"
+              className="text-xs font-normal text-muted-foreground underline underline-offset-2 hover:text-foreground"
+            >
               {t.common.viewAll}
-            </Button>
-          </Link>
+            </Link>
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          {recentInvoices.length === 0 ? (
+          {recent.length === 0 ? (
             <div className="text-center py-8">
               <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
               <p className="text-sm text-muted-foreground mb-3">{t.dashboard.noInvoices}</p>
@@ -443,42 +476,41 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-0">
-              {recentInvoices.map((inv, i) => {
-                const statusKey = inv.status as InvoiceStatus;
-                const statusLabel = t.invoices.status[statusKey] ?? inv.status;
+              {recent.map((inv, i) => {
+                const standing = invoiceStanding(inv, settledByInvoice.get(inv.id) ?? 0, today);
+                const showBalance = inv.status !== "draft" && inv.status !== "cancelled" && standing.balance > 0;
                 return (
                   <div key={inv.id}>
-                    <div className="flex items-center gap-4 py-2.5">
+                    <Link href={`/invoices/${inv.id}`} className="flex items-center gap-4 py-2.5 hover:bg-accent/30 -mx-2 px-2 rounded">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <span
                             className={cn(
                               "text-sm font-medium",
                               inv.number ? "font-mono" : "italic text-muted-foreground"
                             )}
                           >
-                            {inv.number ?? t.invoices.status.draft}
+                            {inv.number ?? t.invoices.standing.draft}
                           </span>
                           {/* A draft without a number already reads "Draft". */}
-                          {inv.number && (
-                            <Badge
-                              variant="outline"
-                              className={cn("text-xs border-0 px-1.5", statusColors[inv.status])}
-                            >
-                              {statusLabel}
-                            </Badge>
-                          )}
+                          {inv.number && <InvoiceStandingBadge status={standing.status} />}
                         </div>
-                        <div className="text-xs text-muted-foreground">{inv.clientName}</div>
+                        <div className="text-xs text-muted-foreground truncate">{inv.clientName}</div>
                       </div>
                       <div className="text-right">
                         <div className="text-sm font-mono">
                           {formatCurrency(inv.total, inv.currency)}
                         </div>
-                        <div className="text-xs text-muted-foreground">{formatDate(inv.date)}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {showBalance
+                            ? formatMessage(t.dashboard.balanceLeft, {
+                                amount: formatCurrency(standing.balance, inv.currency),
+                              })
+                            : formatDate(inv.date)}
+                        </div>
                       </div>
-                    </div>
-                    {i < recentInvoices.length - 1 && <Separator />}
+                    </Link>
+                    {i < recent.length - 1 && <Separator />}
                   </div>
                 );
               })}
@@ -486,6 +518,80 @@ export default async function DashboardPage() {
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+// Late months in red, the month due next, this month so far, and what
+// companies in North Macedonia already paid for the user this year.
+function OwedToUjpDetails({
+  owed,
+  alreadyPaidMKD,
+  year,
+  t,
+}: {
+  owed: ReturnType<typeof owedToUjp>;
+  alreadyPaidMKD: number;
+  year: number;
+  t: Dictionary;
+}) {
+  const current = owed.current && owed.current.unpaidOwedMKD > 0 ? owed.current : null;
+  const nothing = owed.late.length === 0 && !owed.due && !current;
+  return (
+    <div className="space-y-2">
+      {owed.late.map((m) => (
+        <Link
+          key={m.month}
+          href={`/payments?year=${m.month.slice(0, 4)}#month-${m.month}`}
+          className="block rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2.5 space-y-0.5 text-red-400"
+        >
+          <div className="text-xs">
+            {formatMessage(t.tax.owed.forMonth, { month: formatTaxPeriod(m.month, t) })} ·{" "}
+            {t.payments.ujpStatuses.late}
+          </div>
+          <div className="text-xl font-mono font-semibold">{formatMKD(m.unpaidOwedMKD)}</div>
+          <div className="text-xs">
+            {formatMessage(m.filed ? t.dashboard.notPaidBy : t.dashboard.notFiledBy, {
+              date: formatTaxDate(m.filed ? m.payBy : m.reportBy, t),
+            })}
+          </div>
+        </Link>
+      ))}
+      {owed.due && (
+        <Link
+          href={`/payments?year=${owed.due.month.slice(0, 4)}#month-${owed.due.month}`}
+          className="block rounded-lg border border-border px-3 py-2.5 space-y-0.5 hover:bg-accent/30"
+        >
+          <div className="text-xs text-muted-foreground">
+            {formatMessage(t.tax.owed.forMonth, { month: formatTaxPeriod(owed.due.month, t) })} ·{" "}
+            {t.payments.ujpStatuses[owed.due.status]}
+          </div>
+          <div className="text-xl font-mono font-semibold">{formatMKD(owed.due.unpaidOwedMKD)}</div>
+          <div className="text-xs text-muted-foreground">
+            {formatMessage(t.tax.owed.fileAndPay, {
+              reportBy: formatTaxDate(owed.due.reportBy, t),
+              payBy: formatTaxDate(owed.due.payBy, t),
+            })}
+          </div>
+        </Link>
+      )}
+      {current && (
+        <div className="flex justify-between gap-4 text-sm px-3">
+          <span className="text-muted-foreground">
+            {formatMessage(t.tax.owed.soFar, { month: formatTaxPeriod(current.month, t) })}
+          </span>
+          <span className="font-mono text-xs">{formatMKD(current.unpaidOwedMKD)}</span>
+        </div>
+      )}
+      {nothing && <p className="text-xs text-muted-foreground">{t.tax.owed.nothing}</p>}
+      {alreadyPaidMKD > 0 && (
+        <div className="flex justify-between gap-4 text-sm px-3">
+          <span className="text-muted-foreground">
+            {formatMessage(t.dashboard.alreadyPaidYear, { year })}
+          </span>
+          <span className="font-mono text-xs">{formatMKD(alreadyPaidMKD)}</span>
+        </div>
+      )}
     </div>
   );
 }

@@ -22,15 +22,16 @@ import { formatMessage } from "@/lib/i18n/format";
 export function DeleteClientButton({
   id,
   name,
-  invoiceCount,
+  recordCount,
 }: {
   id: string;
   name: string;
-  invoiceCount: number;
+  // Invoices plus payments: either keeps the client.
+  recordCount: number;
 }) {
   const t = useTranslations();
   const [pending, startTransition] = useTransition();
-  const blocked = invoiceCount > 0;
+  const blocked = recordCount > 0;
 
   function handleDelete() {
     startTransition(async () => {
@@ -39,7 +40,7 @@ export function DeleteClientButton({
         toast.error(
           formatMessage(t.clients.deleteBlockedDesc, {
             name,
-            count: result.invoiceCount,
+            count: result.recordCount,
           })
         );
       }
@@ -69,7 +70,7 @@ export function DeleteClientButton({
               <AlertDialogDescription>
                 {formatMessage(t.clients.deleteBlockedDesc, {
                   name,
-                  count: invoiceCount,
+                  count: recordCount,
                 })}
               </AlertDialogDescription>
             </AlertDialogHeader>

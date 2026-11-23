@@ -28,7 +28,7 @@ export function CancelInvoiceButton({ id, number }: { id: string; number: string
   function handleCancel() {
     startTransition(async () => {
       const result = await cancelInvoice(id);
-      if ("errorKey" in result) toast.error(t.invoices.cancel.notIssued);
+      if (result.errorKey) toast.error(t.invoices.cancel[result.errorKey]);
       else toast.success(t.invoices.cancel.cancelled);
     });
   }

@@ -27,7 +27,8 @@ export const sq: Dictionary = {
     dashboard: "Paneli",
     clients: "Klientët",
     invoices: "Faturat",
-    incomeTax: "Të ardhurat & Tatimi",
+    payments: "Pagesat",
+    menu: "Menyja",
     settings: "Cilësimet",
   },
   auth: {
@@ -64,7 +65,7 @@ export const sq: Dictionary = {
     features: [
       {
         title: "Faturim shumëvalutor",
-        desc: "Krijo fatura në MKD, EUR ose USD. Ekuivalenti MKD llogaritet automatikisht sipas një kursi të përafërt të integruar.",
+        desc: "Krijo fatura në MKD, EUR ose USD. Ekuivalenti MKD llogaritet automatikisht sipas kursit mesatar të Bankës Popullore.",
       },
       {
         title: "Monitorim i pragut TVSH",
@@ -93,10 +94,10 @@ export const sq: Dictionary = {
       "Furnizimet e tua në Maqedoninë e Veriut këtë vit e kanë kaluar pragun e TVSH-së prej 2.000.000 MKD. Pasi e kalon, kërkesa për regjistrim për TVSH dorëzohet deri më 15 të muajit pasues (Ligji për TVSH, neni 51 paragrafi 11). Fol me kontabilistin.",
     ddvAlertWarning:
       "Furnizimet e tua në Maqedoninë e Veriut janë në {pct}% të pragut të TVSH-së: mbeten {remaining} para regjistrimit të detyrueshëm për TVSH.",
-    annualIncome: "Të ardhurat vjetore",
-    paidInvoicesYear: "Fatura të paguara, {year}",
+    receivedIn: "Pranuar në {year}",
+    paymentsCount: "{count} pagesë(a)",
     outstanding: "Të papaguara",
-    awaitingPayment: "fatura në pritje pagese",
+    awaitingPayment: "{count} faturë(a) në pritje pagese",
     ddvMonitor: "Monitor i pragut TVSH",
     ddvSafe: "Sigurt",
     ddvWarning: "Paralajmërim",
@@ -109,7 +110,7 @@ export const sq: Dictionary = {
     mustRegister: "Duhet regjistrim TVSH",
     notRequired: "Ende nuk kërkohet",
     ddvLocalOnly:
-      "Numërohen faturat për klientët në Maqedoninë e Veriut sipas datës së furnizimit, të paguara ose jo. Shërbimet për klientët jashtë vendit kryhen jashtë (Ligji për TVSH, neni 14-а), ndaj nuk numërohen në prag.",
+      "Numërohen faturat për klientët në Maqedoninë e Veriut sipas datës së furnizimit, të paguara ose jo, dhe pagesat e tyre pa faturë sipas ditës së pranimit. Shërbimet për klientët jashtë vendit kryhen jashtë (Ligji për TVSH, neni 14-а), ndaj nuk numërohen në prag.",
     nextDeadline: "Afati i ardhshëm tatimor",
     daysAway: "{date} — për {days} ditë",
     dueToday: "{date} — sot",
@@ -117,6 +118,13 @@ export const sq: Dictionary = {
     recentInvoices: "Faturat e fundit",
     noInvoices: "Ende nuk ka fatura",
     createFirst: "Krijo faturën e parë",
+    owedLateMonths: "Muaj me vonesë: {count}",
+    owedSoFarNote: "Deri tani në muajin {month} · paguaj deri më {date}",
+    owedNothingShort: "S'ka asgjë për të paguar",
+    notFiledBy: "Llogaritja nuk u dorëzua deri më {date}",
+    notPaidBy: "Tatimi nuk u pagua deri më {date}",
+    alreadyPaidYear: "Paguar tashmë në emrin tënd në {year}",
+    balanceLeft: "Mbeten {amount}",
   },
   clients: {
     title: "Klientët",
@@ -154,6 +162,9 @@ export const sq: Dictionary = {
       invoiceLanguageHint: "Gjuha e faturave PDF për këtë klient, pavarësisht gjuhës që përdor në aplikacion.",
       looksLikeEmbg:
         "Kjo duket si numër personal (EMBG). Shkruaj numrin tatimor të kompanisë ose lëre bosh.",
+      deemedCosts: "Shpenzimet e normuara (vetëm të drejtat e autorit)",
+      deemedCostsHint:
+        "Vetëm të ardhurat nga të drejtat e autorit dhe të drejtat e përafërta tatohen pas zbritjes së shpenzimeve të normuara (Ligji për tatimin mbi të ardhurat personale, neni 40): 50% për vepra skulpturore, tapiceri, qeramikë dhe vitrazh; 40% për fotografi artistike, pikturë, vepra grafike, dizajn industrial, kostumografi dhe kreacion mode, skenografi, vepra muzikore dhe kinematografike dhe restaurim; 30% për vepra shkencore, profesionale dhe publicistike dhe për interpretimin e muzikës serioze, baletit, operës ose aktrimit; 20% për përkthime, ligjërata dhe vepra të tjera autoriale. Shumica e punëve freelance (softuer, konsulencë, shumica e shërbimeve) janë të ardhura nga puna (neni 14), pa shpenzime të normuara: lëre 0%. Pagesat e reja nga ky klient fillojnë me këtë normë.",
     },
     types: {
       company: "Kompani",
@@ -164,7 +175,7 @@ export const sq: Dictionary = {
       "Kjo do ta fshijë përgjithmonë klientin. Ky veprim nuk mund të kthehet.",
     deleteBlockedTitle: "{name} nuk mund të fshihet",
     deleteBlockedDesc:
-      "{name} ka {count} faturë(a). Klientët me fatura nuk mund të fshihen, sepse faturat janë pjesë e evidencës së të ardhurave dhe tatimeve të tua.",
+      "{name} ka {count} faturë(a) ose pagesë(a). Klientët me fatura ose pagesa nuk mund të fshihen, sepse janë pjesë e evidencës së të ardhurave dhe tatimeve të tua.",
   },
   invoices: {
     title: "Faturat",
@@ -175,12 +186,12 @@ export const sq: Dictionary = {
     drafts: "Drafte",
     emptyTitle: "Ende nuk ka fatura",
     emptyDesc:
-      "Krijo faturën e parë. Mbështet MKD, EUR dhe USD me konvertim automatik në MKD sipas një kursi të përafërt të integruar.",
+      "Krijo faturën e parë. Mbështet MKD, EUR dhe USD me konvertim automatik në MKD sipas kursit mesatar të Bankës Popullore.",
     createFirst: "Krijo faturën e parë",
     colNumber: "Numri",
     colClient: "Klienti",
     colAmount: "Shuma",
-    colMkd: "Ekuiv. MKD",
+    colBalance: "Mbetja",
     colStatus: "Statusi",
     newTitle: "Krijo faturë",
     newBreadcrumb: "Faturë e re",
@@ -213,6 +224,7 @@ export const sq: Dictionary = {
       grandTotal: "Totali",
       mkdEquivalent: "Ekuivalenti MKD",
       exchangeRate: "1 {currency} = {rate} MKD (kurs i përafërt)",
+      exchangeRateNbrsm: "1 {currency} = {rate} MKD (kursi mesatar i BPRMV-së, {date})",
       notes: "Shënime",
       footer: "Gjeneruar nga Freelancr",
       draft: "Draft, e palëshuar",
@@ -240,6 +252,10 @@ export const sq: Dictionary = {
       dueDate: "Afati i pagesës",
       lineItems: "Artikujt",
       approximateRate: "1 {currency} = {rate} MKD (kurs i përafërt)",
+      nbrsmRate: "1 {currency} = {rate} MKD (kursi mesatar i Bankës Popullore, {date})",
+      rateLoading: "Po merret kursi i Bankës Popullore…",
+      rateUnavailable:
+        "kursi i Bankës Popullore nuk u mor, ndaj fatura e përdor këtë kurs të përafërt",
       description: "Përshkrimi",
       qty: "Sas.",
       unitPrice: "Çmimi njësi ({currency})",
@@ -265,12 +281,25 @@ export const sq: Dictionary = {
       currencyUnsupported: "Kjo monedhë nuk mbështetet. Zgjidh një nga monedhat e listuara.",
       requiredFields: "Zgjidh klientin, vendos datat dhe shto të paktën një artikull.",
     },
-    status: {
+    standing: {
       draft: "Draft",
-      sent: "Lëshuar",
+      issued: "Lëshuar",
+      partly_paid: "Paguar pjesërisht",
       paid: "Paguar",
       overdue: "Vonuar",
       cancelled: "Anuluar",
+    },
+    payments: {
+      title: "Pagesat",
+      record: "Regjistro pagesë",
+      none:
+        "Ende nuk ka pagesa të regjistruara. Regjistroje pagesën kur paratë arrijnë në llogari.",
+      settled: "Paguar deri tani",
+      balanceDue: "Mbetet për t'u paguar",
+      overpaid: "Paguar tepër",
+      settledNote:
+        "Provizionet që mori banka ose platforma dhe tatimi që mbajti klienti numërohen në faturë: klienti i pagoi, edhe pse nuk arritën në llogarinë tënde.",
+      cancelHint: "Për ta anuluar faturën, fshiji fillimisht pagesat.",
     },
     issue: {
       button: "Lësho faturën",
@@ -287,38 +316,183 @@ export const sq: Dictionary = {
       button: "Anulo faturën",
       title: "Të anulohet {number}?",
       desc:
-        "Fatura e anuluar mbetet në evidencën tënde, sepse faturat ruhen pesë vjet (Ligji për TVSH, neni 56). Nuk numërohet më si e ardhur dhe në pragun e TVSH-së, dhe kjo nuk mund të kthehet. Ende nuk ka nota krediti.",
+        "Fatura e anuluar mbetet në evidencën tënde, sepse faturat ruhen pesë vjet (Ligji për TVSH, neni 56). Nuk numërohet më në pragun e TVSH-së, dhe kjo nuk mund të kthehet. Ende nuk ka nota krediti.",
       confirm: "Anulo faturën",
       keep: "Mbaje",
       cancelled: "Fatura u anulua",
       notIssued: "Mund të anulohen vetëm faturat e lëshuara.",
+      hasPayments:
+        "Kjo faturë ka pagesa të regjistruara. Fshiji fillimisht pagesat, pastaj anuloje.",
       note:
         "E anuluar. Mbetet në evidencën tënde për pesë vitet që faturat duhet të ruhen (Ligji për TVSH, neni 56).",
     },
   },
-  income: {
-    title: "Të ardhurat & Tatimi",
-    subtitle: "Përmbledhje vjetore për {year} — vetëm fatura të paguara",
-    grossIncome: "Të ardhurat bruto",
-    invoicesPaid: "{count} fatura të paguara",
-    ddvThresholdPct: "Pragu TVSH",
-    ddvMonitor: "Monitor i pragut TVSH",
-    currentAnnual: "Furnizimet në Maqedoninë e Veriut këtë vit",
-    alert70: "Alarm 70%",
-    alert85: "Alarm 85% (kritik)",
-    alert100: "100% — kërkohet regjistrim TVSH",
-    ddvExceededMsg:
-      "E ke kaluar pragun e TVSH-së. Dorëzo kërkesën për regjistrim për TVSH deri më 15 të muajit pas atij në të cilin e kalove (Ligji për TVSH, neni 51 paragrafi 11); fol me kontabilistin.",
-    ddvWarningMsg: "Me këtë ritëm mund ta arrish pragun para fundvitit. {remaining} mbeten.",
-    taxDeadlines: "Afatet tatimore {year}",
-    passed: "Kaluar",
-    daysAway: "për {days} ditë",
-    dueToday: "Afati është sot",
-    dueTomorrow: "Afati është nesër",
-    monthlyBreakdown: "Ndarja mujore e të ardhurave ({year})",
-    annualTotal: "Totali vjetor",
-    byClient: "Të ardhurat sipas klientit",
-    invShort: "faturë",
+  payments: {
+    title: "Pagesat",
+    subtitle:
+      "Paratë që arritën në llogarinë tënde në {year}, sipas muajve, dhe tatimi mbi të ardhurat për to.",
+    newPayment: "Regjistro pagesë",
+    yearLabel: "Viti",
+    yearSummary: "Gjithsej për {year}",
+    received: "Pranuar",
+    grossIncome: "Të ardhurat (të pranuara plus tatimi i mbajtur në burim)",
+    totalIncomeTax: "Tatimi mbi të ardhurat",
+    owedPart: "Ti i paguan UJP-së",
+    creditPart: "Paguar jashtë vendit (zbritet)",
+    alreadyPaidPart: "Paguar tashmë në emrin tënd",
+    notPaidYet: "Ende e papaguar te UJP",
+    annualReturn:
+      "UJP të dërgon deklaratën tatimore vjetore (ГДП) për {year}: konfirmoje ose korrigjoje deri më {confirmBy} dhe paguaj diferencën që tregon deri më {payBy} (Ligji për tatimin mbi të ardhurat personale, nenet 96 dhe 100).",
+    selfEmployedAdvance:
+      "Je i regjistruar si person që ushtron veprimtari të pavarur: këtu pagesat vetëm i ndjekin të ardhurat. Tatimi yt është akontimi mujor prej {amount} deri më 15 dhe bilanci vjetor deri më 15 mars.",
+    selfEmployedNoAdvance:
+      "Je i regjistruar si person që ushtron veprimtari të pavarur: këtu pagesat vetëm i ndjekin të ardhurat. Tatimi yt është akontimi mujor deri më 15 dhe bilanci vjetor deri më 15 mars.",
+    conversionNote:
+      "Çdo pagesë konvertohet me kursin mesatar të Bankës Popullore në ditën kur arriti në llogari, ashtu siç konverton UJP.",
+    feesNote:
+      "Provizionet e bankave dhe platformave nuk janë të ardhura: tatimi është mbi atë që u pranua plus tatimin e mbajtur në burim.",
+    byClient: "Sipas klientit",
+    paymentsCount: "{count} pagesë(a)",
+    empty:
+      "Nuk ka pagesa të regjistruara në {year}. Regjistroje secilën kur paratë arrijnë në llogari.",
+    noInvoice: "Pa faturë",
+    feesLine: "provizione {amount}",
+    withheldLine: "mbajtur {amount}",
+    selfReportedGross: "Të ardhurat që i deklaron vetë",
+    withheldGross: "Të ardhurat e tatuara në burim",
+    businessGross: "Të ardhurat nga veprimtaria",
+    otherRatesFlag:
+      "Disa pagesa këtë muaj përdorin kurs tjetër nga ai i Bankës Popullore për ditën e tyre (kursin e faturës ose një të shkruar me dorë), ndaj shumat në denarë këtu janë të përafërta.",
+    evidenceHint:
+      "Llogaritjes (е-ПДД) bashkëngjitja dëshmitë: kontratën ose konfirmimin e klientit për punën dhe ekstraktin bankar (извод) që tregon se paratë arritën.",
+    treatments: {
+      business: "Të ardhura nga veprimtaria",
+      withheld: "Tatimin e mbajti klienti",
+      self_reported: "E deklaron vetë",
+    },
+    treatmentNotes: {
+      business:
+        "Je i regjistruar si person që ushtron veprimtari të pavarur: këto janë të ardhura për bilancin vjetor, pa llogaritje mujore (е-ПДД).",
+      withheld:
+        "Një kompani në Maqedoninë e Veriut të paguan 90%, ndërsa tatimin prej 10% ia paguan UJP-së në emrin tënd (Ligji për tatimin mbi të ardhurat personale, neni 80). S'ke asgjë për të deklaruar.",
+      self_reported:
+        "Klient nga jashtë ose person fizik në Maqedoninë e Veriut: dorëzo llogaritjen (е-ПДД) deri më 10 të muajit pasues dhe paguaj tatimin prej 10% deri më 15.",
+    },
+    ujpStatuses: {
+      nothing: "S'ka për të deklaruar",
+      to_file: "Për t'u dorëzuar",
+      filed: "Dorëzuar",
+      approved: "Miratuar",
+      paid: "Paguar",
+      late: "Me vonesë",
+    },
+    rateSources: {
+      nbrsm: "Banka Popullore",
+      manual: "kurs i shkruar me dorë",
+      invoice: "kursi i faturës",
+    },
+    channels: {
+      bank: "Transfertë bankare",
+      paypal: "PayPal",
+      wise: "Wise",
+      payoneer: "Payoneer",
+      platform: "Pagesë nga platforma",
+      cash: "Para në dorë",
+      other: "Tjetër",
+    },
+    deemedOptions: {
+      "0": "Pa (0%): të ardhura nga puna",
+      "0.2": "20%: përkthime, ligjërata, vepra të tjera autoriale",
+      "0.3": "30%: vepra shkencore, profesionale, publicistike",
+      "0.4": "40%: fotografi artistike, pikturë, grafikë, dizajn, muzikë, film",
+      "0.5": "50%: skulpturë, tapiceri, qeramikë, vitrazh",
+    },
+    calendar: {
+      title: "Afatet tatimore {year}",
+      passed: "Kaloi",
+      daysAway: "për {days} ditë",
+      dueToday: "Afati është sot",
+      dueTomorrow: "Afati është nesër",
+    },
+    monthActions: {
+      calculationNumber: "Nr. i llogaritjes",
+      folioNumber: "Nr. i folios",
+      paidOn: "Paguar më",
+      markFiled: "Shëno të dorëzuar",
+      markApproved: "Shëno të miratuar",
+      markPaid: "Shëno të paguar",
+      marked: "Pagesa të përditësuara: {count}",
+      useNbrsmRates: "Përdor kurset e Bankës Popullore",
+      ratesUpdated: "Pagesa me kursin e Bankës Popullore: {count}",
+      errors: {
+        monthInvalid: "Muaji nuk është i vlefshëm.",
+        dateInvalid: "Shkruaj një datë të vlefshme pagese.",
+        dateFuture: "Data e pagesës nuk mund të jetë në të ardhmen.",
+        nothingToMark: "Në këtë muaj nuk ka pagesa për këtë hap.",
+        unavailable: "Kurset e Bankës Popullore nuk u morën. Provo më vonë.",
+      },
+    },
+    form: {
+      newTitle: "Regjistro një pagesë",
+      editTitle: "Ndrysho pagesën",
+      needClient:
+        "Shto fillimisht një klient: çdo pagesë vjen nga një klient (edhe platformat si Upwork shtoji si klientë).",
+      invoice: "Fatura",
+      noInvoice: "Pa faturë (pagesë nga platforma ose punë e njëhershme)",
+      balanceHint: "{number}: mbeten {amount}",
+      client: "Nga",
+      clientHint: "Edhe platformat si Upwork janë klientë.",
+      receivedOn: "Pranuar më",
+      receivedOnHint: "Dita kur paratë arritën në llogarinë tënde (data në ekstraktin bankar).",
+      currency: "Monedha",
+      amount: "Shuma e pranuar",
+      amountHint: "Ajo që arriti në llogari.",
+      fees: "Provizione",
+      feesHint: "Ajo që mori banka ose platforma gjatë rrugës.",
+      taxWithheldLocal: "10% që mbajti klienti",
+      taxWithheldLocalHint: "Kompania ia pagoi UJP-së në emrin tënd (neni 80).",
+      taxWithheldAbroad: "Tatim i mbajtur jashtë vendit",
+      taxWithheldAbroadHint:
+        "Zbritet vetëm deri në 10% që detyrohen këtu, dhe vetëm me vërtetimin e organit tatimor të huaj. Provizionet nuk numërohen.",
+      taxWithheldAtSource: "Tatim i mbajtur në burim",
+      rate: "Kursi",
+      rateNbrsm: "1 {currency} = {rate} MKD (kursi mesatar i NBRSM, {date})",
+      rateLoading: "Po merret kursi i Bankës Popullore…",
+      rateUnavailable:
+        "Kursi i Bankës Popullore për {date} nuk u mor. Shkruaj kursin nga lista e saj e kurseve:",
+      manualRate: "MKD për 1 {currency}",
+      deemedCosts: "Shpenzimet e normuara",
+      deemedCostsHint:
+        "Vetëm për të ardhurat nga të drejtat e autorit (neni 40). Shumica e punëve freelance janë të ardhura nga puna (neni 14): 0%.",
+      channel: "Pranuar përmes",
+      note: "Shënim",
+      previewReceived: "Pranuar",
+      previewGross: "Të ardhurat",
+      previewTax: "Tatimi mbi të ardhurat (10%)",
+      previewCredit: "Paguar jashtë vendit (zbritet)",
+      previewOwed: "Ti i paguan UJP-së",
+      previewAlreadyPaid: "Paguar tashmë në emrin tënd",
+      submit: "Ruaj pagesën",
+      delete: "Fshi pagesën",
+      deleteTitle: "Të fshihet kjo pagesë?",
+      deleteDesc:
+        "Fatura e saj kthehet në të papaguar ose të paguar pjesërisht, dhe tatimi i muajit ndryshon. Kjo nuk mund të kthehet.",
+      errors: {
+        dateInvalid: "Shkruaj një datë të vlefshme kur arritën paratë.",
+        dateFuture: "Dita kur arritën paratë nuk mund të jetë në të ardhmen.",
+        amountInvalid: "Shkruaj shumën e pranuar, më shumë se 0.",
+        feesInvalid: "Provizionet duhet të jenë 0 ose më shumë.",
+        withheldInvalid: "Tatimi i mbajtur duhet të jetë 0 ose më shumë.",
+        withheldNotAllowed:
+          "Një person fizik në Maqedoninë e Veriut nuk mban tatim: lëre këtë bosh.",
+        currencyInvalid: "Zgjidh një nga monedhat e ofruara (për një faturë, monedhën e saj).",
+        clientInvalid: "Zgjidh një nga klientët e tu.",
+        invoiceInvalid: "Zgjidh një nga faturat e tua të lëshuara (jo draft dhe jo të anuluar).",
+        rateRequired: "Kursi i Bankës Popullore nuk u mor: shkruaje me dorë.",
+        deemedInvalid: "Zgjidh një nga normat e ofruara të shpenzimeve të normuara.",
+        notFound: "Kjo pagesë nuk ekziston ose nuk është e jotja.",
+      },
+    },
   },
   settings: {
     title: "Cilësimet",
@@ -368,7 +542,7 @@ export const sq: Dictionary = {
   tax: {
     statusLabel: "Si je regjistruar për tatime?",
     statusHint:
-      "Nga kjo varet se cilat afate tatimore shfaqen në panel dhe në faqen „Të ardhurat & Tatimi”.",
+      "Nga kjo varet se cilat afate tatimore shfaqen në panel dhe në faqen „Pagesat”, dhe si llogaritet tatimi për pagesat e reja.",
     statuses: {
       paid_from_abroad: "Pa veprimtari të regjistruar",
       self_employed: "Vetëpunësim i regjistruar",
@@ -395,7 +569,7 @@ export const sq: Dictionary = {
     ],
     rules: {
       paid_from_abroad:
-        "Për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut, dorëzo llogaritjen tatimore (е-ППД) në UJP deri më 10 dhe paguaj tatimin deri më 15 të muajit pasues. Kompanitë në Maqedoninë e Veriut e mbajnë tatimin kur të paguajnë, ndaj faturat e tyre nuk shtojnë muaj.",
+        "Për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut, dorëzo llogaritjen tatimore (е-ПДД) në UJP deri më 10 dhe paguaj tatimin deri më 15 të muajit pasues. Kompanitë në Maqedoninë e Veriut e mbajnë tatimin kur të paguajnë, ndaj pagesat e tyre nuk shtojnë muaj.",
       self_employed:
         "Akontimi i tatimit paguhet deri më 15 të çdo muaji për muajin e kaluar. Bilanci tatimor vjetor (ПДД-ДБ) dhe pasqyra e të ardhurave dhe shpenzimeve dorëzohen deri më 15 mars të vitit pasues, dhe diferenca paguhet deri më 30 mars.",
     },
@@ -405,6 +579,8 @@ export const sq: Dictionary = {
       advance: "Paguaj akontimin e tatimit për muajin {period}",
       annualReturn: "Dorëzo bilancin tatimor vjetor (ПДД-ДБ) për vitin {period}",
       annualPayment: "Paguaj diferencën sipas bilancit tatimor për vitin {period}",
+      returnConfirm: "Konfirmo ose korrigjo deklaratën tatimore vjetore (ГДП) për vitin {period}",
+      returnPay: "Paguaj tatimin sipas deklaratës tatimore vjetore për vitin {period}",
     },
     actions: {
       report: "Dorëzo llogaritjen deri më {date}",
@@ -412,16 +588,19 @@ export const sq: Dictionary = {
       advance: "Paguaj deri më {date}",
       annualReturn: "Dorëzo ПДД-ДБ deri më {date}",
       annualPayment: "Paguaj diferencën deri më {date}",
+      returnConfirm: "Konfirmo ose korrigjo deri më {date}",
+      returnPay: "Paguaj deri më {date}",
     },
     groups: {
       income: "Të ardhurat e muajit {period}",
       advance: "Akontimi për muajin {period}",
       annual: "Bilanci tatimor vjetor {period}",
+      return: "Deklarata tatimore vjetore {period}",
     },
     basedOn: "Afatet për: {status}.",
     changeInSettings: "Ndrysho te Cilësimet",
     noUpcoming:
-      "Nuk ka afat tatimor të afërt. Kur një klient nga jashtë ose një person fizik në Maqedoninë e Veriut paguan një faturë dhe e shënon si të paguar, afatet e atij muaji shfaqen këtu.",
+      "Nuk ka afat tatimor të afërt. Kur regjistron një pagesë nga një klient jashtë vendit ose nga një person fizik në Maqedoninë e Veriut, afatet e atij muaji shfaqen këtu.",
     noneInYear:
       "Ende asnjë. Afatet shfaqen për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut.",
     then: "Pastaj: {label}, {date}",
@@ -432,12 +611,14 @@ export const sq: Dictionary = {
       forMonth: "Tatimi për të ardhurat e muajit {month}",
       soFar: "Deri tani në muajin {month}",
       fileAndPay:
-        "Dorëzo llogaritjen (е-ППД) deri më {reportBy}, paguaj deri më {payBy}",
+        "Dorëzo llogaritjen (е-ПДД) deri më {reportBy}, paguaj deri më {payBy}",
       nothing:
-        "Ende s'ka asgjë për të paguar. Kur një klient nga jashtë ose një person fizik në Maqedoninë e Veriut paguan një faturë dhe e shënon si të paguar, tatimi mbi të (10%) shfaqet këtu.",
+        "S'ka asgjë për të paguar. Kur regjistron një pagesë nga një klient jashtë vendit ose nga një person fizik në Maqedoninë e Veriut, tatimi mbi të shfaqet këtu.",
       note:
-        "Përafërsisht: 10% e asaj që kanë paguar këta klientë, me kursin e ruajtur në çdo faturë. UJP konverton me kursin mesatar të Bankës Popullore (NBRSM) në ditën kur arritën paratë, të cilin aplikacioni ende nuk e përdor, dhe të ardhurat nga të drejtat e autorit tatohen pas shpenzimeve të normuara (Ligji për tatimin mbi të ardhurat personale, neni 40), ndaj shuma mund të jetë më e madhe se sa detyrohesh. Shuma e vërtetë është ajo në llogaritjen që e miraton UJP.",
-      groupAmount: "Tatimi ≈ {amount}",
+        "Llogaritur nga pagesat që ke regjistruar, secila me kursin mesatar të Bankës Popullore në ditën kur arriti, ashtu siç konverton UJP. Shuma përfundimtare është ajo në llogaritjen që e miraton UJP: paguaj shumën nga urdhëresa e pagesës (ПП53).",
+      noteApproximate:
+        "Përafërsisht: disa nga këto pagesa përdorin kurs tjetër nga ai i Bankës Popullore për ditën e tyre (kursin e faturës ose një të shkruar me dorë). Kaloji në kurset e Bankës Popullore te faqja „Pagesat”. Shuma përfundimtare është ajo në llogaritjen që e miraton UJP.",
+      groupAmount: "Tatimi: {amount}",
       advanceTile: "Akontimi deri më {date}",
       advanceHint:
         "Shkruaj akontimin mujor që ta shohësh këtu. Ai është 1/12 e tatimit në bilancin tatimor vjetor të vitit të kaluar, që aplikacioni nuk mund ta llogarisë: merre nga bilanci ose pyet kontabilistin.",
