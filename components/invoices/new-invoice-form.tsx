@@ -10,10 +10,13 @@ import { Separator } from "@/components/ui/separator";
 import { createInvoice } from "@/lib/actions/invoices";
 import {
   SUPPORTED_CURRENCIES,
+  DDV_RATE_REDUCED,
+  DDV_RATE_STANDARD,
   formatCurrency,
   formatMKD,
   getRateToMKD,
 } from "@/lib/tax/calculator";
+import Link from "next/link";
 import { Plus, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "@/lib/i18n/client";
@@ -27,8 +30,12 @@ type LineItem = {
 
 export function NewInvoiceForm({
   clients,
+  vatRegistered,
 }: {
   clients: { id: string; name: string; currency: string }[];
+  // Only a VAT-registered user gets the DDV rate choice; the action forces
+  // 0 for everyone else anyway.
+  vatRegistered: boolean;
 }) {
   const t = useTranslations();
   const f = t.invoices.form;
@@ -42,8 +49,8 @@ export function NewInvoiceForm({
 
   const ddvOptions = [
     { label: f.noDdv, value: 0 },
-    { label: f.reducedDdv, value: 0.05 },
-    { label: f.standardDdv, value: 0.18 },
+    { label: f.reducedDdv, value: DDV_RATE_REDUCED },
+    { label: f.standardDdv, value: DDV_RATE_STANDARD },
   ];
 
   const today = new Date().toISOString().split("T")[0];
@@ -80,7 +87,7 @@ export function NewInvoiceForm({
     const fd = new FormData(e.currentTarget);
     fd.set("items", JSON.stringify(items));
     fd.set("currency", currency);
-    fd.set("ddvRate", ddvRate.toString());
+    if (vatRegistered) fd.set("ddvRate", ddvRate.toString());
 
     startTransition(async () => {
       const result = await createInvoice(fd);
@@ -203,22 +210,31 @@ export function NewInvoiceForm({
       <Separator />
 
       <div className="grid sm:grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="ddvRate">{f.ddv}</Label>
-          <select
-            id="ddvRate"
-            value={ddvRate}
-            onChange={(e) => setDdvRate(parseFloat(e.target.value))}
-            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-          >
-            {ddvOptions.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-card">
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          <p className="text-xs text-muted-foreground">{f.ddvHint}</p>
-        </div>
+        {vatRegistered ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="ddvRate">{f.ddv}</Label>
+            <select
+              id="ddvRate"
+              value={ddvRate}
+              onChange={(e) => setDdvRate(parseFloat(e.target.value))}
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            >
+              {ddvOptions.map((opt) => (
+                <option key={opt.value} value={opt.value} className="bg-card">
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-muted-foreground">{f.ddvHint}</p>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            {f.noVatRegistration}{" "}
+            <Link href="/settings" className="underline underline-offset-2 hover:text-foreground">
+              {t.tax.changeInSettings}
+            </Link>
+          </p>
+        )}
 
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">

@@ -191,6 +191,8 @@ export type Dictionary = {
       addLine: string;
       ddv: string;
       ddvHint: string;
+      noVatRegistration: string;
+      ddvRateInvalid: string;
       noDdv: string;
       reducedDdv: string;
       standardDdv: string;

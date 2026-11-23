@@ -2,10 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getDb, clients, invoices, invoiceItems } from "@/lib/db";
+import { getDb, clients, invoices, invoiceItems, users } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId, generateInvoiceNumber } from "@/lib/utils";
-import { getRateToMKD, isSupportedCurrency } from "@/lib/tax/calculator";
+import { getRateToMKD, isDdvRate, isSupportedCurrency } from "@/lib/tax/calculator";
 import { eq, and } from "drizzle-orm";
 
 export async function createInvoice(formData: FormData) {
@@ -16,7 +16,6 @@ export async function createInvoice(formData: FormData) {
   const date = formData.get("date") as string;
   const dueDate = formData.get("dueDate") as string;
   const currency = formData.get("currency") as string;
-  const ddvRate = parseFloat(formData.get("ddvRate") as string) || 0;
   const notes = formData.get("notes") as string;
 
   const itemsJson = formData.get("items") as string;
@@ -29,6 +28,20 @@ export async function createInvoice(formData: FormData) {
 
   if (!isSupportedCurrency(currency)) {
     return { errorKey: "currencyUnsupported" as const };
+  }
+
+  // DDV only for a VAT-registered user (VAT law Art. 51(3)); for anyone else
+  // it's 0 whatever the form sent, since a VAT amount on their invoice would
+  // be owed to UJP (Art. 55).
+  const [issuer] = await getDb()
+    .select({ vatRegistered: users.vatRegistered })
+    .from(users)
+    .where(eq(users.id, session.userId))
+    .limit(1);
+  let ddvRate = 0;
+  if (issuer?.vatRegistered) {
+    ddvRate = Number(formData.get("ddvRate") ?? 0);
+    if (!isDdvRate(ddvRate)) return { errorKey: "ddvRateInvalid" as const };
   }
 
   // The client id comes from the form, so make sure it is one of this

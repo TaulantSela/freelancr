@@ -1,5 +1,5 @@
 import { getSession } from "@/lib/auth/session";
-import { getDb, clients } from "@/lib/db";
+import { getDb, clients, users } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +19,12 @@ export default async function NewInvoicePage() {
     .select({ id: clients.id, name: clients.name, currency: clients.currency })
     .from(clients)
     .where(eq(clients.userId, session.userId));
+
+  const [user] = await getDb()
+    .select({ vatRegistered: users.vatRegistered })
+    .from(users)
+    .where(eq(users.id, session.userId))
+    .limit(1);
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
@@ -45,7 +51,7 @@ export default async function NewInvoicePage() {
               </Link>
             </div>
           ) : (
-            <NewInvoiceForm clients={clientList} />
+            <NewInvoiceForm clients={clientList} vatRegistered={user?.vatRegistered ?? false} />
           )}
         </CardContent>
       </Card>

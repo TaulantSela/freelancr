@@ -222,7 +222,11 @@ export const sq: Dictionary = {
       unitPrice: "Çmimi njësi ({currency})",
       addLine: "Shto artikull",
       ddv: "TVSH",
-      ddvHint: "Shto TVSH vetëm nëse je i regjistruar për TVSH (mbi 2M MKD).",
+      ddvHint:
+        "Për shërbimet ndaj një biznesi jashtë vendit, vendi i furnizimit është jashtë (Ligji për TVSH, neni 14-а), ndaj nuk llogaritet TVSH maqedonase.",
+      noVatRegistration:
+        "Nuk je i regjistruar për TVSH, ndaj kjo faturë nuk do të tregojë TVSH (Ligji për TVSH, neni 51 paragrafi 3).",
+      ddvRateInvalid: "Zgjidh një nga normat e listuara të TVSH-së.",
       noDdv: "Pa TVSH (0%)",
       reducedDdv: "TVSH e reduktuar (5%)",
       standardDdv: "TVSH standarde (18%)",

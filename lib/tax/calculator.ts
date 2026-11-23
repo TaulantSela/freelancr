@@ -37,6 +37,17 @@ export function isTaxStatus(value: unknown): value is TaxStatus {
 export const DDV_RATE_STANDARD = 0.18; // 18%
 export const DDV_RATE_REDUCED = 0.05; // 5%
 
+// The rates a VAT-registered user can put on an invoice. Everyone else's
+// invoices carry no DDV at all: only a taxpayer registered for VAT may show
+// it (VAT law Art. 51(3)), and showing it anyway makes the issuer owe the
+// amount shown (Art. 55). The invoice actions enforce this from
+// users.vat_registered, whatever the form sends.
+export const DDV_RATES = [0, DDV_RATE_REDUCED, DDV_RATE_STANDARD] as const;
+
+export function isDdvRate(value: number): boolean {
+  return (DDV_RATES as readonly number[]).includes(value);
+}
+
 export function getDDVStatus(annualIncomeMKD: number): {
   percentage: number;
   isRegistered: boolean;

@@ -222,7 +222,11 @@ export const en: Dictionary = {
       unitPrice: "Unit price ({currency})",
       addLine: "Add line item",
       ddv: "DDV (VAT)",
-      ddvHint: "Add DDV only if you are DDV-registered (above 2M MKD threshold).",
+      ddvHint:
+        "For services to a business abroad the place of supply is abroad (VAT law Art. 14-а), so no Macedonian DDV is charged.",
+      noVatRegistration:
+        "You aren't registered for VAT (DDV), so this invoice won't show VAT (VAT law Art. 51(3)).",
+      ddvRateInvalid: "Choose one of the listed DDV rates.",
       noDdv: "No DDV (0%)",
       reducedDdv: "Reduced DDV (5%)",
       standardDdv: "Standard DDV (18%)",
