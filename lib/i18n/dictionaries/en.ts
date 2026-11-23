@@ -360,7 +360,7 @@ export const en: Dictionary = {
     withheldGross: "Income taxed at source",
     businessGross: "Business income",
     otherRatesFlag:
-      "Some payments this month use a rate other than the National Bank's for their day (the invoice's rate, or one typed in), so the tax here is approximate.",
+      "Some payments this month use a rate other than the National Bank's for their day (the invoice's rate, or one typed in), so the amounts in MKD here are approximate.",
     evidenceHint:
       "Attach proof to the calculation (е-ПДД): the contract or the client's confirmation of the work, and the bank statement (извод) showing the money arrived.",
     treatments: {

@@ -362,7 +362,7 @@ export const sq: Dictionary = {
     withheldGross: "Të ardhurat e tatuara në burim",
     businessGross: "Të ardhurat nga veprimtaria",
     otherRatesFlag:
-      "Disa pagesa këtë muaj përdorin kurs tjetër nga ai i Bankës Popullore për ditën e tyre (kursin e faturës ose një të shkruar me dorë), ndaj tatimi këtu është i përafërt.",
+      "Disa pagesa këtë muaj përdorin kurs tjetër nga ai i Bankës Popullore për ditën e tyre (kursin e faturës ose një të shkruar me dorë), ndaj shumat në denarë këtu janë të përafërta.",
     evidenceHint:
       "Llogaritjes (е-ПДД) bashkëngjitja dëshmitë: kontratën ose konfirmimin e klientit për punën dhe ekstraktin bankar (извод) që tregon se paratë arritën.",
     treatments: {
