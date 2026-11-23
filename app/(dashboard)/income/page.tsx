@@ -5,7 +5,7 @@ import {
   getDDVStatus,
   getTaxCalendar,
   groupTaxDeadlines,
-  getForeignIncomeMonths,
+  getSelfReportedIncomeMonths,
   toSkopjeDate,
   daysBetween,
   calculateIncomeTax,
@@ -59,13 +59,13 @@ export default async function IncomePage() {
   const taxCalc = calculateIncomeTax(annualIncomeMKD);
 
   // UJP deadlines due from 1 January, for how the user is registered for tax.
-  // When paid from abroad, they follow the month each invoice was paid in,
+  // When not registered, they follow the month each invoice was paid in,
   // which can differ from the invoice date the breakdowns below use.
   const today = toSkopjeDate(new Date());
   const taxStatus = await getTaxStatus(session.userId);
   const incomeMonths =
     taxStatus === "paid_from_abroad"
-      ? getForeignIncomeMonths(await getPaidInvoicesForDeadlines(session.userId, year))
+      ? getSelfReportedIncomeMonths(await getPaidInvoicesForDeadlines(session.userId, year))
       : [];
   const taxCalendar = getTaxCalendar(taxStatus, year, incomeMonths);
   const deadlineGroups = groupTaxDeadlines(taxCalendar);

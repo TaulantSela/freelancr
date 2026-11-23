@@ -307,12 +307,12 @@ export const en: Dictionary = {
     statusHint:
       "This decides which tax deadlines the dashboard and the Income & Tax page show.",
     statuses: {
-      paid_from_abroad: "Paid from abroad, not registered",
+      paid_from_abroad: "Not registered for an activity",
       self_employed: "Registered self-employed",
     },
     statusDescriptions: {
       paid_from_abroad:
-        "An individual paid by clients outside North Macedonia, with no registered independent activity.",
+        "An individual with no registered independent activity. You report what clients abroad and private persons in North Macedonia pay you; companies in North Macedonia withhold the tax themselves.",
       self_employed:
         "Registered with UJP as a self-employed person (самостоен вршител на дејност).",
     },
@@ -332,7 +332,7 @@ export const en: Dictionary = {
     ],
     rules: {
       paid_from_abroad:
-        "For each month in which a client abroad paid you, submit the tax calculation to UJP by the 10th of the next month and pay the tax by the 15th.",
+        "For each month in which a client abroad or a private person in North Macedonia paid you, submit the tax calculation (е-ППД) to UJP by the 10th of the next month and pay the tax by the 15th. Companies in North Macedonia withhold the tax when they pay you, so their invoices don't add a month.",
       self_employed:
         "Pay an income tax advance by the 15th of each month for the previous month. File the annual tax balance (ПДД-ДБ) and the statement of income and expenses by 15 March of the next year, and pay any difference by 30 March.",
     },
@@ -358,9 +358,9 @@ export const en: Dictionary = {
     basedOn: "Deadlines for: {status}.",
     changeInSettings: "Change in Settings",
     noUpcoming:
-      "No tax deadline coming up. Once a client abroad pays an invoice and you mark it paid, that month's deadlines show up here.",
+      "No tax deadline coming up. Once a client abroad or a private person in North Macedonia pays an invoice and you mark it paid, that month's deadlines show up here.",
     noneInYear:
-      "None yet. Deadlines show up for each month in which a client abroad paid you.",
+      "None yet. Deadlines show up for each month in which a client abroad or a private person in North Macedonia paid you.",
     then: "Then: {label}, {date}",
   },
 };

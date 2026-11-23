@@ -18,8 +18,9 @@ export const PERSONAL_INCOME_TAX_RATE = 0.1;
 
 // How a user is registered for tax, which decides their UJP deadlines. They
 // pick it in Settings and it's stored in users.tax_status.
-// "paid_from_abroad" (the default): an individual who isn't registered for an
-// independent activity and is paid by clients abroad.
+// "paid_from_abroad" (the default; the name predates local private persons):
+// an individual who isn't registered for an independent activity and reports
+// self-reported income (isSelfReportedIncome below) month by month.
 // "self_employed": a registered self-employed person (самостоен вршител на
 // дејност).
 export const TAX_STATUSES = ["paid_from_abroad", "self_employed"] as const;
@@ -87,9 +88,10 @@ export function getDDVStatus(annualIncomeMKD: number): {
 //
 // Which deadlines apply depends on the user's TaxStatus (above).
 //
-// "paid_from_abroad": for each month in which income was received, submit
-// the electronic calculation (е-ППД) by the 10th of the following month and
-// pay the tax by the 15th of the following month.
+// "paid_from_abroad": for each month in which self-reported income was
+// received, submit the electronic calculation (е-ППД) by the 10th of the
+// following month and pay the tax by the 15th of the following month
+// (Personal Income Tax law, Art. 88(1) points 4 and 7, Art. 93(1)).
 // https://biznisinfo.mk/kako-i-koga-da-prijavite-dohod-od-stranstvo-upatstvo-od-ujp-co-pravila-i-rokovi-za-prijavuvanje/
 // https://republika.mk/vesti/ekonomija/ujp-se-priblizhuva-rokot-za-podnesuvane-presmetki-za-dohod-ostvaren-od-rabota-vo-stranstvo-vo-2025-godina/
 // (The republika.mk piece is UJP's reminder about the 31 March calculation
@@ -111,7 +113,7 @@ export function getDDVStatus(annualIncomeMKD: number): {
 // had income, so they can be tested without a clock or a database.
 // ---------------------------------------------------------------------------
 
-// Paid from abroad: day of the following month to submit the calculation by,
+// Not registered: day of the following month to submit the calculation by,
 // and to pay the tax by.
 const ABROAD_REPORT_DAY = 10;
 const ABROAD_PAYMENT_DAY = 15;
@@ -123,8 +125,8 @@ const ANNUAL_RETURN_DATE = "03-15";
 const ANNUAL_PAYMENT_DATE = "03-30";
 
 export type TaxDeadlineKind =
-  | "report" // paid from abroad: submit the calculation for a month's income
-  | "pay" // paid from abroad: pay the tax on a month's income
+  | "report" // not registered: submit the calculation for a month's income
+  | "pay" // not registered: pay the tax on a month's income
   | "advance" // self-employed: pay the monthly advance for a month
   | "annualReturn" // self-employed: file the annual tax balance for a year
   | "annualPayment"; // self-employed: pay any difference for a year
@@ -166,8 +168,8 @@ function followingMonth(month: string): string {
 }
 
 // Every deadline that one tax year leads to, soonest first. incomeMonths
-// ("YYYY-MM") only matters when paid from abroad: a month without income has
-// nothing to report.
+// ("YYYY-MM") only matters when not registered: a month without
+// self-reported income has nothing to report.
 export function getTaxDeadlinesForTaxYear(
   status: TaxStatus,
   taxYear: number,
@@ -238,7 +240,7 @@ export function getUpcomingTaxDeadlines(
 }
 
 export type TaxDeadlineGroup = {
-  // One month's income from abroad (report + pay), one month's advance, or
+  // One month's self-reported income (report + pay), one month's advance, or
   // one tax year's annual balance (return + payment).
   kind: "income" | "advance" | "annual";
   period: string;
@@ -309,16 +311,37 @@ export function getPaymentDate(invoice: PaidInvoiceDates): string {
   return invoice.date.slice(0, 10);
 }
 
-// The months ("YYYY-MM") in which a client outside North Macedonia paid an
-// invoice, oldest first. The monthly calculation is for income from abroad;
-// a Macedonian company that pays an individual withholds the tax itself, so
-// invoices to clients in MK don't add a month.
-export function getForeignIncomeMonths(
-  paidInvoices: readonly (PaidInvoiceDates & { clientCountry: string })[]
+// Whether the freelancer reports the income tax on what a client pays, rather
+// than the client withholding it (Personal Income Tax law, "ЗДЛД"):
+// - a client outside North Macedonia: income from abroad (Art. 87(1) point 3);
+// - a private person in North Macedonia: income from occasional services to
+//   natural persons (Art. 87(1) point 6), since only a payer that keeps
+//   business books withholds (Art. 80(1));
+// - a company in North Macedonia keeps business books and withholds the tax
+//   when it pays (Art. 80(1)), so its invoices are not self-reported.
+// Both self-reported kinds have the same deadlines: the calculation by the
+// 10th of the next month (Art. 88(1) points 4 and 7), the tax by the 15th
+// (Art. 93(1)).
+export function isSelfReportedIncome(client: {
+  clientCountry: string;
+  clientType: string;
+}): boolean {
+  return client.clientCountry !== "MK" || client.clientType === "person";
+}
+
+// The months ("YYYY-MM") in which self-reported income was received (a paid
+// invoice to a client abroad or to a private person in North Macedonia),
+// oldest first. A company in North Macedonia withholds the tax itself, so its
+// invoices don't add a month.
+export function getSelfReportedIncomeMonths(
+  paidInvoices: readonly (PaidInvoiceDates & {
+    clientCountry: string;
+    clientType: string;
+  })[]
 ): string[] {
   const months = new Set<string>();
   for (const invoice of paidInvoices) {
-    if (invoice.clientCountry === "MK") continue;
+    if (!isSelfReportedIncome(invoice)) continue;
     months.add(getPaymentDate(invoice).slice(0, 7));
   }
   return [...months].sort();

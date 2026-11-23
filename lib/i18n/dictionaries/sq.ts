@@ -307,12 +307,12 @@ export const sq: Dictionary = {
     statusHint:
       "Nga kjo varet se cilat afate tatimore shfaqen në panel dhe në faqen „Të ardhurat & Tatimi”.",
     statuses: {
-      paid_from_abroad: "Të ardhura nga jashtë, pa veprimtari të regjistruar",
+      paid_from_abroad: "Pa veprimtari të regjistruar",
       self_employed: "Vetëpunësim i regjistruar",
     },
     statusDescriptions: {
       paid_from_abroad:
-        "Person fizik që paguhet nga klientë jashtë Maqedonisë së Veriut, pa veprimtari të pavarur të regjistruar.",
+        "Person fizik pa veprimtari të pavarur të regjistruar. Deklaron vetë atë që të paguajnë klientët nga jashtë dhe personat fizikë në Maqedoninë e Veriut; kompanitë në Maqedoninë e Veriut e mbajnë vetë tatimin.",
       self_employed:
         "Je regjistruar në UJP si person që ushtron veprimtari të pavarur (самостоен вршител на дејност).",
     },
@@ -332,7 +332,7 @@ export const sq: Dictionary = {
     ],
     rules: {
       paid_from_abroad:
-        "Për çdo muaj në të cilin të ka paguar një klient nga jashtë, dorëzo llogaritjen tatimore në UJP deri më 10 dhe paguaj tatimin deri më 15 të muajit pasues.",
+        "Për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut, dorëzo llogaritjen tatimore (е-ППД) në UJP deri më 10 dhe paguaj tatimin deri më 15 të muajit pasues. Kompanitë në Maqedoninë e Veriut e mbajnë tatimin kur të paguajnë, ndaj faturat e tyre nuk shtojnë muaj.",
       self_employed:
         "Akontimi i tatimit paguhet deri më 15 të çdo muaji për muajin e kaluar. Bilanci tatimor vjetor (ПДД-ДБ) dhe pasqyra e të ardhurave dhe shpenzimeve dorëzohen deri më 15 mars të vitit pasues, dhe diferenca paguhet deri më 30 mars.",
     },
@@ -358,9 +358,9 @@ export const sq: Dictionary = {
     basedOn: "Afatet për: {status}.",
     changeInSettings: "Ndrysho te Cilësimet",
     noUpcoming:
-      "Nuk ka afat tatimor të afërt. Kur një klient nga jashtë paguan një faturë dhe e shënon si të paguar, afatet e atij muaji shfaqen këtu.",
+      "Nuk ka afat tatimor të afërt. Kur një klient nga jashtë ose një person fizik në Maqedoninë e Veriut paguan një faturë dhe e shënon si të paguar, afatet e atij muaji shfaqen këtu.",
     noneInYear:
-      "Ende asnjë. Afatet shfaqen për çdo muaj në të cilin të ka paguar një klient nga jashtë.",
+      "Ende asnjë. Afatet shfaqen për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut.",
     then: "Pastaj: {label}, {date}",
   },
 };

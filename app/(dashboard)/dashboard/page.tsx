@@ -4,7 +4,7 @@ import { eq, sum, count, and, gte } from "drizzle-orm";
 import {
   getDDVStatus,
   getUpcomingTaxDeadlines,
-  getForeignIncomeMonths,
+  getSelfReportedIncomeMonths,
   toSkopjeDate,
   daysBetween,
   calculateIncomeTax,
@@ -80,13 +80,14 @@ export default async function DashboardPage() {
   const ddvStatus = getDDVStatus(annualIncomeMKD);
   const taxCalc = calculateIncomeTax(annualIncomeMKD);
 
-  // The next UJP deadline for how the user is registered for tax. When paid
-  // from abroad, only months in which a client abroad paid have deadlines.
+  // The next UJP deadline for how the user is registered for tax. When not
+  // registered, only months with self-reported income (a client abroad or a
+  // private person in North Macedonia paid) have deadlines.
   const today = toSkopjeDate(new Date());
   const taxStatus = await getTaxStatus(session.userId);
   const incomeMonths =
     taxStatus === "paid_from_abroad"
-      ? getForeignIncomeMonths(
+      ? getSelfReportedIncomeMonths(
           await getPaidInvoicesForDeadlines(session.userId, Number(today.slice(0, 4)))
         )
       : [];
