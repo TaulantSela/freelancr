@@ -4,7 +4,7 @@ export const en: Dictionary = {
   meta: {
     title: "Freelancr — Invoice & Tax Platform for Macedonian Freelancers",
     description:
-      "An invoicing and compliance platform built for North Macedonia's freelancers. Multi-currency invoices, DDV threshold monitoring, quarterly tax reminders.",
+      "An invoicing and compliance platform built for North Macedonia's freelancers. Multi-currency invoices, DDV threshold monitoring, UJP tax deadlines.",
   },
   common: {
     appName: "Freelancr",
@@ -62,7 +62,7 @@ export const en: Dictionary = {
     badge: "Built for North Macedonia · MKD + EUR + USD invoicing",
     heroTitle: "The invoicing platform that actually understands Macedonian freelancers",
     heroSubtitle:
-      "Stop invoicing in Word and tracking income in Excel. Freelancr handles multi-currency invoices, DDV threshold monitoring, quarterly tax reminders, and e-Faktura readiness — all in one place.",
+      "Stop invoicing in Word and tracking income in Excel. Freelancr puts multi-currency invoices, DDV threshold monitoring, your UJP tax deadlines and e-Faktura readiness in one place.",
     startFree: "Start for free",
     signInAccount: "Sign in to your account",
     eFakturaAlert: "October 2026:",
@@ -70,7 +70,7 @@ export const en: Dictionary = {
       "e-Faktura mandate takes effect for businesses above 2,000,000 MKD/year. Are you ready?",
     featuresTitle: "Everything a Macedonian freelancer needs",
     featuresSubtitle:
-      "Global tools don't know what DDV is. Your Excel doesn't send tax reminders. Freelancr does both.",
+      "Global tools don't know what DDV is. Your Excel doesn't know your tax deadlines. Freelancr knows both.",
     features: [
       {
         title: "Multi-currency invoicing",
@@ -81,8 +81,8 @@ export const en: Dictionary = {
         desc: "Real-time tracking against the 2,000,000 MKD threshold with alerts at 70%, 85%, and 100%.",
       },
       {
-        title: "Quarterly tax calendar",
-        desc: "Automatic reminders for April 30, July 31, October 31, and January 31 deadlines.",
+        title: "Tax deadline calendar",
+        desc: "The UJP deadlines for how you're registered: monthly report and payment dates for income from abroad, or monthly advances and the 15 March annual balance if you're self-employed.",
       },
       {
         title: "Annual income tracker",
@@ -118,7 +118,7 @@ export const en: Dictionary = {
         features: [
           "Unlimited invoices & clients",
           "DDV threshold monitoring",
-          "Quarterly tax reminders",
+          "Tax deadline calendar",
           "MKD + EUR/USD invoicing",
           "e-Faktura readiness checklist",
         ],
@@ -152,7 +152,7 @@ export const en: Dictionary = {
     checkStatus: "Check my e-Faktura status",
     compliancePreview: "Your compliance dashboard",
     complianceRows: [
-      { label: "Next tax deadline", value: "31 July 2026" },
+      { label: "Next tax deadline", value: "10 December 2026" },
       { label: "DDV status", value: "Not registered" },
       { label: "e-Faktura readiness", value: "3 of 5 steps done" },
       { label: "Outstanding invoices", value: "2 invoices" },

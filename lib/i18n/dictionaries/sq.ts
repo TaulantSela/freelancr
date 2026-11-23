@@ -4,7 +4,7 @@ export const sq: Dictionary = {
   meta: {
     title: "Freelancr — Platformë faturimi dhe tatimesh për freelancerët",
     description:
-      "Platformë për faturim dhe përputhshmëri e ndërtuar për freelancerët e Maqedonisë së Veriut. Fatura shumëvalutore, monitorim i pragut TVSH, kujtesa tatimore tremujore.",
+      "Platformë për faturim dhe përputhshmëri e ndërtuar për freelancerët e Maqedonisë së Veriut. Fatura shumëvalutore, monitorim i pragut TVSH, afatet tatimore të UJP-së.",
   },
   common: {
     appName: "Freelancr",
@@ -62,7 +62,7 @@ export const sq: Dictionary = {
     badge: "Ndërtuar për Maqedoninë e Veriut · Fatura MKD + EUR + USD",
     heroTitle: "Platforma e faturimit që e kupton freelancerin maqedonas",
     heroSubtitle:
-      "Ndalo faturimin në Word dhe ndjekjen e të ardhurave në Excel. Freelancr menaxhon fatura shumëvalutore, monitorimin e pragut TVSH, kujtesat tatimore tremujore dhe gatishmërinë për e-Faktura — gjithçka në një vend.",
+      "Ndalo faturimin në Word dhe ndjekjen e të ardhurave në Excel. Freelancr i bashkon në një vend faturat shumëvalutore, monitorimin e pragut TVSH, afatet e tua tatimore në UJP dhe gatishmërinë për e-Faktura.",
     startFree: "Fillo falas",
     signInAccount: "Hyr në llogarinë tënde",
     eFakturaAlert: "Tetor 2026:",
@@ -70,7 +70,7 @@ export const sq: Dictionary = {
       "Mandati e-Faktura hyn në fuqi për bizneset mbi 2.000.000 MKD/vit. A je gati?",
     featuresTitle: "Gjithçka që i nevojitet freelancerit maqedonas",
     featuresSubtitle:
-      "Mjetet globale nuk dinë çfarë është TVSH. Excel-i yt nuk dërgon kujtesa tatimore. Freelancr bën të dyja.",
+      "Mjetet globale nuk dinë çfarë është TVSH. Excel-i yt nuk i di afatet e tua tatimore. Freelancr i di të dyja.",
     features: [
       {
         title: "Faturim shumëvalutor",
@@ -81,8 +81,8 @@ export const sq: Dictionary = {
         desc: "Ndjekje në kohë reale kundrejt pragut 2.000.000 MKD me alarme në 70%, 85% dhe 100%.",
       },
       {
-        title: "Kalendar tatimor tremujor",
-        desc: "Kujtesa automatike për 30 prill, 31 korrik, 31 tetor dhe 31 janar.",
+        title: "Kalendar i afateve tatimore",
+        desc: "Afatet e UJP-së sipas mënyrës si je regjistruar: afatet mujore të llogaritjes dhe pagesës për të ardhurat nga jashtë, ose akontimet mujore dhe bilanci vjetor deri më 15 mars për vetëpunësimin e regjistruar.",
       },
       {
         title: "Ndjekës i të ardhurave vjetore",
@@ -118,7 +118,7 @@ export const sq: Dictionary = {
         features: [
           "Fatura dhe klientë të pakufizuar",
           "Monitorim i pragut TVSH",
-          "Kujtesa tatimore tremujore",
+          "Kalendar i afateve tatimore",
           "Fatura MKD + EUR/USD",
           "Lista kontrolluese e-Faktura",
         ],
@@ -152,7 +152,7 @@ export const sq: Dictionary = {
     checkStatus: "Kontrollo statusin tim e-Faktura",
     compliancePreview: "Paneli yt i përputhshmërisë",
     complianceRows: [
-      { label: "Afati i ardhshëm tatimor", value: "31 korrik 2026" },
+      { label: "Afati i ardhshëm tatimor", value: "10 dhjetor 2026" },
       { label: "Statusi TVSH", value: "Jo i regjistruar" },
       { label: "Gatishmëria e-Faktura", value: "3 nga 5 hapa" },
       { label: "Fatura të papaguara", value: "2 fatura" },
