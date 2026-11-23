@@ -55,7 +55,7 @@ export const en: Dictionary = {
     badge: "Built for North Macedonia · MKD + EUR + USD invoicing",
     heroTitle: "The invoicing platform that actually understands Macedonian freelancers",
     heroSubtitle:
-      "Stop invoicing in Word and tracking income in Excel. Freelancr puts multi-currency invoices, DDV threshold monitoring and your UJP tax deadlines in one place.",
+      "Stop invoicing in Word and tracking income in Excel. Freelancr keeps your clients at home and abroad and your invoices in one place, and shows your UJP deadlines with roughly what you owe.",
     createAccount: "Create an account",
     signInAccount: "Sign in to your account",
     featuresTitle: "Everything a Macedonian freelancer needs",
@@ -81,7 +81,7 @@ export const en: Dictionary = {
     ],
     ctaTitle: "Ready to replace Excel + Word?",
     ctaSubtitle:
-      "Automate your invoicing and stop worrying about tax compliance.",
+      "Issue numbered invoices in your client's language and see what you owe UJP each month.",
     ctaButton: "Create your account",
     footerTagline: "Built for North Macedonia · Изградено за Македонија · Ndërtuar për Maqedoninë",
   },

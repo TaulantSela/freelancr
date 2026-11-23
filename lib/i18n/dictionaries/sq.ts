@@ -55,7 +55,7 @@ export const sq: Dictionary = {
     badge: "Ndërtuar për Maqedoninë e Veriut · Fatura MKD + EUR + USD",
     heroTitle: "Platforma e faturimit që e kupton freelancerin maqedonas",
     heroSubtitle:
-      "Ndalo faturimin në Word dhe ndjekjen e të ardhurave në Excel. Freelancr i bashkon në një vend faturat shumëvalutore, monitorimin e pragut TVSH dhe afatet e tua tatimore në UJP.",
+      "Ndalo faturimin në Word dhe ndjekjen e të ardhurave në Excel. Freelancr i mban në një vend klientët në Maqedoni dhe jashtë saj dhe faturat, dhe të tregon afatet në UJP me përafërsisht sa detyrohesh.",
     createAccount: "Krijo llogari",
     signInAccount: "Hyr në llogarinë tënde",
     featuresTitle: "Gjithçka që i nevojitet freelancerit maqedonas",
@@ -81,7 +81,7 @@ export const sq: Dictionary = {
     ],
     ctaTitle: "Gati të zëvendësosh Excel + Word?",
     ctaSubtitle:
-      "Automatizo faturimin dhe mos u shqetëso më për tatimet.",
+      "Lësho fatura të numëruara në gjuhën e klientit dhe shiko sa i detyrohesh UJP-së çdo muaj.",
     ctaButton: "Krijo llogarinë tënde",
     footerTagline: "Built for North Macedonia · Изградено за Македонија · Ndërtuar për Maqedoninë",
   },
