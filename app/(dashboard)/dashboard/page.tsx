@@ -3,12 +3,17 @@ import { getDb, invoices, clients } from "@/lib/db";
 import { eq, sum, count, and, gte } from "drizzle-orm";
 import {
   getDDVStatus,
-  getNextQuarterlyDeadline,
+  getUpcomingTaxDeadlines,
+  getForeignIncomeMonths,
+  toSkopjeDate,
+  daysBetween,
   calculateIncomeTax,
   formatMKD,
   formatCurrency,
   DDV_THRESHOLD_MKD,
 } from "@/lib/tax/calculator";
+import { getTaxStatus, getPaidInvoicesForDeadlines } from "@/lib/tax/queries";
+import { formatTaxDate, taxDeadlineLabel } from "@/lib/tax/labels";
 import { formatDate, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -80,8 +85,38 @@ export default async function DashboardPage() {
     .where(eq(clients.userId, session.userId));
 
   const ddvStatus = getDDVStatus(annualIncomeMKD);
-  const deadline = getNextQuarterlyDeadline();
   const taxCalc = calculateIncomeTax(annualIncomeMKD);
+
+  // The next UJP deadline for how the user is registered for tax. When paid
+  // from abroad, only months in which a client abroad paid have deadlines.
+  const today = toSkopjeDate(new Date());
+  const taxStatus = await getTaxStatus(session.userId);
+  const incomeMonths =
+    taxStatus === "paid_from_abroad"
+      ? getForeignIncomeMonths(
+          await getPaidInvoicesForDeadlines(session.userId, Number(today.slice(0, 4)))
+        )
+      : [];
+  const upcomingDeadlines = getUpcomingTaxDeadlines(taxStatus, today, incomeMonths);
+  const [nextDeadline] = upcomingDeadlines;
+  // Everything due on the next date (an advance and the annual balance can
+  // share 15 March), then the first deadline after it.
+  const dueWithNext = nextDeadline
+    ? upcomingDeadlines.filter((d) => d.dueDate === nextDeadline.dueDate)
+    : [];
+  const thenDeadline =
+    nextDeadline && upcomingDeadlines.find((d) => d.dueDate > nextDeadline.dueDate);
+  const daysToNext = nextDeadline ? daysBetween(today, nextDeadline.dueDate) : null;
+  const nextDeadlineWhen =
+    nextDeadline &&
+    formatMessage(
+      daysToNext === 0
+        ? t.dashboard.dueToday
+        : daysToNext === 1
+        ? t.dashboard.dueTomorrow
+        : t.dashboard.daysAway,
+      { date: formatTaxDate(nextDeadline.dueDate, t), days: daysToNext ?? 0 }
+    );
 
   const statusColors: Record<string, string> = {
     paid: "text-emerald-400",
@@ -281,20 +316,38 @@ export default async function DashboardPage() {
               </div>
             </div>
             <Separator />
-            <div className="flex items-center gap-3 bg-muted/50 rounded-lg px-3 py-2">
-              <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
-              <div>
-                <div className="text-xs font-medium">
-                  {formatMessage(t.dashboard.nextDeadline, { quarter: deadline.quarter })}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {formatMessage(t.dashboard.daysAway, {
-                    date: deadline.deadline,
-                    days: deadline.daysUntil,
-                  })}
+            <div className="flex items-start gap-3 bg-muted/50 rounded-lg px-3 py-2">
+              <Calendar className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+              <div className="min-w-0 space-y-0.5">
+                <div className="text-xs font-medium">{t.dashboard.nextDeadline}</div>
+                {nextDeadline ? (
+                  <>
+                    {dueWithNext.map((d) => (
+                      <div key={`${d.kind}-${d.period}`} className="text-xs">
+                        {taxDeadlineLabel(d, t)}
+                      </div>
+                    ))}
+                    <div className="text-xs text-muted-foreground">{nextDeadlineWhen}</div>
+                    {thenDeadline && (
+                      <div className="text-xs text-muted-foreground">
+                        {formatMessage(t.tax.then, {
+                          label: taxDeadlineLabel(thenDeadline, t),
+                          date: formatTaxDate(thenDeadline.dueDate, t),
+                        })}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-xs text-muted-foreground">{t.tax.noUpcoming}</div>
+                )}
+                <div className="text-xs text-muted-foreground pt-1">
+                  {formatMessage(t.tax.basedOn, { status: t.tax.statuses[taxStatus] })}{" "}
+                  <Link href="/settings" className="underline underline-offset-2 hover:text-foreground">
+                    {t.tax.changeInSettings}
+                  </Link>
                 </div>
               </div>
-              {deadline.daysUntil <= 30 && (
+              {daysToNext !== null && daysToNext <= 7 && (
                 <AlertTriangle className="h-4 w-4 text-yellow-500 ml-auto shrink-0" />
               )}
             </div>

@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "tax_status" text DEFAULT 'paid_from_abroad' NOT NULL;

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { updateProfile } from "@/lib/actions/settings";
 import { Loader2 } from "lucide-react";
 import type { User } from "@/lib/db/schema";
+import { TAX_STATUSES } from "@/lib/tax/calculator";
 import { useTranslations } from "@/lib/i18n/client";
 import { formatMessage } from "@/lib/i18n/format";
 
@@ -57,6 +58,33 @@ export function SettingsForm({ user }: { user: User }) {
           ))}
         </select>
       </div>
+
+      <fieldset className="space-y-2">
+        <legend className="text-sm leading-none font-medium">{t.tax.statusLabel}</legend>
+        <p className="text-xs text-muted-foreground">{t.tax.statusHint}</p>
+        <div className="grid sm:grid-cols-2 gap-2">
+          {TAX_STATUSES.map((status) => (
+            <label
+              key={status}
+              className="flex items-start gap-3 rounded-md border border-input px-3 py-2 text-sm cursor-pointer has-checked:border-primary has-checked:bg-primary/5"
+            >
+              <input
+                type="radio"
+                name="taxStatus"
+                value={status}
+                defaultChecked={user.taxStatus === status}
+                className="mt-0.5 accent-primary"
+              />
+              <span className="space-y-0.5">
+                <span className="block font-medium">{t.tax.statuses[status]}</span>
+                <span className="block text-xs text-muted-foreground">
+                  {t.tax.statusDescriptions[status]}
+                </span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">

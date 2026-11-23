@@ -4,7 +4,7 @@ export const en: Dictionary = {
   meta: {
     title: "Freelancr — Invoice & Tax Platform for Macedonian Freelancers",
     description:
-      "An invoicing and compliance platform built for North Macedonia's freelancers. Multi-currency invoices, DDV threshold monitoring, quarterly tax reminders.",
+      "An invoicing and compliance platform built for North Macedonia's freelancers. Multi-currency invoices, DDV threshold monitoring, UJP tax deadlines.",
   },
   common: {
     appName: "Freelancr",
@@ -62,7 +62,7 @@ export const en: Dictionary = {
     badge: "Built for North Macedonia · MKD + EUR + USD invoicing",
     heroTitle: "The invoicing platform that actually understands Macedonian freelancers",
     heroSubtitle:
-      "Stop invoicing in Word and tracking income in Excel. Freelancr handles multi-currency invoices, DDV threshold monitoring, quarterly tax reminders, and e-Faktura readiness — all in one place.",
+      "Stop invoicing in Word and tracking income in Excel. Freelancr puts multi-currency invoices, DDV threshold monitoring, your UJP tax deadlines and e-Faktura readiness in one place.",
     startFree: "Start for free",
     signInAccount: "Sign in to your account",
     eFakturaAlert: "October 2026:",
@@ -70,7 +70,7 @@ export const en: Dictionary = {
       "e-Faktura mandate takes effect for businesses above 2,000,000 MKD/year. Are you ready?",
     featuresTitle: "Everything a Macedonian freelancer needs",
     featuresSubtitle:
-      "Global tools don't know what DDV is. Your Excel doesn't send tax reminders. Freelancr does both.",
+      "Global tools don't know what DDV is. Your Excel doesn't know your tax deadlines. Freelancr knows both.",
     features: [
       {
         title: "Multi-currency invoicing",
@@ -81,8 +81,8 @@ export const en: Dictionary = {
         desc: "Real-time tracking against the 2,000,000 MKD threshold with alerts at 70%, 85%, and 100%.",
       },
       {
-        title: "Quarterly tax calendar",
-        desc: "Automatic reminders for April 30, July 31, October 31, and January 31 deadlines.",
+        title: "Tax deadline calendar",
+        desc: "The UJP deadlines for how you're registered: monthly report and payment dates for income from abroad, or monthly advances and the 15 March annual balance if you're self-employed.",
       },
       {
         title: "Annual income tracker",
@@ -118,7 +118,7 @@ export const en: Dictionary = {
         features: [
           "Unlimited invoices & clients",
           "DDV threshold monitoring",
-          "Quarterly tax reminders",
+          "Tax deadline calendar",
           "MKD + EUR/USD invoicing",
           "e-Faktura readiness checklist",
         ],
@@ -152,7 +152,7 @@ export const en: Dictionary = {
     checkStatus: "Check my e-Faktura status",
     compliancePreview: "Your compliance dashboard",
     complianceRows: [
-      { label: "Next tax deadline", value: "31 July 2026" },
+      { label: "Next tax deadline", value: "10 December 2026" },
       { label: "DDV status", value: "Not registered" },
       { label: "e-Faktura readiness", value: "3 of 5 steps done" },
       { label: "Outstanding invoices", value: "2 invoices" },
@@ -196,8 +196,10 @@ export const en: Dictionary = {
     bracketTax: "Income tax ({bracket})",
     totalEstTax: "Estimated total tax",
     netIncome: "Net income (after tax)",
-    nextDeadline: "Next deadline: {quarter}",
+    nextDeadline: "Next tax deadline",
     daysAway: "{date} — {days} days away",
+    dueToday: "{date} — today",
+    dueTomorrow: "{date} — tomorrow",
     recentInvoices: "Recent Invoices",
     noInvoices: "No invoices yet",
     createFirst: "Create first invoice",
@@ -365,9 +367,11 @@ export const en: Dictionary = {
     effectiveRate: "Effective rate",
     taxNote:
       "MK personal income tax is a flat 10%. This estimate applies it to your paid invoices, but the tax base for independent activity is net income after expenses — consult your accountant.",
-    quarterlyDeadlines: "Quarterly Tax Deadlines {year}",
+    taxDeadlines: "Tax deadlines {year}",
     passed: "Passed",
     daysAway: "{days} days away",
+    dueToday: "Due today",
+    dueTomorrow: "Due tomorrow",
     monthlyBreakdown: "Monthly income breakdown ({year})",
     annualTotal: "Annual total",
     byClient: "Income by client",
@@ -410,5 +414,66 @@ export const en: Dictionary = {
       { value: "doo", label: "DOO (limited liability company)" },
       { value: "trade", label: "Trade / craft" },
     ],
+  },
+  tax: {
+    statusLabel: "How are you registered for tax?",
+    statusHint:
+      "This decides which tax deadlines the dashboard and the Income & Tax page show.",
+    statuses: {
+      paid_from_abroad: "Paid from abroad, not registered",
+      self_employed: "Registered self-employed",
+    },
+    statusDescriptions: {
+      paid_from_abroad:
+        "An individual paid by clients outside North Macedonia, with no registered independent activity.",
+      self_employed:
+        "Registered with UJP as a self-employed person (самостоен вршител на дејност).",
+    },
+    months: [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ],
+    rules: {
+      paid_from_abroad:
+        "For each month in which a client abroad paid you, submit the tax calculation to UJP by the 10th of the next month and pay the tax by the 15th.",
+      self_employed:
+        "Pay an income tax advance by the 15th of each month for the previous month. File the annual tax balance (ПДД-ДБ) and the statement of income and expenses by 15 March of the next year, and pay any difference by 30 March.",
+    },
+    deadlines: {
+      report: "Submit the tax calculation for {period} income",
+      pay: "Pay the tax on {period} income",
+      advance: "Pay the income tax advance for {period}",
+      annualReturn: "File the annual tax balance (ПДД-ДБ) for {period}",
+      annualPayment: "Pay any difference from the {period} tax balance",
+    },
+    actions: {
+      report: "Submit the calculation by {date}",
+      pay: "Pay the tax by {date}",
+      advance: "Pay by {date}",
+      annualReturn: "File ПДД-ДБ by {date}",
+      annualPayment: "Pay any difference by {date}",
+    },
+    groups: {
+      income: "{period} income",
+      advance: "Advance for {period}",
+      annual: "Annual tax balance {period}",
+    },
+    basedOn: "Deadlines for: {status}.",
+    changeInSettings: "Change in Settings",
+    noUpcoming:
+      "No tax deadline coming up. Once a client abroad pays an invoice and you mark it paid, that month's deadlines show up here.",
+    noneInYear:
+      "None yet. Deadlines show up for each month in which a client abroad paid you.",
+    then: "Then: {label}, {date}",
   },
 };

@@ -4,6 +4,7 @@ import {
   doublePrecision,
   timestamp,
 } from "drizzle-orm/pg-core";
+import { DEFAULT_TAX_STATUS, TAX_STATUSES } from "../tax/calculator";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -16,6 +17,11 @@ export const users = pgTable("users", {
   address: text("address"),
   bankAccount: text("bank_account"),
   bankName: text("bank_name"),
+  // How the user is registered for tax, which decides their UJP deadlines
+  // (see lib/tax/calculator.ts). Existing rows get the default.
+  taxStatus: text("tax_status", { enum: TAX_STATUSES })
+    .notNull()
+    .default(DEFAULT_TAX_STATUS),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 });
 

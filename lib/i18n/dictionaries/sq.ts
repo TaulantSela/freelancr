@@ -4,7 +4,7 @@ export const sq: Dictionary = {
   meta: {
     title: "Freelancr — Platformë faturimi dhe tatimesh për freelancerët",
     description:
-      "Platformë për faturim dhe përputhshmëri e ndërtuar për freelancerët e Maqedonisë së Veriut. Fatura shumëvalutore, monitorim i pragut TVSH, kujtesa tatimore tremujore.",
+      "Platformë për faturim dhe përputhshmëri e ndërtuar për freelancerët e Maqedonisë së Veriut. Fatura shumëvalutore, monitorim i pragut TVSH, afatet tatimore të UJP-së.",
   },
   common: {
     appName: "Freelancr",
@@ -62,7 +62,7 @@ export const sq: Dictionary = {
     badge: "Ndërtuar për Maqedoninë e Veriut · Fatura MKD + EUR + USD",
     heroTitle: "Platforma e faturimit që e kupton freelancerin maqedonas",
     heroSubtitle:
-      "Ndalo faturimin në Word dhe ndjekjen e të ardhurave në Excel. Freelancr menaxhon fatura shumëvalutore, monitorimin e pragut TVSH, kujtesat tatimore tremujore dhe gatishmërinë për e-Faktura — gjithçka në një vend.",
+      "Ndalo faturimin në Word dhe ndjekjen e të ardhurave në Excel. Freelancr i bashkon në një vend faturat shumëvalutore, monitorimin e pragut TVSH, afatet e tua tatimore në UJP dhe gatishmërinë për e-Faktura.",
     startFree: "Fillo falas",
     signInAccount: "Hyr në llogarinë tënde",
     eFakturaAlert: "Tetor 2026:",
@@ -70,7 +70,7 @@ export const sq: Dictionary = {
       "Mandati e-Faktura hyn në fuqi për bizneset mbi 2.000.000 MKD/vit. A je gati?",
     featuresTitle: "Gjithçka që i nevojitet freelancerit maqedonas",
     featuresSubtitle:
-      "Mjetet globale nuk dinë çfarë është TVSH. Excel-i yt nuk dërgon kujtesa tatimore. Freelancr bën të dyja.",
+      "Mjetet globale nuk dinë çfarë është TVSH. Excel-i yt nuk i di afatet e tua tatimore. Freelancr i di të dyja.",
     features: [
       {
         title: "Faturim shumëvalutor",
@@ -81,8 +81,8 @@ export const sq: Dictionary = {
         desc: "Ndjekje në kohë reale kundrejt pragut 2.000.000 MKD me alarme në 70%, 85% dhe 100%.",
       },
       {
-        title: "Kalendar tatimor tremujor",
-        desc: "Kujtesa automatike për 30 prill, 31 korrik, 31 tetor dhe 31 janar.",
+        title: "Kalendar i afateve tatimore",
+        desc: "Afatet e UJP-së sipas mënyrës si je regjistruar: afatet mujore të llogaritjes dhe pagesës për të ardhurat nga jashtë, ose akontimet mujore dhe bilanci vjetor deri më 15 mars për vetëpunësimin e regjistruar.",
       },
       {
         title: "Ndjekës i të ardhurave vjetore",
@@ -118,7 +118,7 @@ export const sq: Dictionary = {
         features: [
           "Fatura dhe klientë të pakufizuar",
           "Monitorim i pragut TVSH",
-          "Kujtesa tatimore tremujore",
+          "Kalendar i afateve tatimore",
           "Fatura MKD + EUR/USD",
           "Lista kontrolluese e-Faktura",
         ],
@@ -152,7 +152,7 @@ export const sq: Dictionary = {
     checkStatus: "Kontrollo statusin tim e-Faktura",
     compliancePreview: "Paneli yt i përputhshmërisë",
     complianceRows: [
-      { label: "Afati i ardhshëm tatimor", value: "31 korrik 2026" },
+      { label: "Afati i ardhshëm tatimor", value: "10 dhjetor 2026" },
       { label: "Statusi TVSH", value: "Jo i regjistruar" },
       { label: "Gatishmëria e-Faktura", value: "3 nga 5 hapa" },
       { label: "Fatura të papaguara", value: "2 fatura" },
@@ -196,8 +196,10 @@ export const sq: Dictionary = {
     bracketTax: "Tatimi {bracket}",
     totalEstTax: "Tatimi total i vlerësuar",
     netIncome: "Të ardhurat neto (pas tatimit)",
-    nextDeadline: "Afati i ardhshëm: {quarter}",
+    nextDeadline: "Afati i ardhshëm tatimor",
     daysAway: "{date} — për {days} ditë",
+    dueToday: "{date} — sot",
+    dueTomorrow: "{date} — nesër",
     recentInvoices: "Faturat e fundit",
     noInvoices: "Ende nuk ka fatura",
     createFirst: "Krijo faturën e parë",
@@ -365,9 +367,11 @@ export const sq: Dictionary = {
     effectiveRate: "Shkalla efektive",
     taxNote:
       "Tatimi mbi të ardhurat personale në MK është me normë të sheshtë 10%. Ky vlerësim e llogarit mbi faturat e paguara, por baza tatimore për veprimtarinë e pavarur janë të ardhurat neto pas shpenzimeve — konsulto kontabilistin.",
-    quarterlyDeadlines: "Afatet tatimore tremujore {year}",
+    taxDeadlines: "Afatet tatimore {year}",
     passed: "Kaluar",
     daysAway: "për {days} ditë",
+    dueToday: "Afati është sot",
+    dueTomorrow: "Afati është nesër",
     monthlyBreakdown: "Ndarja mujore e të ardhurave ({year})",
     annualTotal: "Totali vjetor",
     byClient: "Të ardhurat sipas klientit",
@@ -410,5 +414,66 @@ export const sq: Dictionary = {
       { value: "doo", label: "DOO (shoqëri me përgjegjësi të kufizuar)" },
       { value: "trade", label: "Zanat / tregti" },
     ],
+  },
+  tax: {
+    statusLabel: "Si je regjistruar për tatime?",
+    statusHint:
+      "Nga kjo varet se cilat afate tatimore shfaqen në panel dhe në faqen „Të ardhurat & Tatimi”.",
+    statuses: {
+      paid_from_abroad: "Të ardhura nga jashtë, pa veprimtari të regjistruar",
+      self_employed: "Vetëpunësim i regjistruar",
+    },
+    statusDescriptions: {
+      paid_from_abroad:
+        "Person fizik që paguhet nga klientë jashtë Maqedonisë së Veriut, pa veprimtari të pavarur të regjistruar.",
+      self_employed:
+        "Je regjistruar në UJP si person që ushtron veprimtari të pavarur (самостоен вршител на дејност).",
+    },
+    months: [
+      "janar",
+      "shkurt",
+      "mars",
+      "prill",
+      "maj",
+      "qershor",
+      "korrik",
+      "gusht",
+      "shtator",
+      "tetor",
+      "nëntor",
+      "dhjetor",
+    ],
+    rules: {
+      paid_from_abroad:
+        "Për çdo muaj në të cilin të ka paguar një klient nga jashtë, dorëzo llogaritjen tatimore në UJP deri më 10 dhe paguaj tatimin deri më 15 të muajit pasues.",
+      self_employed:
+        "Akontimi i tatimit paguhet deri më 15 të çdo muaji për muajin e kaluar. Bilanci tatimor vjetor (ПДД-ДБ) dhe pasqyra e të ardhurave dhe shpenzimeve dorëzohen deri më 15 mars të vitit pasues, dhe diferenca paguhet deri më 30 mars.",
+    },
+    deadlines: {
+      report: "Dorëzo llogaritjen tatimore për të ardhurat e muajit {period}",
+      pay: "Paguaj tatimin për të ardhurat e muajit {period}",
+      advance: "Paguaj akontimin e tatimit për muajin {period}",
+      annualReturn: "Dorëzo bilancin tatimor vjetor (ПДД-ДБ) për vitin {period}",
+      annualPayment: "Paguaj diferencën sipas bilancit tatimor për vitin {period}",
+    },
+    actions: {
+      report: "Dorëzo llogaritjen deri më {date}",
+      pay: "Paguaj tatimin deri më {date}",
+      advance: "Paguaj deri më {date}",
+      annualReturn: "Dorëzo ПДД-ДБ deri më {date}",
+      annualPayment: "Paguaj diferencën deri më {date}",
+    },
+    groups: {
+      income: "Të ardhurat e muajit {period}",
+      advance: "Akontimi për muajin {period}",
+      annual: "Bilanci tatimor vjetor {period}",
+    },
+    basedOn: "Afatet për: {status}.",
+    changeInSettings: "Ndrysho te Cilësimet",
+    noUpcoming:
+      "Nuk ka afat tatimor të afërt. Kur një klient nga jashtë paguan një faturë dhe e shënon si të paguar, afatet e atij muaji shfaqen këtu.",
+    noneInYear:
+      "Ende asnjë. Afatet shfaqen për çdo muaj në të cilin të ka paguar një klient nga jashtë.",
+    then: "Pastaj: {label}, {date}",
   },
 };
