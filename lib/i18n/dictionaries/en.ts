@@ -756,6 +756,14 @@ export const en: Dictionary = {
       ibanInvalid:
         "That IBAN doesn't check out. Copy it from your bank's documents, e.g. MK07 2501 2000 0058 984.",
     },
+    reminders: {
+      title: "Email reminders",
+      toggle: "Email me before UJP deadlines",
+      hint:
+        "If you're not registered for an activity: on the 5th and 9th while last month's е-ПДД isn't filed, on the 13th while its tax isn't paid, and on 20 May for the annual return (ГДП). If you're self-employed: on the 12th for the monthly advance.",
+      notConfigured: "Email isn't set up on this server yet.",
+      saved: "Saved",
+    },
   },
   tax: {
     statusLabel: "How are you registered for tax?",
@@ -854,6 +862,38 @@ export const en: Dictionary = {
         "Someone asked to reset the password of your Freelancr account. If it was you, use the link below to set a new one. It's valid for {minutes} minutes and works once.",
       button: "Set a new password",
       ignore: "If you didn't ask for this, ignore this email: your password stays as it is.",
+    },
+    reminders: {
+      greeting: "Hello {name},",
+      button: "Open your payments",
+      footer:
+        "You get this because deadline reminders are on in Freelancr's Settings; you can turn them off there.",
+      fileBy10: {
+        subject: "File the е-ПДД for {month} by the 10th",
+        body:
+          "The calculation (е-ПДД) for your {month} income is due with UJP by {date}. The tax on it is {amount}; pay it by the 15th.",
+      },
+      fileTomorrow: {
+        subject: "Tomorrow: the е-ПДД for {month}",
+        body:
+          "The calculation (е-ПДД) for your {month} income is due tomorrow, {date}. The tax on it is {amount}.",
+      },
+      payBy15: {
+        subject: "Pay {amount} to UJP by the 15th",
+        body:
+          "The tax on your {month} income that isn't marked paid is {amount}. Pay it by {date}, against the payment order (ПП53) on the approved calculation.",
+      },
+      annualReturn: {
+        subject: "Confirm UJP's annual return (ГДП) for {year} by 31 May",
+        body:
+          "UJP prepares the annual tax return (ГДП) for {year}. Confirm or correct it by {date}; any tax it shows is due by 30 June.",
+      },
+      advance: {
+        subject: "Pay your monthly advance by the 15th",
+        body: "Pay the income tax advance for {month}, {amount}, by {date}.",
+        bodyNoAmount:
+          "Pay the income tax advance for {month} by {date}. Add its amount in Settings to see it here.",
+      },
     },
   },
 };

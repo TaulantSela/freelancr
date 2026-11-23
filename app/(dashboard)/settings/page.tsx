@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SettingsForm } from "@/components/dashboard/settings-form";
 import { ChangePasswordForm } from "@/components/dashboard/change-password-form";
+import { RemindersToggle } from "@/components/dashboard/reminders-toggle";
+import { isEmailConfigured } from "@/lib/email/config";
 import { getTranslations } from "@/lib/i18n/server";
 
 export default async function SettingsPage() {
@@ -26,6 +28,7 @@ export default async function SettingsPage() {
       vatRegistered: users.vatRegistered,
       vatNumber: users.vatNumber,
       isDemo: users.isDemo,
+      remindersEnabled: users.remindersEnabled,
       taxNumber: users.taxNumber,
       address: users.address,
       placeOfIssue: users.placeOfIssue,
@@ -70,6 +73,24 @@ export default async function SettingsPage() {
             <span className="text-muted-foreground">{t.settings.memberSince}</span>
             <span className="text-xs text-muted-foreground">{user.createdAt?.slice(0, 10)}</span>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">{t.settings.reminders.title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <RemindersToggle
+            enabled={user.remindersEnabled}
+            disabledReason={
+              user.isDemo
+                ? t.common.demoUnavailable
+                : !isEmailConfigured()
+                ? t.settings.reminders.notConfigured
+                : null
+            }
+          />
         </CardContent>
       </Card>
 

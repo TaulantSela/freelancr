@@ -76,6 +76,9 @@ export const users = pgTable("users", {
   // The language emails to the user are written in: the UI language at
   // sign-up, then whatever they switch to while signed in.
   locale: text("locale").notNull().default("mk"),
+  // Emails before UJP deadlines (app/api/cron/daily); on unless turned off
+  // in Settings.
+  remindersEnabled: boolean("reminders_enabled").notNull().default(true),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 });
 
@@ -224,6 +227,21 @@ export const payments = pgTable("payments", {
     "payments_deemed_costs_rate_allowed",
     sql`${table.deemedCostsRate} in (0, 0.2, 0.3, 0.4, 0.5)`
   ),
+]);
+
+// Deadline reminders that went out: one row per user, kind and period
+// (e.g. "file-by-10", "2026-10"). The row is written before the email, so
+// a second run of the cron sends nothing; a failed send deletes it again.
+export const reminderLog = pgTable("reminder_log", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  kind: text("kind").notNull(),
+  period: text("period").notNull(),
+  sentAt: timestamp("sent_at", { mode: "string" }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("reminder_log_user_id_kind_period_unique").on(table.userId, table.kind, table.period),
 ]);
 
 // Every attempt to email an invoice to a client: a row is written before

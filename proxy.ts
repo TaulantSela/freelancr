@@ -18,7 +18,9 @@ export async function proxy(request: NextRequest) {
     pathname === "/sign-in" ||
     pathname === "/sign-up" ||
     pathname === "/forgot-password" ||
-    pathname === "/reset-password";
+    pathname === "/reset-password" ||
+    // Vercel Cron: no session, a bearer secret (checked by the route).
+    pathname.startsWith("/api/cron/");
 
   const token = request.cookies.get(SESSION_COOKIE)?.value;
 

@@ -759,6 +759,14 @@ export const sq: Dictionary = {
       ibanInvalid:
         "Ky IBAN nuk është i saktë. Kopjoje nga dokumentet e bankës, p.sh. MK07 2501 2000 0058 984.",
     },
+    reminders: {
+      title: "Kujtesa me email",
+      toggle: "Më dërgo email para afateve të UJP-së",
+      hint:
+        "Nëse nuk ke veprimtari të regjistruar: më 5 dhe 9 derisa llogaritja (е-ПДД) e muajit të kaluar të mos jetë dorëzuar, më 13 derisa tatimi të mos jetë paguar, dhe më 20 maj për deklaratën vjetore (ГДП). Nëse je i vetëpunësuar: më 12 për akontimin mujor.",
+      notConfigured: "Email-i ende nuk është konfiguruar në këtë server.",
+      saved: "U ruajt",
+    },
   },
   tax: {
     statusLabel: "Si je regjistruar për tatime?",
@@ -858,6 +866,38 @@ export const sq: Dictionary = {
         "Dikush kërkoi rivendosjen e fjalëkalimit të llogarisë tënde në Freelancr. Nëse ishe ti, përdor lidhjen më poshtë për të vendosur një të ri. Vlen {minutes} minuta dhe funksionon një herë.",
       button: "Vendos fjalëkalim të ri",
       ignore: "Nëse nuk e kërkove këtë, injoroje këtë email: fjalëkalimi yt mbetet i njëjtë.",
+    },
+    reminders: {
+      greeting: "Përshëndetje {name},",
+      button: "Hap pagesat",
+      footer:
+        "E merr këtë sepse kujtesat për afatet janë të ndezura te Cilësimet e Freelancr; mund t'i fikësh atje.",
+      fileBy10: {
+        subject: "Dorëzo llogaritjen (е-ПДД) për {month} deri më 10",
+        body:
+          "Llogaritja (е-ПДД) për të ardhurat e muajit {month} duhet dorëzuar në UJP deri më {date}. Tatimi është {amount}; paguaje deri më 15.",
+      },
+      fileTomorrow: {
+        subject: "Nesër: llogaritja (е-ПДД) për {month}",
+        body:
+          "Llogaritja (е-ПДД) për të ardhurat e muajit {month} duhet dorëzuar nesër, më {date}. Tatimi është {amount}.",
+      },
+      payBy15: {
+        subject: "Paguaj {amount} te UJP deri më 15",
+        body:
+          "Tatimi për të ardhurat e muajit {month} që nuk është shënuar si i paguar është {amount}. Paguaje deri më {date}, sipas urdhëresës (ПП53) të llogaritjes së miratuar.",
+      },
+      annualReturn: {
+        subject: "Konfirmo deklaratën vjetore (ГДП) për {year} deri më 31 maj",
+        body:
+          "UJP përgatit deklaratën tatimore vjetore (ГДП) për {year}. Konfirmoje ose korrigjoje deri më {date}; tatimi që tregon paguhet deri më 30 qershor.",
+      },
+      advance: {
+        subject: "Paguaj akontimin mujor deri më 15",
+        body: "Paguaj akontimin e tatimit për {month}, {amount}, deri më {date}.",
+        bodyNoAmount:
+          "Paguaj akontimin e tatimit për {month} deri më {date}. Shto shumën te Cilësimet që ta shohësh këtu.",
+      },
     },
   },
 };

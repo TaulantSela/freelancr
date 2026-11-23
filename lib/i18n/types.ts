@@ -680,6 +680,13 @@ export type Dictionary = {
       looksLikeEmbg: string;
       ibanInvalid: string;
     };
+    reminders: {
+      title: string;
+      toggle: string;
+      hint: string;
+      notConfigured: string;
+      saved: string;
+    };
   };
   tax: {
     statusLabel: string;
@@ -738,6 +745,32 @@ export type Dictionary = {
       body: string;
       button: string;
       ignore: string;
+    };
+    reminders: {
+      greeting: string;
+      button: string;
+      footer: string;
+      fileBy10: {
+        subject: string;
+        body: string;
+      };
+      fileTomorrow: {
+        subject: string;
+        body: string;
+      };
+      payBy15: {
+        subject: string;
+        body: string;
+      };
+      annualReturn: {
+        subject: string;
+        body: string;
+      };
+      advance: {
+        subject: string;
+        body: string;
+        bodyNoAmount: string;
+      };
     };
   };
 };
