@@ -52,6 +52,35 @@ export type Dictionary = {
       invalidCredentials: string;
       passwordTooShort: string;
     };
+    passwordChanged: string;
+    forgot: {
+      link: string;
+      title: string;
+      desc: string;
+      submit: string;
+      sent: string;
+      notConfigured: string;
+      back: string;
+      errors: {
+        emailRequired: string;
+        notConfigured: string;
+      };
+    };
+    reset: {
+      title: string;
+      desc: string;
+      new: string;
+      confirm: string;
+      submit: string;
+      invalid: string;
+      requestNew: string;
+      errors: {
+        required: string;
+        tooShort: string;
+        mismatch: string;
+        invalidToken: string;
+      };
+    };
   };
   landing: {
     badge: string;
@@ -675,6 +704,15 @@ export type Dictionary = {
       advancePayBy: string;
       advanceSet: string;
       addInSettings: string;
+    };
+  };
+  emails: {
+    reset: {
+      subject: string;
+      greeting: string;
+      body: string;
+      button: string;
+      ignore: string;
     };
   };
 };

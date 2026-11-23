@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,8 @@ import type { AuthErrorKey } from "@/lib/i18n/format";
 
 export default function SignInPage() {
   const t = useTranslations();
+  // Back from /reset-password with a new password.
+  const passwordChanged = useSearchParams().get("reset") === "1";
   const [errorKey, setErrorKey] = useState<AuthErrorKey | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -51,6 +54,11 @@ export default function SignInPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {passwordChanged && (
+                <p className="text-sm text-emerald-400 bg-emerald-500/10 rounded px-3 py-2">
+                  {t.auth.passwordChanged}
+                </p>
+              )}
               <div className="space-y-1.5">
                 <Label htmlFor="email">{t.auth.email}</Label>
                 <Input
@@ -63,7 +71,15 @@ export default function SignInPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="password">{t.auth.password}</Label>
+                <div className="flex items-baseline justify-between gap-2">
+                  <Label htmlFor="password">{t.auth.password}</Label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+                  >
+                    {t.auth.forgot.link}
+                  </Link>
+                </div>
                 <Input
                   id="password"
                   name="password"

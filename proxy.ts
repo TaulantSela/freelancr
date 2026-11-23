@@ -14,7 +14,11 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isPublic =
-    pathname === "/" || pathname === "/sign-in" || pathname === "/sign-up";
+    pathname === "/" ||
+    pathname === "/sign-in" ||
+    pathname === "/sign-up" ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password";
 
   const token = request.cookies.get(SESSION_COOKIE)?.value;
 

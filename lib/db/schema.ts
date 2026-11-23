@@ -226,6 +226,34 @@ export const payments = pgTable("payments", {
   ),
 ]);
 
+// Password reset links: a token goes out by email, only its sha256 is kept.
+// It lasts 60 minutes and works once; a successful reset marks all of the
+// user's tokens used (lib/auth/reset.ts). At most 3 a user an hour.
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  // sha256 of the token, hex.
+  tokenHash: text("token_hash").notNull(),
+  expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
+  usedAt: timestamp("used_at", { mode: "string" }),
+  createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("password_reset_tokens_token_hash_unique").on(table.tokenHash),
+  index("password_reset_tokens_user_id_created_at_idx").on(table.userId, table.createdAt),
+]);
+
+// Every "forgot password" request, by a keyed hash of the requester's IP
+// (not the IP itself), to allow at most 10 an hour from one IP.
+export const passwordResetRequests = pgTable("password_reset_requests", {
+  id: text("id").primaryKey(),
+  ipHash: text("ip_hash").notNull(),
+  createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
+}, (table) => [
+  index("password_reset_requests_ip_hash_created_at_idx").on(table.ipHash, table.createdAt),
+]);
+
 // A credit note (книжно одобрение) on an issued invoice: it lowers what the
 // client owes, and the base and DDV with it, in the period of its date (VAT
 // law Art. 22(1): the supplier corrects the tax "во текот на даночниот

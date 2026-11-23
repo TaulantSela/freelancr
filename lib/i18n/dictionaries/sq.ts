@@ -53,6 +53,38 @@ export const sq: Dictionary = {
       invalidCredentials: "Email ose fjalëkalim i pavlefshëm",
       passwordTooShort: "Fjalëkalimi duhet të ketë të paktën 8 karaktere",
     },
+    passwordChanged: "Fjalëkalimi u ndryshua. Hyr me fjalëkalimin e ri.",
+    forgot: {
+      link: "Harrove fjalëkalimin?",
+      title: "Rivendos fjalëkalimin",
+      desc:
+        "Shkruaj email-in e llogarisë dhe do të të dërgojmë një lidhje për të vendosur fjalëkalim të ri.",
+      submit: "Dërgo lidhjen",
+      sent: "Nëse ekziston një llogari me atë email, të kemi dërguar një lidhje. Vlen 60 minuta.",
+      notConfigured:
+        "Email-i ende nuk është konfiguruar në këtë server, ndaj lidhjet për rivendosje nuk mund të dërgohen.",
+      back: "Kthehu te hyrja",
+      errors: {
+        emailRequired: "Shkruaj adresën tënde të email-it.",
+        notConfigured:
+          "Email-i ende nuk është konfiguruar në këtë server, ndaj lidhjet për rivendosje nuk mund të dërgohen.",
+      },
+    },
+    reset: {
+      title: "Vendos fjalëkalim të ri",
+      desc: "Zgjidh një fjalëkalim të ri për llogarinë. Do të dalësh nga llogaria kudo tjetër.",
+      new: "Fjalëkalimi i ri",
+      confirm: "Përsërit fjalëkalimin e ri",
+      submit: "Vendos fjalëkalimin",
+      invalid: "Kjo lidhje është e pavlefshme, ka skaduar ose është përdorur tashmë.",
+      requestNew: "Kërko lidhje të re",
+      errors: {
+        required: "Plotëso të dyja fushat.",
+        tooShort: "Fjalëkalimi i ri duhet të ketë të paktën 8 karaktere.",
+        mismatch: "Dy fjalëkalimet nuk përputhen.",
+        invalidToken: "Kjo lidhje është e pavlefshme, ka skaduar ose është përdorur tashmë.",
+      },
+    },
   },
   landing: {
     badge: "Ndërtuar për Maqedoninë e Veriut · Fatura MKD + EUR + USD",
@@ -789,6 +821,16 @@ export const sq: Dictionary = {
       advanceSet:
         "Shuma që e ke shkruar: 1/12 e tatimit në bilancin vjetor të vitit të kaluar.",
       addInSettings: "Shtoje te Cilësimet",
+    },
+  },
+  emails: {
+    reset: {
+      subject: "Rivendosja e fjalëkalimit për Freelancr",
+      greeting: "Përshëndetje {name},",
+      body:
+        "Dikush kërkoi rivendosjen e fjalëkalimit të llogarisë tënde në Freelancr. Nëse ishe ti, përdor lidhjen më poshtë për të vendosur një të ri. Vlen {minutes} minuta dhe funksionon një herë.",
+      button: "Vendos fjalëkalim të ri",
+      ignore: "Nëse nuk e kërkove këtë, injoroje këtë email: fjalëkalimi yt mbetet i njëjtë.",
     },
   },
 };

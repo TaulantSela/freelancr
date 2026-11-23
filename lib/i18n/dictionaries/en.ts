@@ -53,6 +53,35 @@ export const en: Dictionary = {
       invalidCredentials: "Invalid email or password",
       passwordTooShort: "The password needs at least 8 characters",
     },
+    passwordChanged: "Your password is changed. Sign in with the new one.",
+    forgot: {
+      link: "Forgot password?",
+      title: "Reset your password",
+      desc: "Enter your account's email and we'll send you a link to set a new password.",
+      submit: "Send the link",
+      sent: "If an account exists for that email, we've sent a link. It's valid for 60 minutes.",
+      notConfigured: "Email isn't set up on this server yet, so reset links can't be sent.",
+      back: "Back to sign in",
+      errors: {
+        emailRequired: "Enter your email address.",
+        notConfigured: "Email isn't set up on this server yet, so reset links can't be sent.",
+      },
+    },
+    reset: {
+      title: "Set a new password",
+      desc: "Choose a new password for your account. You'll be signed out everywhere else.",
+      new: "New password",
+      confirm: "Repeat the new password",
+      submit: "Set password",
+      invalid: "This link is invalid, has expired or was already used.",
+      requestNew: "Request a new link",
+      errors: {
+        required: "Fill in both fields.",
+        tooShort: "The new password needs at least 8 characters.",
+        mismatch: "The two passwords don't match.",
+        invalidToken: "This link is invalid, has expired or was already used.",
+      },
+    },
   },
   landing: {
     badge: "Built for North Macedonia · MKD + EUR + USD invoicing",
@@ -788,6 +817,16 @@ export const en: Dictionary = {
       advanceSet:
         "The amount you entered: 1/12 of the tax in last year's annual balance.",
       addInSettings: "Add it in Settings",
+    },
+  },
+  emails: {
+    reset: {
+      subject: "Reset your Freelancr password",
+      greeting: "Hello {name},",
+      body:
+        "Someone asked to reset the password of your Freelancr account. If it was you, use the link below to set a new one. It's valid for {minutes} minutes and works once.",
+      button: "Set a new password",
+      ignore: "If you didn't ask for this, ignore this email: your password stays as it is.",
     },
   },
 };
