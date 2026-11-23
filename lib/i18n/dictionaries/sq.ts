@@ -188,6 +188,7 @@ export const sq: Dictionary = {
     deleteTitle: "Fshi {number}?",
     deleteDesc:
       "Kjo do ta fshijë përgjithmonë faturën dhe të gjithë artikujt e saj. Ky veprim nuk mund të kthehet.",
+    deleteDraftTitle: "Të fshihet ky draft?",
     detail: {
       from: "Nga",
       billTo: "Për",
@@ -211,6 +212,7 @@ export const sq: Dictionary = {
       exchangeRate: "1 {currency} = {rate} MKD (kurs i përafërt)",
       notes: "Shënime",
       footer: "Gjeneruar nga Freelancr",
+      draft: "Draft, e palëshuar",
     },
     form: {
       client: "Klienti",
@@ -246,10 +248,19 @@ export const sq: Dictionary = {
     },
     status: {
       draft: "Draft",
-      sent: "Dërguar",
+      sent: "Lëshuar",
       paid: "Paguar",
       overdue: "Vonuar",
       cancelled: "Anuluar",
+    },
+    issue: {
+      button: "Lësho faturën",
+      title: "Të lëshohet kjo faturë?",
+      desc:
+        "Merr numrin e radhës të faturës për vitin {year} dhe pas kësaj nuk mund të ndryshohet.",
+      confirm: "Lësho",
+      issued: "U lëshua me numrin {number}",
+      notDraft: "Kjo faturë është lëshuar tashmë.",
     },
   },
   income: {

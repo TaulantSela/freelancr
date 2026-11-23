@@ -445,7 +445,14 @@ export default async function DashboardPage() {
                     <div className="flex items-center gap-4 py-2.5">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium font-mono">{inv.number}</span>
+                          <span
+                            className={cn(
+                              "text-sm font-medium",
+                              inv.number ? "font-mono" : "italic text-muted-foreground"
+                            )}
+                          >
+                            {inv.number ?? t.invoices.status.draft}
+                          </span>
                           <Badge
                             variant="outline"
                             className={cn("text-xs border-0 px-1.5", statusColors[inv.status])}

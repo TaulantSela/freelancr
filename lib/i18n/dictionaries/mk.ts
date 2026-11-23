@@ -188,6 +188,7 @@ export const mk: Dictionary = {
     deleteTitle: "Избриши {number}?",
     deleteDesc:
       "Ова трајно ќе ја избрише фактурата и сите нејзини ставки. Оваа акција не може да се врати.",
+    deleteDraftTitle: "Да се избрише нацртот?",
     detail: {
       from: "Од",
       billTo: "За",
@@ -211,6 +212,7 @@ export const mk: Dictionary = {
       exchangeRate: "1 {currency} = {rate} MKD (приближен курс)",
       notes: "Белешки",
       footer: "Генерирано од Freelancr",
+      draft: "Нацрт, не е издадена",
     },
     form: {
       client: "Клиент",
@@ -247,10 +249,19 @@ export const mk: Dictionary = {
     },
     status: {
       draft: "Нацрт",
-      sent: "Испратена",
+      sent: "Издадена",
       paid: "Платена",
       overdue: "Задоцнета",
       cancelled: "Откажана",
+    },
+    issue: {
+      button: "Издади фактура",
+      title: "Да се издаде фактурата?",
+      desc:
+        "Ќе го добие следниот број на фактура за {year} и потоа не може да се менува.",
+      confirm: "Издади",
+      issued: "Издадена со број {number}",
+      notDraft: "Оваа фактура е веќе издадена.",
     },
   },
   income: {

@@ -1,0 +1,2 @@
+ALTER TABLE "invoices" ALTER COLUMN "number" DROP NOT NULL;--> statement-breakpoint
+CREATE UNIQUE INDEX "invoices_user_id_number_unique" ON "invoices" USING btree ("user_id","number") WHERE "invoices"."number" is not null;

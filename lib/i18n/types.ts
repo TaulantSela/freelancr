@@ -155,6 +155,7 @@ export type Dictionary = {
     downloadPdf: string;
     deleteTitle: string;
     deleteDesc: string;
+    deleteDraftTitle: string;
     detail: {
       from: string;
       billTo: string;
@@ -178,6 +179,7 @@ export type Dictionary = {
       exchangeRate: string;
       notes: string;
       footer: string;
+      draft: string;
     };
     form: {
       client: string;
@@ -215,6 +217,14 @@ export type Dictionary = {
       paid: string;
       overdue: string;
       cancelled: string;
+    };
+    issue: {
+      button: string;
+      title: string;
+      desc: string;
+      confirm: string;
+      issued: string;
+      notDraft: string;
     };
   };
   income: {

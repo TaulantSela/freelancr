@@ -11,6 +11,7 @@ import { formatCurrency, formatMKD } from "@/lib/tax/calculator";
 import { InvoiceStatusButton } from "@/components/invoices/invoice-status-button";
 import { DeleteInvoiceButton } from "@/components/invoices/delete-invoice-button";
 import { DownloadPdfButton } from "@/components/invoices/download-pdf-button";
+import { IssueInvoiceButton } from "@/components/invoices/issue-invoice-button";
 import { getTranslations } from "@/lib/i18n/server";
 import { formatMessage } from "@/lib/i18n/format";
 
@@ -31,6 +32,8 @@ export default async function InvoiceDetailPage({
   const { invoice, items, client, user } = data;
   const fromName = user.businessName || user.name;
   const ddvPct = Math.round(invoice.ddvRate * 100);
+  const isDraft = invoice.status === "draft";
+  const title = invoice.number ?? t.invoices.status.draft;
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
@@ -42,9 +45,10 @@ export default async function InvoiceDetailPage({
             </Button>
           </Link>
           <span className="text-muted-foreground">/</span>
-          <span className="text-sm font-mono font-medium">{invoice.number}</span>
+          <span className="text-sm font-mono font-medium">{title}</span>
         </div>
         <div className="flex items-center gap-2">
+          {isDraft && <IssueInvoiceButton id={invoice.id} year={invoice.date.slice(0, 4)} />}
           <DownloadPdfButton invoiceId={invoice.id} />
           <DeleteInvoiceButton id={invoice.id} number={invoice.number} />
         </div>
@@ -54,7 +58,7 @@ export default async function InvoiceDetailPage({
         <CardHeader className="pb-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <CardTitle className="text-lg font-mono">{invoice.number}</CardTitle>
+              <CardTitle className="text-lg font-mono">{title}</CardTitle>
               <p className="text-sm text-muted-foreground mt-1">{fromName}</p>
             </div>
             <InvoiceStatusButton id={invoice.id} currentStatus={invoice.status} />

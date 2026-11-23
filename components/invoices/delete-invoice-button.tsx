@@ -23,7 +23,7 @@ export function DeleteInvoiceButton({
   number,
 }: {
   id: string;
-  number: string;
+  number: string | null;
 }) {
   const t = useTranslations();
   const [pending, startTransition] = useTransition();
@@ -45,7 +45,9 @@ export function DeleteInvoiceButton({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            {formatMessage(t.invoices.deleteTitle, { number })}
+            {number
+              ? formatMessage(t.invoices.deleteTitle, { number })
+              : t.invoices.deleteDraftTitle}
           </AlertDialogTitle>
           <AlertDialogDescription>{t.invoices.deleteDesc}</AlertDialogDescription>
         </AlertDialogHeader>

@@ -176,6 +176,7 @@ export type InvoicePdfLabels = {
   exchangeRate: string;
   notes: string;
   footer: string;
+  draft: string;
 };
 
 function formatMoney(amount: number, currency: string) {
@@ -215,7 +216,7 @@ export function InvoicePdfDocument({
           </View>
           <View style={styles.metaBlock}>
             <Text style={styles.metaLabel}>{labels.invoice}</Text>
-            <Text style={styles.metaValue}>{invoice.number}</Text>
+            <Text style={styles.metaValue}>{invoice.number ?? labels.draft}</Text>
             <Text style={styles.metaLabel}>{labels.invoiceDate}</Text>
             <Text style={styles.metaValue}>{formatDate(invoice.date)}</Text>
             {invoice.dueDate && (

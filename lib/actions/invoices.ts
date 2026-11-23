@@ -4,9 +4,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getDb, clients, invoices, invoiceItems, users } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
-import { generateId, generateInvoiceNumber } from "@/lib/utils";
+import { generateId } from "@/lib/utils";
 import { getRateToMKD, isDdvRate, isSupportedCurrency } from "@/lib/tax/calculator";
-import { eq, and } from "drizzle-orm";
+import { issueDraftInvoice } from "@/lib/invoices/numbering";
+import { eq, and, inArray, sql } from "drizzle-orm";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -64,13 +65,6 @@ export async function createInvoice(formData: FormData) {
     return { errorKey: "requiredFields" as const };
   }
 
-  const existingInvoices = await getDb()
-    .select({ number: invoices.number })
-    .from(invoices)
-    .where(eq(invoices.userId, session.userId));
-
-  const number = generateInvoiceNumber(existingInvoices.map((i) => i.number));
-
   const subtotal = items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
   const ddvAmount = subtotal * ddvRate;
   const total = subtotal + ddvAmount;
@@ -79,11 +73,11 @@ export async function createInvoice(formData: FormData) {
 
   const invoiceId = generateId();
 
+  // A new invoice is a draft without a number; issueInvoice() numbers it.
   await getDb().insert(invoices).values({
     id: invoiceId,
     userId: session.userId,
     clientId,
-    number,
     date,
     supplyDate,
     dueDate: dueDate || null,
@@ -110,23 +104,52 @@ export async function createInvoice(formData: FormData) {
   );
 
   revalidatePath("/invoices");
-  redirect("/invoices");
+  redirect(`/invoices/${invoiceId}`);
 }
 
-export async function updateInvoiceStatus(
-  id: string,
-  status: "draft" | "sent" | "paid" | "overdue" | "cancelled"
-) {
+// Gives a draft the next number for its year and marks it issued ("sent").
+export async function issueInvoice(id: string) {
   const session = await getSession();
   if (!session) redirect("/sign-in");
+
+  const number = await issueDraftInvoice(getDb(), id, session.userId);
+  if (!number) return { errorKey: "notDraft" as const };
+
+  revalidatePath("/invoices");
+  revalidatePath(`/invoices/${id}`);
+  revalidatePath("/dashboard");
+  return { number };
+}
+
+const ISSUED_STATUSES = ["sent", "paid", "overdue", "cancelled"] as const;
+type IssuedStatus = (typeof ISSUED_STATUSES)[number];
+
+// Moves an issued invoice between issued statuses. A draft only leaves
+// "draft" through issueInvoice(), so it gets a number; nothing goes back to
+// draft.
+export async function updateInvoiceStatus(id: string, status: IssuedStatus) {
+  const session = await getSession();
+  if (!session) redirect("/sign-in");
+  if (!(ISSUED_STATUSES as readonly string[]).includes(status)) return;
 
   await getDb()
     .update(invoices)
     .set({
       status,
-      paidAt: status === "paid" ? new Date().toISOString() : null,
+      // Keeps the payment date when an invoice that's already paid is
+      // marked paid again.
+      paidAt:
+        status === "paid"
+          ? sql`coalesce(${invoices.paidAt}, ${new Date().toISOString()})`
+          : null,
     })
-    .where(and(eq(invoices.id, id), eq(invoices.userId, session.userId)));
+    .where(
+      and(
+        eq(invoices.id, id),
+        eq(invoices.userId, session.userId),
+        inArray(invoices.status, ISSUED_STATUSES)
+      )
+    );
 
   revalidatePath("/invoices");
   revalidatePath(`/invoices/${id}`);

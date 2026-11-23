@@ -4,7 +4,9 @@ import {
   doublePrecision,
   timestamp,
   boolean,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { DEFAULT_TAX_STATUS, TAX_STATUSES } from "../tax/calculator";
 import {
   CLIENT_TYPES,
@@ -78,7 +80,10 @@ export const invoices = pgTable("invoices", {
   clientId: text("client_id")
     .notNull()
     .references(() => clients.id),
-  number: text("number").notNull(),
+  // INV-YYYY-NNN, given when the invoice is issued (lib/invoices/numbering.ts);
+  // null while it's a draft. Invoices from before drafts went unnumbered keep
+  // the number they were created with.
+  number: text("number"),
   // Date of issue, "YYYY-MM-DD".
   date: text("date").notNull(),
   // Date of supply ("ден на извршениот промет", VAT law Art. 53(10) point 4),
@@ -97,7 +102,12 @@ export const invoices = pgTable("invoices", {
   notes: text("notes"),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
   paidAt: text("paid_at"),
-});
+}, (table) => [
+  // No two of a user's invoices share a number; drafts have none.
+  uniqueIndex("invoices_user_id_number_unique")
+    .on(table.userId, table.number)
+    .where(sql`${table.number} is not null`),
+]);
 
 export const invoiceItems = pgTable("invoice_items", {
   id: text("id").primaryKey(),

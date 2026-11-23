@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Plus, FileText } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { formatCurrency, formatMKD } from "@/lib/tax/calculator";
 import { InvoiceStatusButton } from "@/components/invoices/invoice-status-button";
 import { getTranslations } from "@/lib/i18n/server";
@@ -104,9 +104,12 @@ export default async function InvoicesPage() {
                   <div className="w-32">
                     <Link
                       href={`/invoices/${inv.id}`}
-                      className="font-mono text-sm font-medium hover:underline"
+                      className={cn(
+                        "text-sm font-medium hover:underline",
+                        inv.number ? "font-mono" : "italic text-muted-foreground"
+                      )}
                     >
-                      {inv.number}
+                      {inv.number ?? t.invoices.status.draft}
                     </Link>
                     <div className="text-xs text-muted-foreground mt-0.5">{formatDate(inv.date)}</div>
                   </div>

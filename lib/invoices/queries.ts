@@ -4,7 +4,8 @@ import { eq, and } from "drizzle-orm";
 export type InvoiceDetail = {
   invoice: {
     id: string;
-    number: string;
+    // Null while the invoice is a draft.
+    number: string | null;
     date: string;
     // The date of supply; the invoice date for rows saved without one.
     supplyDate: string;
