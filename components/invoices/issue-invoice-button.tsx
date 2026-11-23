@@ -28,8 +28,10 @@ export function IssueInvoiceButton({ id, year }: { id: string; year: string }) {
   function handleIssue() {
     startTransition(async () => {
       const result = await issueInvoice(id);
-      if ("errorKey" in result) toast.error(t.invoices.issue.notDraft);
-      else toast.success(formatMessage(t.invoices.issue.issued, { number: result.number }));
+      if (result.errorKey) toast.error(t.invoices.issue[result.errorKey]);
+      else if (result.number) {
+        toast.success(formatMessage(t.invoices.issue.issued, { number: result.number }));
+      }
     });
   }
 

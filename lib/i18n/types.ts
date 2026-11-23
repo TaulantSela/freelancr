@@ -244,6 +244,7 @@ export type Dictionary = {
       confirm: string;
       issued: string;
       notDraft: string;
+      ddvNotRegistered: string;
     };
     cancel: {
       button: string;

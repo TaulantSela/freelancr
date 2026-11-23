@@ -281,6 +281,8 @@ export const en: Dictionary = {
       confirm: "Issue",
       issued: "Issued as {number}",
       notDraft: "This invoice has already been issued.",
+      ddvNotRegistered:
+        "This draft shows DDV, but you aren't registered for VAT. Edit and save it (that removes the DDV) before issuing it.",
     },
     cancel: {
       button: "Cancel invoice",

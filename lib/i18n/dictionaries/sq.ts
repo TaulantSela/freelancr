@@ -280,6 +280,8 @@ export const sq: Dictionary = {
       confirm: "Lësho",
       issued: "U lëshua me numrin {number}",
       notDraft: "Kjo faturë është lëshuar tashmë.",
+      ddvNotRegistered:
+        "Ky draft tregon TVSH, por nuk je i regjistruar për TVSH. Ndryshoje dhe ruaje (kështu hiqet TVSH-ja) para se ta lëshosh.",
     },
     cancel: {
       button: "Anulo faturën",

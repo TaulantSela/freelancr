@@ -179,6 +179,20 @@ export async function issueInvoice(id: string) {
   const session = await getSession();
   if (!session) redirect("/sign-in");
 
+  // A draft saved before the VAT check (or before the user's VAT status
+  // changed) can still carry DDV. Only a VAT-registered user may issue it
+  // like that (VAT law Art. 51(3), Art. 55); anyone else saves the draft
+  // again first, which sets the DDV to 0.
+  const [draft] = await getDb()
+    .select({ ddvRate: invoices.ddvRate, vatRegistered: users.vatRegistered })
+    .from(invoices)
+    .innerJoin(users, eq(invoices.userId, users.id))
+    .where(and(eq(invoices.id, id), eq(invoices.userId, session.userId)))
+    .limit(1);
+  if (draft && draft.ddvRate > 0 && !draft.vatRegistered) {
+    return { errorKey: "ddvNotRegistered" as const };
+  }
+
   const number = await issueDraftInvoice(getDb(), id, session.userId);
   if (!number) return { errorKey: "notDraft" as const };
 
