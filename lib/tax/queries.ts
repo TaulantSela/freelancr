@@ -7,13 +7,22 @@ import {
   type TaxStatus,
 } from "./calculator";
 
-export async function getTaxStatus(userId: string): Promise<TaxStatus> {
+export type TaxProfile = {
+  taxStatus: TaxStatus;
+  // Registered self-employed: the monthly advance they entered in Settings.
+  monthlyAdvanceMKD: number | null;
+};
+
+export async function getTaxProfile(userId: string): Promise<TaxProfile> {
   const [row] = await getDb()
-    .select({ taxStatus: users.taxStatus })
+    .select({ taxStatus: users.taxStatus, monthlyAdvanceMKD: users.monthlyAdvanceMKD })
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
-  return row && isTaxStatus(row.taxStatus) ? row.taxStatus : DEFAULT_TAX_STATUS;
+  return {
+    taxStatus: row && isTaxStatus(row.taxStatus) ? row.taxStatus : DEFAULT_TAX_STATUS,
+    monthlyAdvanceMKD: row?.monthlyAdvanceMKD ?? null,
+  };
 }
 
 // Paid invoices that can lead to a deadline, or tax owed, in `year`: the ones

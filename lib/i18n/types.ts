@@ -251,6 +251,9 @@ export type Dictionary = {
     account: string;
     email: string;
     memberSince: string;
+    monthlyAdvance: string;
+    monthlyAdvanceHint: string;
+    errors: { nameRequired: string; advanceInvalid: string };
   };
   tax: {
     statusLabel: string;
@@ -290,8 +293,11 @@ export type Dictionary = {
       note: string;
       groupAmount: string;
       advanceTile: string;
-      advanceDue: string;
       advanceHint: string;
+      advanceFor: string;
+      advancePayBy: string;
+      advanceSet: string;
+      addInSettings: string;
     };
   };
 };

@@ -29,6 +29,13 @@
       "when": 1795457136306,
       "tag": "0003_client_invoice_language",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795457646924,
+      "tag": "0004_user_monthly_advance",
+      "breakpoints": true
     }
   ]
 }

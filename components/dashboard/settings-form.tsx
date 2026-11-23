@@ -1,28 +1,28 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { updateProfile } from "@/lib/actions/settings";
+import { updateProfile, type SettingsErrorKey } from "@/lib/actions/settings";
 import { Loader2 } from "lucide-react";
 import type { User } from "@/lib/db/schema";
-import { TAX_STATUSES } from "@/lib/tax/calculator";
+import { TAX_STATUSES, type TaxStatus } from "@/lib/tax/calculator";
 import { useTranslations } from "@/lib/i18n/client";
-import { formatMessage } from "@/lib/i18n/format";
 
-type State = { success?: boolean; error?: string } | null;
+type State = { success?: boolean; errorKey?: SettingsErrorKey } | null;
 
 async function updateProfileAction(_prev: State, formData: FormData): Promise<State> {
   const result = await updateProfile(formData);
-  if (result && "error" in result) return result;
+  if (result && "errorKey" in result) return result;
   return { success: true };
 }
 
 export function SettingsForm({ user }: { user: User }) {
   const t = useTranslations();
   const [state, action, pending] = useActionState(updateProfileAction, null);
+  const [taxStatus, setTaxStatus] = useState<TaxStatus>(user.taxStatus);
 
   return (
     <form action={action} className="space-y-5">
@@ -55,7 +55,8 @@ export function SettingsForm({ user }: { user: User }) {
                 type="radio"
                 name="taxStatus"
                 value={status}
-                defaultChecked={user.taxStatus === status}
+                checked={taxStatus === status}
+                onChange={() => setTaxStatus(status)}
                 className="mt-0.5 accent-primary"
               />
               <span className="space-y-0.5">
@@ -67,6 +68,20 @@ export function SettingsForm({ user }: { user: User }) {
             </label>
           ))}
         </div>
+        {taxStatus === "self_employed" && (
+          <div className="space-y-1.5 pt-2">
+            <Label htmlFor="monthlyAdvanceMKD">{t.settings.monthlyAdvance}</Label>
+            <Input
+              id="monthlyAdvanceMKD"
+              name="monthlyAdvanceMKD"
+              inputMode="decimal"
+              defaultValue={user.monthlyAdvanceMKD ?? ""}
+              placeholder="0"
+              className="font-mono sm:w-1/2"
+            />
+            <p className="text-xs text-muted-foreground">{t.settings.monthlyAdvanceHint}</p>
+          </div>
+        )}
       </fieldset>
 
       <div className="grid sm:grid-cols-2 gap-4">
@@ -104,9 +119,9 @@ export function SettingsForm({ user }: { user: User }) {
         </div>
       </div>
 
-      {state?.error && (
+      {state?.errorKey && (
         <p className="text-sm text-destructive bg-destructive/10 rounded px-3 py-2">
-          {state.error}
+          {t.settings.errors[state.errorKey]}
         </p>
       )}
       {state?.success && (

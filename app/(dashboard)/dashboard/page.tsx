@@ -12,7 +12,7 @@ import {
   formatCurrency,
   DDV_THRESHOLD_MKD,
 } from "@/lib/tax/calculator";
-import { getTaxStatus, getPaidInvoicesForDeadlines } from "@/lib/tax/queries";
+import { getTaxProfile, getPaidInvoicesForDeadlines } from "@/lib/tax/queries";
 import { formatTaxDate, formatTaxPeriod, taxDeadlineLabel } from "@/lib/tax/labels";
 import { formatDate, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
   // private person in North Macedonia paid) have deadlines, and the tax owed
   // is 10% of that income (approximate; see getOwedToUjp).
   const today = toSkopjeDate(new Date());
-  const taxStatus = await getTaxStatus(session.userId);
+  const { taxStatus, monthlyAdvanceMKD } = await getTaxProfile(session.userId);
   const notRegistered = taxStatus === "paid_from_abroad";
   const payments = notRegistered
     ? await getPaidInvoicesForDeadlines(session.userId, Number(today.slice(0, 4)))
@@ -196,7 +196,9 @@ export default async function DashboardPage() {
               </>
             ) : (
               <>
-                <div className="text-xl font-mono font-semibold">—</div>
+                <div className="text-xl font-mono font-semibold">
+                  {monthlyAdvanceMKD !== null ? formatMKD(monthlyAdvanceMKD) : "—"}
+                </div>
                 {nextAdvance && (
                   <div className="text-xs text-muted-foreground mt-0.5">
                     {formatMessage(t.tax.owed.advanceTile, {
@@ -283,16 +285,30 @@ export default async function DashboardPage() {
                 <p className="text-xs text-muted-foreground">{t.tax.owed.nothing}</p>
               )
             ) : (
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {nextAdvance && (
-                  <div className="text-sm">
-                    {formatMessage(t.tax.owed.advanceDue, {
-                      month: formatTaxPeriod(nextAdvance.period, t),
-                      date: formatTaxDate(nextAdvance.dueDate, t),
-                    })}
+                  <div className="rounded-lg border border-border px-3 py-2.5 space-y-0.5">
+                    <div className="text-xs text-muted-foreground">
+                      {formatMessage(t.tax.owed.advanceFor, {
+                        month: formatTaxPeriod(nextAdvance.period, t),
+                      })}
+                    </div>
+                    <div className="text-xl font-mono font-semibold">
+                      {monthlyAdvanceMKD !== null ? formatMKD(monthlyAdvanceMKD) : "—"}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {formatMessage(t.tax.owed.advancePayBy, {
+                        date: formatTaxDate(nextAdvance.dueDate, t),
+                      })}
+                    </div>
                   </div>
                 )}
-                <p className="text-xs text-muted-foreground">{t.tax.owed.advanceHint}</p>
+                <p className="text-xs text-muted-foreground">
+                  {monthlyAdvanceMKD !== null ? t.tax.owed.advanceSet : t.tax.owed.advanceHint}{" "}
+                  <Link href="/settings" className="underline underline-offset-2 hover:text-foreground">
+                    {monthlyAdvanceMKD !== null ? t.tax.changeInSettings : t.tax.owed.addInSettings}
+                  </Link>
+                </p>
               </div>
             )}
             <Separator />

@@ -284,6 +284,13 @@ export const en: Dictionary = {
     account: "Account",
     email: "Email",
     memberSince: "Member since",
+    monthlyAdvance: "Monthly advance (MKD)",
+    monthlyAdvanceHint:
+      "1/12 of the tax in last year's annual tax balance (ПДД-ДБ); your accountant can tell you. Leave it empty if you don't know it yet, and update it after you file the balance in March.",
+    errors: {
+      nameRequired: "Name is required",
+      advanceInvalid: "Enter the monthly advance as an amount in MKD, or leave it empty.",
+    },
   },
   tax: {
     statusLabel: "How are you registered for tax?",
@@ -358,9 +365,13 @@ export const en: Dictionary = {
         "Approximate: 10% of what these clients paid, at the exchange rate stored on each invoice. UJP converts at the National Bank's (NBRSM) middle rate on the day the money arrived, which the app doesn't use yet, and income from author's rights is taxed after deemed costs (Personal Income Tax law, Art. 40), so this can be more than you owe. The calculation UJP approves is the real figure.",
       groupAmount: "Tax ≈ {amount}",
       advanceTile: "Advance due by {date}",
-      advanceDue: "Advance for {month}: pay by {date}",
       advanceHint:
-        "The monthly advance is 1/12 of the tax in last year's annual tax balance. The app can't work it out: take it from your balance or ask your accountant.",
+        "Enter your monthly advance to see it here. It's 1/12 of the tax in last year's annual tax balance, which the app can't work out: take it from your balance or ask your accountant.",
+      advanceFor: "Advance for {month}",
+      advancePayBy: "Pay by {date}",
+      advanceSet:
+        "The amount you entered: 1/12 of the tax in last year's annual balance.",
+      addInSettings: "Add it in Settings",
     },
   },
 };

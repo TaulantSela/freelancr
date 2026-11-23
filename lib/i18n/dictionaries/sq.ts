@@ -284,6 +284,13 @@ export const sq: Dictionary = {
     account: "Llogaria",
     email: "Email",
     memberSince: "Anëtar që",
+    monthlyAdvance: "Akontimi mujor (MKD)",
+    monthlyAdvanceHint:
+      "1/12 e tatimit në bilancin tatimor vjetor (ПДД-ДБ) të vitit të kaluar; kontabilisti mund të ta thotë. Lëre bosh nëse ende nuk e di dhe përditësoje pasi të dorëzosh bilancin në mars.",
+    errors: {
+      nameRequired: "Emri është i detyrueshëm",
+      advanceInvalid: "Shkruaj akontimin mujor si shumë në MKD, ose lëre bosh.",
+    },
   },
   tax: {
     statusLabel: "Si je regjistruar për tatime?",
@@ -359,9 +366,13 @@ export const sq: Dictionary = {
         "Përafërsisht: 10% e asaj që kanë paguar këta klientë, me kursin e ruajtur në çdo faturë. UJP konverton me kursin mesatar të Bankës Popullore (NBRSM) në ditën kur arritën paratë, të cilin aplikacioni ende nuk e përdor, dhe të ardhurat nga të drejtat e autorit tatohen pas shpenzimeve të normuara (Ligji për tatimin mbi të ardhurat personale, neni 40), ndaj shuma mund të jetë më e madhe se sa detyrohesh. Shuma e vërtetë është ajo në llogaritjen që e miraton UJP.",
       groupAmount: "Tatimi ≈ {amount}",
       advanceTile: "Akontimi deri më {date}",
-      advanceDue: "Akontimi për muajin {month}: paguaj deri më {date}",
       advanceHint:
-        "Akontimi mujor është 1/12 e tatimit në bilancin tatimor vjetor të vitit të kaluar. Aplikacioni nuk mund ta llogarisë: merre nga bilanci ose pyet kontabilistin.",
+        "Shkruaj akontimin mujor që ta shohësh këtu. Ai është 1/12 e tatimit në bilancin tatimor vjetor të vitit të kaluar, që aplikacioni nuk mund ta llogarisë: merre nga bilanci ose pyet kontabilistin.",
+      advanceFor: "Akontimi për muajin {month}",
+      advancePayBy: "Paguaj deri më {date}",
+      advanceSet:
+        "Shuma që e ke shkruar: 1/12 e tatimit në bilancin vjetor të vitit të kaluar.",
+      addInSettings: "Shtoje te Cilësimet",
     },
   },
 };

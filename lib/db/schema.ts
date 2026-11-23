@@ -29,6 +29,10 @@ export const users = pgTable("users", {
   taxStatus: text("tax_status", { enum: TAX_STATUSES })
     .notNull()
     .default(DEFAULT_TAX_STATUS),
+  // Registered self-employed only: the monthly income tax advance in MKD,
+  // 1/12 of the tax in last year's annual balance, as the user enters it.
+  // Null when not entered.
+  monthlyAdvanceMKD: doublePrecision("monthly_advance_mkd"),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 });
 

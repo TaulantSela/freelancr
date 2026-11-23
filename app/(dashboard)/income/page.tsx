@@ -13,7 +13,7 @@ import {
   formatMKD,
   DDV_THRESHOLD_MKD,
 } from "@/lib/tax/calculator";
-import { getTaxStatus, getPaidInvoicesForDeadlines } from "@/lib/tax/queries";
+import { getTaxProfile, getPaidInvoicesForDeadlines } from "@/lib/tax/queries";
 import {
   formatTaxDate,
   formatTaxPeriod,
@@ -68,7 +68,7 @@ export default async function IncomePage() {
   // which can differ from the invoice date the breakdowns below use, and each
   // month's group shows 10% of that month's self-reported income.
   const today = toSkopjeDate(new Date());
-  const taxStatus = await getTaxStatus(session.userId);
+  const { taxStatus, monthlyAdvanceMKD } = await getTaxProfile(session.userId);
   const notRegistered = taxStatus === "paid_from_abroad";
   const payments = notRegistered
     ? await getPaidInvoicesForDeadlines(session.userId, year)
@@ -80,6 +80,7 @@ export default async function IncomePage() {
   const taxCalendar = getTaxCalendar(taxStatus, year, incomeMonths);
   const deadlineGroups = groupTaxDeadlines(taxCalendar);
   const nextDueDate = taxCalendar.find((d) => d.dueDate >= today)?.dueDate;
+  const nextAdvance = taxCalendar.find((d) => d.kind === "advance" && d.dueDate >= today);
 
   const ddvBadgeLabels = {
     safe: t.dashboard.ddvSafe,
@@ -158,7 +159,18 @@ export default async function IncomePage() {
                 </div>
               </>
             ) : (
-              <div className="text-lg font-mono font-semibold">—</div>
+              <>
+                <div className="text-lg font-mono font-semibold">
+                  {monthlyAdvanceMKD !== null ? formatMKD(monthlyAdvanceMKD) : "—"}
+                </div>
+                {nextAdvance && (
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    {formatMessage(t.tax.owed.advanceTile, {
+                      date: formatTaxDate(nextAdvance.dueDate, t),
+                    })}
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>
@@ -299,6 +311,11 @@ export default async function IncomePage() {
                         })}
                       </div>
                     )}
+                    {/* The amount entered in Settings; only for advances still
+                        to pay, since earlier ones may have been different. */}
+                    {group.kind === "advance" && !isPast && monthlyAdvanceMKD !== null && (
+                      <div className="text-sm font-mono mb-1">{formatMKD(monthlyAdvanceMKD)}</div>
+                    )}
                     {group.deadlines.map((d) => (
                       <div key={d.kind} className="text-xs text-muted-foreground mb-1">
                         {taxDeadlineAction(d, t)}
@@ -332,7 +349,12 @@ export default async function IncomePage() {
             </div>
           )}
           {!notRegistered && (
-            <p className="text-xs text-muted-foreground">{t.tax.owed.advanceHint}</p>
+            <p className="text-xs text-muted-foreground">
+              {monthlyAdvanceMKD !== null ? t.tax.owed.advanceSet : t.tax.owed.advanceHint}{" "}
+              <Link href="/settings" className="underline underline-offset-2 hover:text-foreground">
+                {monthlyAdvanceMKD !== null ? t.tax.changeInSettings : t.tax.owed.addInSettings}
+              </Link>
+            </p>
           )}
           <p className="text-xs text-muted-foreground">
             {formatMessage(t.tax.basedOn, { status: t.tax.statuses[taxStatus] })}{" "}
