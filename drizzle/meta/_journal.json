@@ -71,6 +71,13 @@
       "when": 1795462016140,
       "tag": "0009_invoice_rate_source",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795462173393,
+      "tag": "0010_payments",
+      "breakpoints": true
     }
   ]
 }
