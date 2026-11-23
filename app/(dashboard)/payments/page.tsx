@@ -270,7 +270,7 @@ function MonthCard({
                     {r.rateSource !== "nbrsm" && (
                       <span className="text-amber-400">({p.rateSources[r.rateSource]}) </span>
                     )}
-                    = {formatMKD((r.amount + r.taxWithheld) * r.rateToMKD)}
+                    = {formatMKD(paymentTax(r).receivedMKD)}
                   </span>
                   <Link href={`/payments/${r.id}/edit`} className="underline underline-offset-2 hover:text-foreground">
                     {t.common.edit}
