@@ -6,6 +6,7 @@ import { getRateToMKD, toSkopjeDate } from "../lib/tax/calculator";
 import { fetchNbrsmRates } from "../lib/rates/nbrsm";
 import { insertInvoicePayment, insertPayout, markMonth } from "../lib/payments/write";
 import { taxTreatmentFor } from "../lib/payments/config";
+import { insertCreditNote } from "../lib/credit-notes/write";
 
 const DEMO_EMAIL = "demo@freelancr.mk";
 const DEMO_PASSWORD = "demo1234";
@@ -230,6 +231,17 @@ async function main() {
       : await insertPayout(db, { ...fields, clientId: clientIds[p.client] });
     if (!saved) throw new Error(`Payment from ${client.name} on ${p.receivedOn} wasn't saved`);
   }
+
+  // A credit note: a discount agreed on the overdue invoice.
+  const creditNote = await insertCreditNote(db, {
+    id: nanoid(),
+    userId,
+    invoiceId: invoiceIds.i6,
+    date: monthsAgo(today, 0, 5),
+    amount: 300,
+    reason: "Discount agreed for the late delivery of the second milestone",
+  });
+  if (!creditNote) throw new Error("The demo credit note wasn't saved");
 
   // UJP: months before last month are filed, approved and paid. Last month
   // follows today: still to file until the 10th, filed and approved until
