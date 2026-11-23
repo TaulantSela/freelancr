@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getDb, invoices, invoiceItems } from "@/lib/db";
+import { getDb, clients, invoices, invoiceItems } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId, generateInvoiceNumber } from "@/lib/utils";
 import { getRateToMKD, isSupportedCurrency } from "@/lib/tax/calculator";
@@ -29,6 +29,17 @@ export async function createInvoice(formData: FormData) {
 
   if (!isSupportedCurrency(currency)) {
     return { errorKey: "currencyUnsupported" as const };
+  }
+
+  // The client id comes from the form, so make sure it is one of this
+  // user's clients before attaching an invoice to it.
+  const [ownClient] = await getDb()
+    .select({ id: clients.id })
+    .from(clients)
+    .where(and(eq(clients.id, clientId), eq(clients.userId, session.userId)))
+    .limit(1);
+  if (!ownClient) {
+    return { error: "Client, date, and at least one item are required" };
   }
 
   const existingInvoices = await getDb()
