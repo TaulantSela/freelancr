@@ -3,7 +3,8 @@
 // DDV (VAT) threshold in MKD per year
 export const DDV_THRESHOLD_MKD = 2_000_000;
 
-// MK personal income tax (2026): a flat 10%, with no brackets.
+// MK personal income tax (2026): a flat 10%, with no brackets (Personal
+// Income Tax law, "ЗДЛД", Art. 11(1); 15% applies only to gambling winnings).
 // UJP's guide on income from independent activity gives the rate as 10%:
 // https://ujp.gov.mk/en/vodic/category/546
 // The 10%/18% progressive rates that applied in 2019 were suspended for
@@ -11,9 +12,7 @@ export const DDV_THRESHOLD_MKD = 2_000_000;
 // 274/2022). PwC Worldwide Tax Summaries (reviewed 23 July 2026) lists the
 // same flat 10% for self-employment income:
 // https://taxsummaries.pwc.com/north-macedonia/individual/taxes-on-personal-income
-// The legal base for independent activity is net income (revenue minus
-// expenses); calculateIncomeTax() applies the rate to paid invoice totals,
-// so it overestimates for anyone with deductible expenses.
+// getMonthlyTaxOwed() below applies it to the gross amount clients paid.
 export const PERSONAL_INCOME_TAX_RATE = 0.1;
 
 // How a user is registered for tax, which decides their UJP deadlines. They
@@ -37,29 +36,6 @@ export function isTaxStatus(value: unknown): value is TaxStatus {
 // Standard DDV rate in Macedonia
 export const DDV_RATE_STANDARD = 0.18; // 18%
 export const DDV_RATE_REDUCED = 0.05; // 5%
-
-export function calculateIncomeTax(annualIncomeMKD: number): {
-  totalTax: number;
-  effectiveRate: number;
-  breakdown: { bracket: string; amount: number; tax: number }[];
-} {
-  if (annualIncomeMKD <= 0) {
-    return { totalTax: 0, effectiveRate: 0, breakdown: [] };
-  }
-
-  const totalTax = annualIncomeMKD * PERSONAL_INCOME_TAX_RATE;
-  return {
-    totalTax,
-    effectiveRate: PERSONAL_INCOME_TAX_RATE,
-    breakdown: [
-      {
-        bracket: `${PERSONAL_INCOME_TAX_RATE * 100}%`,
-        amount: annualIncomeMKD,
-        tax: totalTax,
-      },
-    ],
-  };
-}
 
 export function getDDVStatus(annualIncomeMKD: number): {
   percentage: number;
@@ -345,6 +321,100 @@ export function getSelfReportedIncomeMonths(
     months.add(getPaymentDate(invoice).slice(0, 7));
   }
   return [...months].sort();
+}
+
+// ---------------------------------------------------------------------------
+// What's owed to UJP (not registered for an activity)
+//
+// For each month in which self-reported income was received, the tax is 10%
+// of it (ЗДЛД Art. 11(1), Art. 87(2)), with the calculation due by the 10th
+// of the following month (Art. 88(1) points 4 and 7) and the tax by the 15th
+// (Art. 93(1)). It's an approximation, and the UI says so:
+// - it converts at the rate stored on each invoice, while UJP uses the
+//   National Bank's (NBRSM) middle rate on the day the income was received
+//   (Art. 93(2));
+// - it taxes the gross amount, while income from author's rights is taxed
+//   after deemed costs of 20-50% (Art. 40), so it can overstate the tax;
+// - UJP's approved calculation is the real figure (Art. 88(4)).
+// A registered self-employed person pays a monthly advance instead: 1/12 of
+// the tax in last year's annual balance (Art. 94(1)), which the app can't
+// work out; they enter it in Settings.
+// ---------------------------------------------------------------------------
+
+export type SelfReportedPayment = PaidInvoiceDates & {
+  clientCountry: string;
+  clientType: string;
+  // The invoice's amount before VAT, in MKD at the rate stored on the
+  // invoice: subtotal x exchange rate.
+  amountMKD: number;
+};
+
+export type MonthlyTaxOwed = {
+  // "YYYY-MM": the month the income was received in (Skopje time).
+  month: string;
+  // Self-reported income received that month, in MKD.
+  incomeMKD: number;
+  // 10% of it, rounded to the deni.
+  taxMKD: number;
+  // "YYYY-MM-DD": submit the calculation (е-ППД) by this date...
+  reportBy: string;
+  // ...and pay the tax by this one.
+  payBy: string;
+};
+
+function roundToDeni(amount: number): number {
+  return Math.round(amount * 100) / 100;
+}
+
+// The tax on one month's self-reported income and its two deadlines.
+export function taxOwedForMonth(month: string, incomeMKD: number): MonthlyTaxOwed {
+  const next = followingMonth(month);
+  return {
+    month,
+    incomeMKD: roundToDeni(incomeMKD),
+    taxMKD: roundToDeni(incomeMKD * PERSONAL_INCOME_TAX_RATE),
+    reportBy: `${next}-${pad2(ABROAD_REPORT_DAY)}`,
+    payBy: `${next}-${pad2(ABROAD_PAYMENT_DAY)}`,
+  };
+}
+
+// One entry per month with self-reported income, oldest first. Invoices to
+// companies in North Macedonia are left out: those companies withhold the tax.
+export function getMonthlyTaxOwed(
+  payments: readonly SelfReportedPayment[]
+): MonthlyTaxOwed[] {
+  const byMonth = new Map<string, number>();
+  for (const payment of payments) {
+    if (!isSelfReportedIncome(payment)) continue;
+    const month = getPaymentDate(payment).slice(0, 7);
+    byMonth.set(month, (byMonth.get(month) ?? 0) + payment.amountMKD);
+  }
+  return [...byMonth.keys()]
+    .sort()
+    .map((month) => taxOwedForMonth(month, byMonth.get(month)!));
+}
+
+export type OwedToUjp = {
+  // Last month's tax while it isn't due yet (until the 15th), if there was
+  // any self-reported income last month; otherwise null.
+  due: MonthlyTaxOwed | null;
+  // This month's tax so far, due next month. Zero if nothing yet.
+  current: MonthlyTaxOwed;
+};
+
+// What the dashboard shows on `today` ("YYYY-MM-DD"): the payment coming up
+// for last month, and this month's running amount.
+export function getOwedToUjp(
+  payments: readonly SelfReportedPayment[],
+  today: string
+): OwedToUjp {
+  const monthly = getMonthlyTaxOwed(payments);
+  const currentMonth = today.slice(0, 7);
+  return {
+    due: monthly.find((m) => m.month < currentMonth && m.payBy >= today) ?? null,
+    current:
+      monthly.find((m) => m.month === currentMonth) ?? taxOwedForMonth(currentMonth, 0),
+  };
 }
 
 // Whole days from one "YYYY-MM-DD" date to another; negative if `to` is

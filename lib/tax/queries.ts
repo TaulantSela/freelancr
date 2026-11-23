@@ -1,6 +1,11 @@
 import { and, eq, sql } from "drizzle-orm";
 import { getDb, invoices, clients, users } from "@/lib/db";
-import { DEFAULT_TAX_STATUS, isTaxStatus, type TaxStatus } from "./calculator";
+import {
+  DEFAULT_TAX_STATUS,
+  isTaxStatus,
+  type SelfReportedPayment,
+  type TaxStatus,
+} from "./calculator";
 
 export async function getTaxStatus(userId: string): Promise<TaxStatus> {
   const [row] = await getDb()
@@ -11,18 +16,24 @@ export async function getTaxStatus(userId: string): Promise<TaxStatus> {
   return row && isTaxStatus(row.taxStatus) ? row.taxStatus : DEFAULT_TAX_STATUS;
 }
 
-// Paid invoices that can lead to a deadline in `year`: the ones paid from
-// December of the year before, whose report is due in January. The bound is
-// a day early because paidAt is stored in UTC, which is behind North
-// Macedonia; getSelfReportedIncomeMonths() then works out each exact month.
-export async function getPaidInvoicesForDeadlines(userId: string, year: number) {
+// Paid invoices that can lead to a deadline, or tax owed, in `year`: the ones
+// paid from December of the year before, whose report is due in January. The
+// bound is a day early because paidAt is stored in UTC, which is behind North
+// Macedonia; getSelfReportedIncomeMonths() and getMonthlyTaxOwed() then work
+// out each exact month.
+export async function getPaidInvoicesForDeadlines(
+  userId: string,
+  year: number
+): Promise<SelfReportedPayment[]> {
   const since = `${year - 1}-11-30`;
-  return getDb()
+  const rows = await getDb()
     .select({
       paidAt: invoices.paidAt,
       date: invoices.date,
       clientCountry: clients.country,
       clientType: clients.clientType,
+      subtotal: invoices.subtotal,
+      exchangeRateMKD: invoices.exchangeRateMKD,
     })
     .from(invoices)
     .innerJoin(clients, eq(invoices.clientId, clients.id))
@@ -33,4 +44,8 @@ export async function getPaidInvoicesForDeadlines(userId: string, year: number) 
         sql`coalesce(${invoices.paidAt}, ${invoices.date}) >= ${since}`
       )
     );
+  return rows.map(({ subtotal, exchangeRateMKD, ...row }) => ({
+    ...row,
+    amountMKD: subtotal * exchangeRateMKD,
+  }));
 }

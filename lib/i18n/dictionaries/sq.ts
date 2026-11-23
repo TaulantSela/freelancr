@@ -76,7 +76,7 @@ export const sq: Dictionary = {
       },
       {
         title: "Ndjekës i të ardhurave vjetore",
-        desc: "Të ardhurat vjetore sipas klientit dhe monedhës, me një vlerësim të tatimit mbi të ardhurat me normë të sheshtë 10%.",
+        desc: "Të ardhurat vjetore sipas klientit dhe monedhës, dhe përafërsisht sa i detyrohesh UJP-së për çdo muaj.",
       },
     ],
     ctaTitle: "Gati të zëvendësosh Excel + Word?",
@@ -97,8 +97,6 @@ export const sq: Dictionary = {
     paidInvoicesYear: "Fatura të paguara, {year}",
     outstanding: "Të papaguara",
     awaitingPayment: "fatura në pritje pagese",
-    estTax: "Tatim i vler.",
-    effectiveRate: "shkalla efektive",
     ddvMonitor: "Monitor i pragut TVSH",
     ddvSafe: "Sigurt",
     ddvWarning: "Paralajmërim",
@@ -110,11 +108,6 @@ export const sq: Dictionary = {
     ddvStatus: "Statusi aktual",
     mustRegister: "Duhet regjistrim TVSH",
     notRequired: "Ende nuk kërkohet",
-    taxSummary: "Përmbledhje tatimore",
-    grossIncome: "Të ardhurat bruto ({year})",
-    bracketTax: "Tatimi {bracket}",
-    totalEstTax: "Tatimi total i vlerësuar",
-    netIncome: "Të ardhurat neto (pas tatimit)",
     nextDeadline: "Afati i ardhshëm tatimor",
     daysAway: "{date} — për {days} ditë",
     dueToday: "{date} — sot",
@@ -255,9 +248,6 @@ export const sq: Dictionary = {
     subtitle: "Përmbledhje vjetore për {year} — vetëm fatura të paguara",
     grossIncome: "Të ardhurat bruto",
     invoicesPaid: "{count} fatura të paguara",
-    estTax: "Tatim i vlerësuar",
-    netIncome: "Të ardhurat neto",
-    afterTax: "pas tatimit të vlerësuar",
     ddvThresholdPct: "Pragu TVSH",
     ddvMonitor: "Monitor i pragut TVSH",
     currentAnnual: "Të ardhurat vjetore aktuale",
@@ -267,13 +257,6 @@ export const sq: Dictionary = {
     ddvExceededMsg:
       "Ke tejkaluar pragun TVSH. Konsulto kontabilistin për regjistrim të detyrueshëm TVSH.",
     ddvWarningMsg: "Me këtë ritëm mund ta arrish pragun para fundvitit. {remaining} mbeten.",
-    taxBreakdown: "Ndarja e tatimit mbi të ardhurat ({year})",
-    noIncome: "Ende nuk ka të ardhura të regjistruara këtë vit.",
-    bracketOn: "{bracket} mbi",
-    totalEstTax: "Tatimi total i vlerësuar",
-    effectiveRate: "Shkalla efektive",
-    taxNote:
-      "Tatimi mbi të ardhurat personale në MK është me normë të sheshtë 10%. Ky vlerësim e llogarit mbi faturat e paguara, por baza tatimore për veprimtarinë e pavarur janë të ardhurat neto pas shpenzimeve — konsulto kontabilistin.",
     taxDeadlines: "Afatet tatimore {year}",
     passed: "Kaluar",
     daysAway: "për {days} ditë",
@@ -362,5 +345,23 @@ export const sq: Dictionary = {
     noneInYear:
       "Ende asnjë. Afatet shfaqen për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut.",
     then: "Pastaj: {label}, {date}",
+    owed: {
+      title: "Detyrimi ndaj UJP-së",
+      approximate: "Përafërsisht",
+      tileDue: "Të ardhurat e muajit {month} · paguaj deri më {date}",
+      forMonth: "Tatimi për të ardhurat e muajit {month}",
+      soFar: "Deri tani në muajin {month}",
+      fileAndPay:
+        "Dorëzo llogaritjen (е-ППД) deri më {reportBy}, paguaj deri më {payBy}",
+      nothing:
+        "Ende s'ka asgjë për të paguar. Kur një klient nga jashtë ose një person fizik në Maqedoninë e Veriut paguan një faturë dhe e shënon si të paguar, tatimi mbi të (10%) shfaqet këtu.",
+      note:
+        "Përafërsisht: 10% e asaj që kanë paguar këta klientë, me kursin e ruajtur në çdo faturë. UJP konverton me kursin mesatar të Bankës Popullore (NBRSM) në ditën kur arritën paratë, të cilin aplikacioni ende nuk e përdor, dhe të ardhurat nga të drejtat e autorit tatohen pas shpenzimeve të normuara (Ligji për tatimin mbi të ardhurat personale, neni 40), ndaj shuma mund të jetë më e madhe se sa detyrohesh. Shuma e vërtetë është ajo në llogaritjen që e miraton UJP.",
+      groupAmount: "Tatimi ≈ {amount}",
+      advanceTile: "Akontimi deri më {date}",
+      advanceDue: "Akontimi për muajin {month}: paguaj deri më {date}",
+      advanceHint:
+        "Akontimi mujor është 1/12 e tatimit në bilancin tatimor vjetor të vitit të kaluar. Aplikacioni nuk mund ta llogarisë: merre nga bilanci ose pyet kontabilistin.",
+    },
   },
 };

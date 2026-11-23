@@ -76,7 +76,7 @@ export const en: Dictionary = {
       },
       {
         title: "Annual income tracker",
-        desc: "Yearly income by client and currency, with an estimate of the flat 10% income tax.",
+        desc: "Yearly income by client and currency, and roughly what you owe UJP for each month.",
       },
     ],
     ctaTitle: "Ready to replace Excel + Word?",
@@ -97,8 +97,6 @@ export const en: Dictionary = {
     paidInvoicesYear: "Paid invoices, {year}",
     outstanding: "Outstanding",
     awaitingPayment: "invoices awaiting payment",
-    estTax: "Est. tax",
-    effectiveRate: "effective rate",
     ddvMonitor: "DDV Threshold Monitor",
     ddvSafe: "Safe",
     ddvWarning: "Warning",
@@ -110,11 +108,6 @@ export const en: Dictionary = {
     ddvStatus: "Current status",
     mustRegister: "Must register for DDV",
     notRequired: "Not required yet",
-    taxSummary: "Tax Summary",
-    grossIncome: "Gross income ({year})",
-    bracketTax: "Income tax ({bracket})",
-    totalEstTax: "Estimated total tax",
-    netIncome: "Net income (after tax)",
     nextDeadline: "Next tax deadline",
     daysAway: "{date} — {days} days away",
     dueToday: "{date} — today",
@@ -255,9 +248,6 @@ export const en: Dictionary = {
     subtitle: "Annual overview for {year} — paid invoices only",
     grossIncome: "Gross income",
     invoicesPaid: "{count} invoices paid",
-    estTax: "Estimated tax",
-    netIncome: "Net income",
-    afterTax: "after estimated tax",
     ddvThresholdPct: "DDV threshold",
     ddvMonitor: "DDV Threshold Monitor",
     currentAnnual: "Current annual income",
@@ -267,13 +257,6 @@ export const en: Dictionary = {
     ddvExceededMsg:
       "You have exceeded the DDV threshold. Contact your accountant about mandatory DDV registration.",
     ddvWarningMsg: "At this rate, you may reach the threshold before year end. {remaining} remaining.",
-    taxBreakdown: "Income Tax Breakdown ({year})",
-    noIncome: "No income recorded yet this year.",
-    bracketOn: "{bracket} on",
-    totalEstTax: "Total estimated tax",
-    effectiveRate: "Effective rate",
-    taxNote:
-      "MK personal income tax is a flat 10%. This estimate applies it to your paid invoices, but the tax base for independent activity is net income after expenses — consult your accountant.",
     taxDeadlines: "Tax deadlines {year}",
     passed: "Passed",
     daysAway: "{days} days away",
@@ -362,5 +345,22 @@ export const en: Dictionary = {
     noneInYear:
       "None yet. Deadlines show up for each month in which a client abroad or a private person in North Macedonia paid you.",
     then: "Then: {label}, {date}",
+    owed: {
+      title: "Owed to UJP",
+      approximate: "Approximate",
+      tileDue: "{month} income · pay by {date}",
+      forMonth: "Tax on {month} income",
+      soFar: "{month} so far",
+      fileAndPay: "File the calculation (е-ППД) by {reportBy}, pay by {payBy}",
+      nothing:
+        "Nothing to pay yet. When a client abroad or a private person in North Macedonia pays an invoice and you mark it paid, the tax on it (10%) shows up here.",
+      note:
+        "Approximate: 10% of what these clients paid, at the exchange rate stored on each invoice. UJP converts at the National Bank's (NBRSM) middle rate on the day the money arrived, which the app doesn't use yet, and income from author's rights is taxed after deemed costs (Personal Income Tax law, Art. 40), so this can be more than you owe. The calculation UJP approves is the real figure.",
+      groupAmount: "Tax ≈ {amount}",
+      advanceTile: "Advance due by {date}",
+      advanceDue: "Advance for {month}: pay by {date}",
+      advanceHint:
+        "The monthly advance is 1/12 of the tax in last year's annual tax balance. The app can't work it out: take it from your balance or ask your accountant.",
+    },
   },
 };

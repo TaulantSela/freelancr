@@ -5,15 +5,15 @@ import {
   getDDVStatus,
   getUpcomingTaxDeadlines,
   getSelfReportedIncomeMonths,
+  getOwedToUjp,
   toSkopjeDate,
   daysBetween,
-  calculateIncomeTax,
   formatMKD,
   formatCurrency,
   DDV_THRESHOLD_MKD,
 } from "@/lib/tax/calculator";
 import { getTaxStatus, getPaidInvoicesForDeadlines } from "@/lib/tax/queries";
-import { formatTaxDate, taxDeadlineLabel } from "@/lib/tax/labels";
+import { formatTaxDate, formatTaxPeriod, taxDeadlineLabel } from "@/lib/tax/labels";
 import { formatDate, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,20 +78,24 @@ export default async function DashboardPage() {
     .limit(5);
 
   const ddvStatus = getDDVStatus(annualIncomeMKD);
-  const taxCalc = calculateIncomeTax(annualIncomeMKD);
 
   // The next UJP deadline for how the user is registered for tax. When not
   // registered, only months with self-reported income (a client abroad or a
-  // private person in North Macedonia paid) have deadlines.
+  // private person in North Macedonia paid) have deadlines, and the tax owed
+  // is 10% of that income (approximate; see getOwedToUjp).
   const today = toSkopjeDate(new Date());
   const taxStatus = await getTaxStatus(session.userId);
-  const incomeMonths =
-    taxStatus === "paid_from_abroad"
-      ? getSelfReportedIncomeMonths(
-          await getPaidInvoicesForDeadlines(session.userId, Number(today.slice(0, 4)))
-        )
-      : [];
+  const notRegistered = taxStatus === "paid_from_abroad";
+  const payments = notRegistered
+    ? await getPaidInvoicesForDeadlines(session.userId, Number(today.slice(0, 4)))
+    : [];
+  const incomeMonths = getSelfReportedIncomeMonths(payments);
+  const owed = getOwedToUjp(payments, today);
+  // The payment coming up: last month's until the 15th, then this month's.
+  const owedNext = owed.due ?? owed.current;
+  const hasOwed = owed.due !== null || owed.current.incomeMKD > 0;
   const upcomingDeadlines = getUpcomingTaxDeadlines(taxStatus, today, incomeMonths);
+  const nextAdvance = upcomingDeadlines.find((d) => d.kind === "advance");
   const [nextDeadline] = upcomingDeadlines;
   // Everything due on the next date (an advance and the annual balance can
   // share 15 March), then the first deadline after it.
@@ -175,6 +179,38 @@ export default async function DashboardPage() {
         <Card>
           <CardContent className="pt-5">
             <div className="flex items-center gap-2 mb-1">
+              <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                {t.tax.owed.title}
+              </span>
+            </div>
+            {notRegistered ? (
+              <>
+                <div className="text-xl font-mono font-semibold">{formatMKD(owedNext.taxMKD)}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  {formatMessage(t.tax.owed.tileDue, {
+                    month: formatTaxPeriod(owedNext.month, t),
+                    date: formatTaxDate(owedNext.payBy, t),
+                  })}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-xl font-mono font-semibold">—</div>
+                {nextAdvance && (
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    {formatMessage(t.tax.owed.advanceTile, {
+                      date: formatTaxDate(nextAdvance.dueDate, t),
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5">
+            <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
               <span className="text-xs text-muted-foreground uppercase tracking-wider">
                 {t.dashboard.annualIncome}
@@ -198,23 +234,108 @@ export default async function DashboardPage() {
             <div className="text-xs text-muted-foreground mt-0.5">{t.dashboard.awaitingPayment}</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-5">
-            <div className="flex items-center gap-2 mb-1">
-              <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                {t.dashboard.estTax}
-              </span>
-            </div>
-            <div className="text-xl font-mono font-semibold">{formatMKD(taxCalc.totalTax)}</div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              {(taxCalc.effectiveRate * 100).toFixed(1)}% {t.dashboard.effectiveRate}
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center justify-between">
+              {t.tax.owed.title}
+              {notRegistered && (
+                <Badge variant="outline" className="text-xs font-normal">
+                  {t.tax.owed.approximate}
+                </Badge>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {notRegistered ? (
+              hasOwed ? (
+                <div className="space-y-2">
+                  <div className="rounded-lg border border-border px-3 py-2.5 space-y-0.5">
+                    <div className="text-xs text-muted-foreground">
+                      {formatMessage(owed.due ? t.tax.owed.forMonth : t.tax.owed.soFar, {
+                        month: formatTaxPeriod(owedNext.month, t),
+                      })}
+                    </div>
+                    <div className="text-xl font-mono font-semibold">
+                      {formatMKD(owedNext.taxMKD)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {formatMessage(t.tax.owed.fileAndPay, {
+                        reportBy: formatTaxDate(owedNext.reportBy, t),
+                        payBy: formatTaxDate(owedNext.payBy, t),
+                      })}
+                    </div>
+                  </div>
+                  {owed.due && (
+                    <div className="flex justify-between gap-4 text-sm px-3">
+                      <span className="text-muted-foreground">
+                        {formatMessage(t.tax.owed.soFar, {
+                          month: formatTaxPeriod(owed.current.month, t),
+                        })}
+                      </span>
+                      <span className="font-mono text-xs">{formatMKD(owed.current.taxMKD)}</span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">{t.tax.owed.nothing}</p>
+              )
+            ) : (
+              <div className="space-y-1">
+                {nextAdvance && (
+                  <div className="text-sm">
+                    {formatMessage(t.tax.owed.advanceDue, {
+                      month: formatTaxPeriod(nextAdvance.period, t),
+                      date: formatTaxDate(nextAdvance.dueDate, t),
+                    })}
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">{t.tax.owed.advanceHint}</p>
+              </div>
+            )}
+            <Separator />
+            <div className="flex items-start gap-3 bg-muted/50 rounded-lg px-3 py-2">
+              <Calendar className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+              <div className="min-w-0 space-y-0.5">
+                <div className="text-xs font-medium">{t.dashboard.nextDeadline}</div>
+                {nextDeadline ? (
+                  <>
+                    {dueWithNext.map((d) => (
+                      <div key={`${d.kind}-${d.period}`} className="text-xs">
+                        {taxDeadlineLabel(d, t)}
+                      </div>
+                    ))}
+                    <div className="text-xs text-muted-foreground">{nextDeadlineWhen}</div>
+                    {thenDeadline && (
+                      <div className="text-xs text-muted-foreground">
+                        {formatMessage(t.tax.then, {
+                          label: taxDeadlineLabel(thenDeadline, t),
+                          date: formatTaxDate(thenDeadline.dueDate, t),
+                        })}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-xs text-muted-foreground">{t.tax.noUpcoming}</div>
+                )}
+                <div className="text-xs text-muted-foreground pt-1">
+                  {formatMessage(t.tax.basedOn, { status: t.tax.statuses[taxStatus] })}{" "}
+                  <Link href="/settings" className="underline underline-offset-2 hover:text-foreground">
+                    {t.tax.changeInSettings}
+                  </Link>
+                </div>
+              </div>
+              {daysToNext !== null && daysToNext <= 7 && (
+                <AlertTriangle className="h-4 w-4 text-yellow-500 ml-auto shrink-0" />
+              )}
+            </div>
+            {notRegistered && hasOwed && (
+              <p className="text-xs text-muted-foreground">{t.tax.owed.note}</p>
+            )}
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center justify-between">
@@ -255,77 +376,6 @@ export default async function DashboardPage() {
                   {ddvStatus.isRegistered ? t.dashboard.mustRegister : t.dashboard.notRequired}
                 </span>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">{t.dashboard.taxSummary}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {formatMessage(t.dashboard.grossIncome, { year })}
-                </span>
-                <span className="font-mono text-xs">{formatMKD(annualIncomeMKD)}</span>
-              </div>
-              {taxCalc.breakdown.map((b, i) => (
-                <div key={i} className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    {formatMessage(t.dashboard.bracketTax, { bracket: b.bracket })}
-                  </span>
-                  <span className="font-mono text-xs">{formatMKD(b.tax)}</span>
-                </div>
-              ))}
-              <Separator />
-              <div className="flex justify-between font-medium">
-                <span>{t.dashboard.totalEstTax}</span>
-                <span className="font-mono text-xs">{formatMKD(taxCalc.totalTax)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t.dashboard.netIncome}</span>
-                <span className="font-mono text-xs text-emerald-400">
-                  {formatMKD(annualIncomeMKD - taxCalc.totalTax)}
-                </span>
-              </div>
-            </div>
-            <Separator />
-            <div className="flex items-start gap-3 bg-muted/50 rounded-lg px-3 py-2">
-              <Calendar className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-              <div className="min-w-0 space-y-0.5">
-                <div className="text-xs font-medium">{t.dashboard.nextDeadline}</div>
-                {nextDeadline ? (
-                  <>
-                    {dueWithNext.map((d) => (
-                      <div key={`${d.kind}-${d.period}`} className="text-xs">
-                        {taxDeadlineLabel(d, t)}
-                      </div>
-                    ))}
-                    <div className="text-xs text-muted-foreground">{nextDeadlineWhen}</div>
-                    {thenDeadline && (
-                      <div className="text-xs text-muted-foreground">
-                        {formatMessage(t.tax.then, {
-                          label: taxDeadlineLabel(thenDeadline, t),
-                          date: formatTaxDate(thenDeadline.dueDate, t),
-                        })}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="text-xs text-muted-foreground">{t.tax.noUpcoming}</div>
-                )}
-                <div className="text-xs text-muted-foreground pt-1">
-                  {formatMessage(t.tax.basedOn, { status: t.tax.statuses[taxStatus] })}{" "}
-                  <Link href="/settings" className="underline underline-offset-2 hover:text-foreground">
-                    {t.tax.changeInSettings}
-                  </Link>
-                </div>
-              </div>
-              {daysToNext !== null && daysToNext <= 7 && (
-                <AlertTriangle className="h-4 w-4 text-yellow-500 ml-auto shrink-0" />
-              )}
             </div>
           </CardContent>
         </Card>

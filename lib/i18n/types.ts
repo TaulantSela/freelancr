@@ -74,8 +74,6 @@ export type Dictionary = {
     paidInvoicesYear: string;
     outstanding: string;
     awaitingPayment: string;
-    estTax: string;
-    effectiveRate: string;
     ddvMonitor: string;
     ddvSafe: string;
     ddvWarning: string;
@@ -87,11 +85,6 @@ export type Dictionary = {
     ddvStatus: string;
     mustRegister: string;
     notRequired: string;
-    taxSummary: string;
-    grossIncome: string;
-    bracketTax: string;
-    totalEstTax: string;
-    netIncome: string;
     nextDeadline: string;
     daysAway: string;
     dueToday: string;
@@ -223,9 +216,6 @@ export type Dictionary = {
     subtitle: string;
     grossIncome: string;
     invoicesPaid: string;
-    estTax: string;
-    netIncome: string;
-    afterTax: string;
     ddvThresholdPct: string;
     ddvMonitor: string;
     currentAnnual: string;
@@ -234,12 +224,6 @@ export type Dictionary = {
     alert100: string;
     ddvExceededMsg: string;
     ddvWarningMsg: string;
-    taxBreakdown: string;
-    noIncome: string;
-    bracketOn: string;
-    totalEstTax: string;
-    effectiveRate: string;
-    taxNote: string;
     taxDeadlines: string;
     passed: string;
     daysAway: string;
@@ -295,5 +279,19 @@ export type Dictionary = {
     noUpcoming: string;
     noneInYear: string;
     then: string;
+    owed: {
+      title: string;
+      approximate: string;
+      tileDue: string;
+      forMonth: string;
+      soFar: string;
+      fileAndPay: string;
+      nothing: string;
+      note: string;
+      groupAmount: string;
+      advanceTile: string;
+      advanceDue: string;
+      advanceHint: string;
+    };
   };
 };
