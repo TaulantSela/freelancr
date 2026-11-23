@@ -97,8 +97,6 @@ export const mk: Dictionary = {
     paidInvoicesYear: "Платени фактури, {year}",
     outstanding: "Неплатени",
     awaitingPayment: "фактури чекаат плаќање",
-    clients: "Клиенти",
-    activeClients: "активни клиенти",
     estTax: "Проц. данок",
     effectiveRate: "ефективна стапка",
     ddvMonitor: "Следење на ДДВ праг",

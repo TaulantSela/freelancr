@@ -24,7 +24,6 @@ import {
   AlertTriangle,
   TrendingUp,
   FileText,
-  Users,
   Plus,
   Calendar,
   Clock,
@@ -77,11 +76,6 @@ export default async function DashboardPage() {
     .where(eq(invoices.userId, session.userId))
     .orderBy(invoices.createdAt)
     .limit(5);
-
-  const [clientCount] = await getDb()
-    .select({ cnt: count() })
-    .from(clients)
-    .where(eq(clients.userId, session.userId));
 
   const ddvStatus = getDDVStatus(annualIncomeMKD);
   const taxCalc = calculateIncomeTax(annualIncomeMKD);
@@ -176,7 +170,7 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-5">
             <div className="flex items-center gap-2 mb-1">
@@ -201,18 +195,6 @@ export default async function DashboardPage() {
             </div>
             <div className="text-xl font-mono font-semibold">{outstandingStats?.cnt ?? 0}</div>
             <div className="text-xs text-muted-foreground mt-0.5">{t.dashboard.awaitingPayment}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-5">
-            <div className="flex items-center gap-2 mb-1">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                {t.dashboard.clients}
-              </span>
-            </div>
-            <div className="text-xl font-mono font-semibold">{clientCount?.cnt ?? 0}</div>
-            <div className="text-xs text-muted-foreground mt-0.5">{t.dashboard.activeClients}</div>
           </CardContent>
         </Card>
         <Card>

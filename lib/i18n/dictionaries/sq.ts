@@ -97,8 +97,6 @@ export const sq: Dictionary = {
     paidInvoicesYear: "Fatura të paguara, {year}",
     outstanding: "Të papaguara",
     awaitingPayment: "fatura në pritje pagese",
-    clients: "Klientët",
-    activeClients: "klientë aktivë",
     estTax: "Tatim i vler.",
     effectiveRate: "shkalla efektive",
     ddvMonitor: "Monitor i pragut TVSH",

@@ -74,8 +74,6 @@ export type Dictionary = {
     paidInvoicesYear: string;
     outstanding: string;
     awaitingPayment: string;
-    clients: string;
-    activeClients: string;
     estTax: string;
     effectiveRate: string;
     ddvMonitor: string;

@@ -97,8 +97,6 @@ export const en: Dictionary = {
     paidInvoicesYear: "Paid invoices, {year}",
     outstanding: "Outstanding",
     awaitingPayment: "invoices awaiting payment",
-    clients: "Clients",
-    activeClients: "active clients",
     estTax: "Est. tax",
     effectiveRate: "effective rate",
     ddvMonitor: "DDV Threshold Monitor",
