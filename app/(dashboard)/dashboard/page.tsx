@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/auth/session";
 import { getDb, invoices, clients } from "@/lib/db";
-import { eq, sum, count, and, gte, inArray } from "drizzle-orm";
+import { eq, sum, count, and, gte, inArray, desc } from "drizzle-orm";
 import {
   getDDVStatus,
   getLocalSupplies,
@@ -85,7 +85,7 @@ export default async function DashboardPage() {
     .from(invoices)
     .leftJoin(clients, eq(invoices.clientId, clients.id))
     .where(eq(invoices.userId, session.userId))
-    .orderBy(invoices.createdAt)
+    .orderBy(desc(invoices.createdAt))
     .limit(5);
 
   // The next UJP deadline for how the user is registered for tax. When not
