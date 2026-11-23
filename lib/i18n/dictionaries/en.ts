@@ -72,7 +72,7 @@ export const en: Dictionary = {
       },
       {
         title: "Tax deadline calendar",
-        desc: "The UJP deadlines for how you're registered: monthly report and payment dates for income from abroad, or monthly advances and the 15 March annual balance if you're self-employed.",
+        desc: "The UJP deadlines for how you're registered: monthly report and payment dates for income you report yourself (from clients abroad or private persons), or monthly advances and the 15 March annual balance if you're self-employed.",
       },
       {
         title: "Annual income tracker",

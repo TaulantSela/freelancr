@@ -72,7 +72,7 @@ export const sq: Dictionary = {
       },
       {
         title: "Kalendar i afateve tatimore",
-        desc: "Afatet e UJP-së sipas mënyrës si je regjistruar: afatet mujore të llogaritjes dhe pagesës për të ardhurat nga jashtë, ose akontimet mujore dhe bilanci vjetor deri më 15 mars për vetëpunësimin e regjistruar.",
+        desc: "Afatet e UJP-së sipas mënyrës si je regjistruar: afatet mujore të llogaritjes dhe pagesës për të ardhurat që i deklaron vetë (nga klientë jashtë vendit ose persona fizikë), ose akontimet mujore dhe bilanci vjetor deri më 15 mars për vetëpunësimin e regjistruar.",
       },
       {
         title: "Ndjekës i të ardhurave vjetore",
