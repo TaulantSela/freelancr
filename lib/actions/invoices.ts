@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getDb, invoices, invoiceItems } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId, generateInvoiceNumber } from "@/lib/utils";
-import { FALLBACK_RATES, toMKD } from "@/lib/tax/calculator";
+import { getRateToMKD } from "@/lib/tax/calculator";
 import { eq, and } from "drizzle-orm";
 
 export async function createInvoice(formData: FormData) {
@@ -37,8 +37,8 @@ export async function createInvoice(formData: FormData) {
   const subtotal = items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
   const ddvAmount = subtotal * ddvRate;
   const total = subtotal + ddvAmount;
-  const rate = FALLBACK_RATES[currency] ?? 1;
-  const totalMKD = toMKD(total, currency, rate);
+  const rate = getRateToMKD(currency);
+  const totalMKD = total * rate;
 
   const invoiceId = generateId();
 

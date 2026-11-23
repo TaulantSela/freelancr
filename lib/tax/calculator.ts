@@ -126,18 +126,50 @@ export function getNextQuarterlyDeadline(): {
   };
 }
 
-// Approximate exchange rates (fallback if API unavailable)
-export const FALLBACK_RATES: Record<string, number> = {
-  EUR: 61.5, // 1 EUR ≈ 61.5 MKD
-  USD: 56.8, // 1 USD ≈ 56.8 MKD
-  GBP: 72.1, // 1 GBP ≈ 72.1 MKD
+// Every currency a client can default to or an invoice can be issued in.
+// The client form, the invoice form and the server actions all read this
+// list, so a currency can't be offered without a rate below.
+export const SUPPORTED_CURRENCIES = [
+  "EUR",
+  "USD",
+  "GBP",
+  "MKD",
+  "CHF",
+  "AUD",
+  "CAD",
+] as const;
+
+export type Currency = (typeof SUPPORTED_CURRENCIES)[number];
+
+// Approximate MKD rates. These are the only rates the app uses: nothing calls
+// a live rate service, and each invoice stores the rate it was created with.
+// Values are NBRM middle rates (среден курс) from the exchange rate list
+// formed on 20 November 2026 (valid from 21 November 2026), rounded to one
+// decimal, retrieved from
+// https://www.nbrm.mk/KLServiceNOV/GetExchangeRates?StartDate=21.11.2026&EndDate=21.11.2026&format=json
+export const APPROXIMATE_RATES_TO_MKD: Record<Currency, number> = {
+  EUR: 61.6, // NBRM middle 61.5942
+  USD: 56.0, // NBRM middle 56.0457
+  GBP: 73.6, // NBRM middle 73.5585
+  CHF: 66.8, // NBRM middle 66.7833
+  AUD: 37.4, // NBRM middle 37.3593
+  CAD: 39.2, // NBRM middle 39.1746
   MKD: 1,
 };
 
-export function toMKD(amount: number, currency: string, rate?: number): number {
-  if (currency === "MKD") return amount;
-  const r = rate ?? FALLBACK_RATES[currency] ?? 1;
-  return amount * r;
+export function isSupportedCurrency(value: string): value is Currency {
+  return (SUPPORTED_CURRENCIES as readonly string[]).includes(value);
+}
+
+// Throws for a currency without a rate rather than treating it as 1:1 MKD,
+// which would silently distort the DDV threshold and income totals.
+export function getRateToMKD(currency: string): number {
+  if (!isSupportedCurrency(currency)) {
+    throw new Error(
+      `Unsupported currency "${currency}": no MKD exchange rate is configured`
+    );
+  }
+  return APPROXIMATE_RATES_TO_MKD[currency];
 }
 
 export function formatMKD(amount: number): string {
