@@ -459,12 +459,15 @@ export default async function DashboardPage() {
                           >
                             {inv.number ?? t.invoices.status.draft}
                           </span>
-                          <Badge
-                            variant="outline"
-                            className={cn("text-xs border-0 px-1.5", statusColors[inv.status])}
-                          >
-                            {statusLabel}
-                          </Badge>
+                          {/* A draft without a number already reads "Draft". */}
+                          {inv.number && (
+                            <Badge
+                              variant="outline"
+                              className={cn("text-xs border-0 px-1.5", statusColors[inv.status])}
+                            >
+                              {statusLabel}
+                            </Badge>
+                          )}
                         </div>
                         <div className="text-xs text-muted-foreground">{inv.clientName}</div>
                       </div>
