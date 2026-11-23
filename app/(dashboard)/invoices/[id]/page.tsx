@@ -212,25 +212,32 @@ export default async function InvoiceDetailPage({
               {t.invoices.form.lineItems}
             </p>
             <div className="space-y-0 border border-border rounded-lg overflow-hidden">
-              <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-4 py-2 bg-muted/40 text-xs text-muted-foreground uppercase tracking-wider">
+              <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-4 px-4 py-2 bg-muted/40 text-xs text-muted-foreground uppercase tracking-wider">
                 <div>{t.invoices.form.description}</div>
                 <div className="w-12 text-right">{t.invoices.form.qty}</div>
-                <div className="w-24 text-right">{t.invoices.form.unitPrice.replace("{currency}", invoice.currency)}</div>
-                <div className="w-24 text-right">{t.invoices.form.total}</div>
+                <div className="w-32 text-right">{t.invoices.form.unitPrice.replace("{currency}", invoice.currency)}</div>
+                <div className="w-32 text-right">{t.invoices.form.total}</div>
               </div>
+              {/* On phones: the description with quantity x price under it,
+                  and the line total. */}
               {items.map((item, i) => (
                 <div
                   key={item.id}
-                  className={`grid grid-cols-[1fr_auto_auto_auto] gap-4 px-4 py-3 text-sm items-center ${
+                  className={`grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_auto_auto] gap-4 px-4 py-3 text-sm items-center ${
                     i < items.length - 1 ? "border-b border-border" : ""
                   }`}
                 >
-                  <div>{item.description}</div>
-                  <div className="w-12 text-right font-mono">{item.quantity}</div>
-                  <div className="w-24 text-right font-mono">
+                  <div className="min-w-0">
+                    {item.description}
+                    <div className="sm:hidden text-xs text-muted-foreground font-mono">
+                      {item.quantity} × {formatCurrency(item.unitPrice, invoice.currency)}
+                    </div>
+                  </div>
+                  <div className="hidden sm:block w-12 text-right font-mono">{item.quantity}</div>
+                  <div className="hidden sm:block w-32 text-right font-mono">
                     {formatCurrency(item.unitPrice, invoice.currency)}
                   </div>
-                  <div className="w-24 text-right font-mono font-medium">
+                  <div className="sm:w-32 text-right font-mono font-medium whitespace-nowrap">
                     {formatCurrency(item.total, invoice.currency)}
                   </div>
                 </div>

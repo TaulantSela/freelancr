@@ -73,7 +73,7 @@ export default async function InvoicesPage() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+      <div className="grid sm:grid-cols-3 gap-2 sm:gap-4">
         <Card>
           <CardContent className="pt-4 pb-4">
             <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{t.invoices.paidMkd}</div>

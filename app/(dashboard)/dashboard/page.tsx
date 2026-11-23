@@ -452,13 +452,16 @@ export default async function DashboardPage() {
       </div>
 
       <Card>
-        <CardHeader className="pb-2 flex-row items-center justify-between">
-          <CardTitle className="text-sm">{t.dashboard.recentInvoices}</CardTitle>
-          <Link href="/invoices">
-            <Button variant="ghost" size="sm" className="text-xs text-muted-foreground h-7">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center justify-between gap-2">
+            {t.dashboard.recentInvoices}
+            <Link
+              href="/invoices"
+              className="text-xs font-normal text-muted-foreground underline underline-offset-2 hover:text-foreground"
+            >
               {t.common.viewAll}
-            </Button>
-          </Link>
+            </Link>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {recent.length === 0 ? (
