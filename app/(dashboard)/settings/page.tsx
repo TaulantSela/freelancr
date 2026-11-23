@@ -25,6 +25,7 @@ export default async function SettingsPage() {
       monthlyAdvanceMKD: users.monthlyAdvanceMKD,
       vatRegistered: users.vatRegistered,
       vatNumber: users.vatNumber,
+      isDemo: users.isDemo,
       taxNumber: users.taxNumber,
       address: users.address,
       placeOfIssue: users.placeOfIssue,
@@ -77,7 +78,11 @@ export default async function SettingsPage() {
           <CardTitle className="text-sm">{t.settings.password.title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <ChangePasswordForm />
+          {user.isDemo ? (
+            <p className="text-sm text-muted-foreground">{t.common.demoUnavailable}</p>
+          ) : (
+            <ChangePasswordForm />
+          )}
         </CardContent>
       </Card>
     </div>

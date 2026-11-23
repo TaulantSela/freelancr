@@ -63,7 +63,7 @@ export async function signIn(formData: FormData) {
 }
 
 export type ChangePasswordState =
-  | { errorKey: "required" | "wrongCurrent" | "tooShort" | "mismatch" }
+  | { errorKey: "required" | "wrongCurrent" | "tooShort" | "mismatch" | "demo" }
   | { changed: true }
   | null;
 
@@ -85,10 +85,12 @@ export async function changePassword(
   if (next !== confirm) return { errorKey: "mismatch" };
 
   const [user] = await getDb()
-    .select({ passwordHash: users.passwordHash })
+    .select({ passwordHash: users.passwordHash, isDemo: users.isDemo })
     .from(users)
     .where(eq(users.id, session.userId))
     .limit(1);
+  // The demo's password is public; it stays as it is.
+  if (user?.isDemo) return { errorKey: "demo" };
   if (!user || !(await bcrypt.compare(current, user.passwordHash))) {
     return { errorKey: "wrongCurrent" };
   }

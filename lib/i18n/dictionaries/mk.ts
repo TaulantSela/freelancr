@@ -19,6 +19,7 @@ export const mk: Dictionary = {
     viewAll: "Види сè",
     signOut: "Одјави се",
     language: "Јазик",
+    demoUnavailable: "Не е достапно во демо сметката.",
   },
   nav: {
     features: "Функции",
@@ -689,6 +690,7 @@ export const mk: Dictionary = {
         wrongCurrent: "Сегашната лозинка не е точна.",
         tooShort: "Новата лозинка треба да има најмалку 8 карактери.",
         mismatch: "Двете нови лозинки не се совпаѓаат.",
+        demo: "Не е достапно во демо сметката.",
       },
     },
     errors: {

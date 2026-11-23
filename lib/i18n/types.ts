@@ -18,6 +18,7 @@ export type Dictionary = {
     viewAll: string;
     signOut: string;
     language: string;
+    demoUnavailable: string;
   };
   nav: {
     features: string;
@@ -615,6 +616,7 @@ export type Dictionary = {
         wrongCurrent: string;
         tooShort: string;
         mismatch: string;
+        demo: string;
       };
     };
     errors: {

@@ -66,6 +66,10 @@ export const users = pgTable("users", {
   // The VAT number (ДДВ број, e.g. "MK4030000000000"), printed on invoices
   // when registered.
   vatNumber: text("vat_number"),
+  // A shared account whose password is public (the demo, and Phase 5's
+  // per-visitor sandboxes): it can't change its password, reset it, send
+  // email or get reminders.
+  isDemo: boolean("is_demo").notNull().default(false),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 });
 

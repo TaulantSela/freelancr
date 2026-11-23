@@ -19,6 +19,7 @@ export const sq: Dictionary = {
     viewAll: "Shiko të gjitha",
     signOut: "Dil",
     language: "Gjuha",
+    demoUnavailable: "Nuk është në dispozicion në llogarinë demo.",
   },
   nav: {
     features: "Veçoritë",
@@ -687,6 +688,7 @@ export const sq: Dictionary = {
         wrongCurrent: "Fjalëkalimi aktual nuk është i saktë.",
         tooShort: "Fjalëkalimi i ri duhet të ketë të paktën 8 karaktere.",
         mismatch: "Dy fjalëkalimet e reja nuk përputhen.",
+        demo: "Nuk është në dispozicion në llogarinë demo.",
       },
     },
     errors: {

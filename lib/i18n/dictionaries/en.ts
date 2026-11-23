@@ -19,6 +19,7 @@ export const en: Dictionary = {
     viewAll: "View all",
     signOut: "Sign out",
     language: "Language",
+    demoUnavailable: "Not available in the demo account.",
   },
   nav: {
     features: "Features",
@@ -687,6 +688,7 @@ export const en: Dictionary = {
         wrongCurrent: "The current password isn't right.",
         tooShort: "The new password needs at least 8 characters.",
         mismatch: "The two new passwords don't match.",
+        demo: "Not available in the demo account.",
       },
     },
     errors: {
