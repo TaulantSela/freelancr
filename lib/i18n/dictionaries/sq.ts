@@ -180,7 +180,7 @@ export const sq: Dictionary = {
     colNumber: "Numri",
     colClient: "Klienti",
     colAmount: "Shuma",
-    colMkd: "Ekuiv. MKD",
+    colBalance: "Mbetja",
     colStatus: "Statusi",
     newTitle: "Krijo faturë",
     newBreadcrumb: "Faturë e re",
@@ -277,6 +277,25 @@ export const sq: Dictionary = {
       overdue: "Vonuar",
       cancelled: "Anuluar",
     },
+    standing: {
+      draft: "Draft",
+      issued: "Lëshuar",
+      partly_paid: "Paguar pjesërisht",
+      paid: "Paguar",
+      overdue: "Vonuar",
+      cancelled: "Anuluar",
+    },
+    payments: {
+      title: "Pagesat",
+      record: "Regjistro pagesë",
+      none:
+        "Ende nuk ka pagesa të regjistruara. Regjistroje pagesën kur paratë arrijnë në llogari.",
+      settled: "Paguar deri tani",
+      balanceDue: "Mbetet për t'u paguar",
+      overpaid: "Paguar tepër",
+      settledNote:
+        "Provizionet që mori banka ose platforma dhe tatimi që mbajti klienti numërohen në faturë: klienti i pagoi, edhe pse nuk arritën në llogarinë tënde.",
+    },
     issue: {
       button: "Lësho faturën",
       title: "Të lëshohet kjo faturë?",
@@ -292,11 +311,13 @@ export const sq: Dictionary = {
       button: "Anulo faturën",
       title: "Të anulohet {number}?",
       desc:
-        "Fatura e anuluar mbetet në evidencën tënde, sepse faturat ruhen pesë vjet (Ligji për TVSH, neni 56). Nuk numërohet më si e ardhur dhe në pragun e TVSH-së, dhe kjo nuk mund të kthehet. Ende nuk ka nota krediti.",
+        "Fatura e anuluar mbetet në evidencën tënde, sepse faturat ruhen pesë vjet (Ligji për TVSH, neni 56). Nuk numërohet më në pragun e TVSH-së, dhe kjo nuk mund të kthehet. Ende nuk ka nota krediti.",
       confirm: "Anulo faturën",
       keep: "Mbaje",
       cancelled: "Fatura u anulua",
       notIssued: "Mund të anulohen vetëm faturat e lëshuara.",
+      hasPayments:
+        "Kjo faturë ka pagesa të regjistruara. Fshiji fillimisht pagesat, pastaj anuloje.",
       note:
         "E anuluar. Mbetet në evidencën tënde për pesë vitet që faturat duhet të ruhen (Ligji për TVSH, neni 56).",
     },

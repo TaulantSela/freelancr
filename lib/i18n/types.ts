@@ -147,7 +147,7 @@ export type Dictionary = {
     colNumber: string;
     colClient: string;
     colAmount: string;
-    colMkd: string;
+    colBalance: string;
     colStatus: string;
     newTitle: string;
     newBreadcrumb: string;
@@ -241,6 +241,23 @@ export type Dictionary = {
       overdue: string;
       cancelled: string;
     };
+    standing: {
+      draft: string;
+      issued: string;
+      partly_paid: string;
+      paid: string;
+      overdue: string;
+      cancelled: string;
+    };
+    payments: {
+      title: string;
+      record: string;
+      none: string;
+      settled: string;
+      balanceDue: string;
+      overpaid: string;
+      settledNote: string;
+    };
     issue: {
       button: string;
       title: string;
@@ -258,6 +275,7 @@ export type Dictionary = {
       keep: string;
       cancelled: string;
       notIssued: string;
+      hasPayments: string;
       note: string;
     };
   };

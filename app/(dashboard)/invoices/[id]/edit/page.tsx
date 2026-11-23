@@ -53,7 +53,7 @@ export default async function EditInvoicePage({
       <div className="flex items-center gap-3">
         <Link href={`/invoices/${id}`}>
           <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground">
-            <ArrowLeft className="h-4 w-4" /> {invoice.number ?? t.invoices.status.draft}
+            <ArrowLeft className="h-4 w-4" /> {invoice.number ?? t.invoices.standing.draft}
           </Button>
         </Link>
         <span className="text-muted-foreground">/</span>

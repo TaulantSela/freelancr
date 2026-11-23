@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getDb, clients, invoices, invoiceItems, users } from "@/lib/db";
+import { getDb, clients, invoices, invoiceItems, payments, users } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId } from "@/lib/utils";
 import {
@@ -241,44 +241,16 @@ export async function issueInvoice(id: string) {
   return { number };
 }
 
-// An issued invoice that's still open moves between these from the status
-// menu. A draft only leaves "draft" through issueInvoice(), so it gets a
-// number; cancelling is cancelInvoice(), and is final.
+// An issued invoice that isn't cancelled. Payments are what move it between
+// sent and paid (lib/payments/write.ts); there's no status menu any more.
 const OPEN_STATUSES = ["sent", "paid", "overdue"] as const;
-type OpenStatus = (typeof OPEN_STATUSES)[number];
-
-export async function updateInvoiceStatus(id: string, status: OpenStatus) {
-  const session = await getSession();
-  if (!session) redirect("/sign-in");
-  if (!(OPEN_STATUSES as readonly string[]).includes(status)) return;
-
-  await getDb()
-    .update(invoices)
-    .set({
-      status,
-      // Keeps the payment date when an invoice that's already paid is
-      // marked paid again.
-      paidAt:
-        status === "paid"
-          ? sql`coalesce(${invoices.paidAt}, ${new Date().toISOString()})`
-          : null,
-    })
-    .where(
-      and(
-        eq(invoices.id, id),
-        eq(invoices.userId, session.userId),
-        inArray(invoices.status, OPEN_STATUSES)
-      )
-    );
-
-  revalidatePath("/invoices");
-  revalidatePath(`/invoices/${id}`);
-}
 
 // Cancels an issued invoice. It isn't deleted: invoices have to be kept for
 // five years after the end of their year (VAT law Art. 56(1)), so it stays,
-// marked cancelled, and stops counting as income or toward the DDV
-// threshold. There's no way back and no credit note yet.
+// marked cancelled, and stops counting toward the DDV threshold. There's no
+// way back and no credit note yet. An invoice with payments isn't cancelled:
+// its payments have to be deleted first, so no income is left pointing at a
+// cancelled invoice.
 export async function cancelInvoice(id: string) {
   const session = await getSession();
   if (!session) redirect("/sign-in");
@@ -290,11 +262,19 @@ export async function cancelInvoice(id: string) {
       and(
         eq(invoices.id, id),
         eq(invoices.userId, session.userId),
-        inArray(invoices.status, OPEN_STATUSES)
+        inArray(invoices.status, OPEN_STATUSES),
+        sql`not exists (select 1 from ${payments} where ${payments.invoiceId} = ${invoices.id})`
       )
     )
     .returning({ id: invoices.id });
-  if (cancelled.length === 0) return { errorKey: "notIssued" as const };
+  if (cancelled.length === 0) {
+    const [paid] = await getDb()
+      .select({ id: payments.id })
+      .from(payments)
+      .where(and(eq(payments.invoiceId, id), eq(payments.userId, session.userId)))
+      .limit(1);
+    return { errorKey: paid ? ("hasPayments" as const) : ("notIssued" as const) };
+  }
 
   revalidatePath("/invoices");
   revalidatePath(`/invoices/${id}`);

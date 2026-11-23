@@ -180,7 +180,7 @@ export const en: Dictionary = {
     colNumber: "Number",
     colClient: "Client",
     colAmount: "Amount",
-    colMkd: "MKD equiv.",
+    colBalance: "Balance",
     colStatus: "Status",
     newTitle: "Create invoice",
     newBreadcrumb: "New invoice",
@@ -278,6 +278,24 @@ export const en: Dictionary = {
       overdue: "Overdue",
       cancelled: "Cancelled",
     },
+    standing: {
+      draft: "Draft",
+      issued: "Issued",
+      partly_paid: "Partly paid",
+      paid: "Paid",
+      overdue: "Overdue",
+      cancelled: "Cancelled",
+    },
+    payments: {
+      title: "Payments",
+      record: "Record payment",
+      none: "No payments recorded yet. Record one when the money reaches your account.",
+      settled: "Paid so far",
+      balanceDue: "Balance due",
+      overpaid: "Overpaid by",
+      settledNote:
+        "Fees the bank or platform took and tax the client withheld count toward the invoice: the client paid them, even though they didn't reach your account.",
+    },
     issue: {
       button: "Issue invoice",
       title: "Issue this invoice?",
@@ -293,11 +311,12 @@ export const en: Dictionary = {
       button: "Cancel invoice",
       title: "Cancel {number}?",
       desc:
-        "A cancelled invoice stays in your records, since invoices have to be kept for five years (VAT law Art. 56). It stops counting as income and toward the DDV threshold, and this can't be undone. There are no credit notes yet.",
+        "A cancelled invoice stays in your records, since invoices have to be kept for five years (VAT law Art. 56). It stops counting toward the DDV threshold, and this can't be undone. There are no credit notes yet.",
       confirm: "Cancel invoice",
       keep: "Keep it",
       cancelled: "Invoice cancelled",
       notIssued: "Only issued invoices can be cancelled.",
+      hasPayments: "This invoice has payments recorded. Delete its payments first, then cancel it.",
       note:
         "Cancelled. It stays in your records for the five years invoices have to be kept (VAT law Art. 56).",
     },
