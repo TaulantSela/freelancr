@@ -67,12 +67,6 @@ export const sq: Dictionary = {
     eFakturaAlert: "Tetor 2026:",
     eFakturaAlertDetail:
       "Mandati e-Faktura hyn në fuqi për bizneset mbi 2.000.000 MKD/vit. A je gati?",
-    stats: {
-      freelancers: "Freelancerë në MK",
-      hourlyRate: "Tarifa mesatare/orë",
-      ddvThreshold: "Pragu TVSH/vit",
-      adminTime: "Kohë admin/muaj",
-    },
     featuresTitle: "Gjithçka që i nevojitet freelancerit maqedonas",
     featuresSubtitle:
       "Mjetet globale nuk dinë çfarë është TVSH. Excel-i yt nuk dërgon kujtesa tatimore. Freelancr bën të dyja.",

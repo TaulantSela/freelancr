@@ -60,7 +60,6 @@ export type Dictionary = {
     signInAccount: string;
     eFakturaAlert: string;
     eFakturaAlertDetail: string;
-    stats: { freelancers: string; hourlyRate: string; ddvThreshold: string; adminTime: string };
     featuresTitle: string;
     featuresSubtitle: string;
     features: { title: string; desc: string }[];

@@ -67,12 +67,6 @@ export const mk: Dictionary = {
     eFakturaAlert: "Октомври 2026:",
     eFakturaAlertDetail:
       "е-фактура мандатот стапува на сила за бизниси над 2.000.000 MKD годишно. Дали сте подготвени?",
-    stats: {
-      freelancers: "Фриленсери во МК",
-      hourlyRate: "Просечна часовна стапка",
-      ddvThreshold: "ДДВ праг/година",
-      adminTime: "Админ време/месец",
-    },
     featuresTitle: "Сè што им треба на македонските фриленсери",
     featuresSubtitle:
       "Глобалните алатки не знаат што е ДДВ. Вашиот Excel не праќа даночни потсетници. Freelancr прави и двете.",

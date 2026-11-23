@@ -67,12 +67,6 @@ export const en: Dictionary = {
     eFakturaAlert: "October 2026:",
     eFakturaAlertDetail:
       "e-Faktura mandate takes effect for businesses above 2,000,000 MKD/year. Are you ready?",
-    stats: {
-      freelancers: "Freelancers in MK",
-      hourlyRate: "Avg hourly rate",
-      ddvThreshold: "DDV threshold/year",
-      adminTime: "Wasted on admin/month",
-    },
     featuresTitle: "Everything a Macedonian freelancer needs",
     featuresSubtitle:
       "Global tools don't know what DDV is. Your Excel doesn't send tax reminders. Freelancr does both.",

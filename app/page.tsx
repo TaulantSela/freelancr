@@ -22,13 +22,6 @@ const FEATURE_ICONS = [FileText, Shield, Calendar, TrendingUp, Banknote, Globe, 
 export default async function LandingPage() {
   const { t } = await getTranslations();
 
-  const stats = [
-    { value: "50,000+", label: t.landing.stats.freelancers },
-    { value: "$19.8/hr", label: t.landing.stats.hourlyRate },
-    { value: "2M MKD", label: t.landing.stats.ddvThreshold },
-    { value: "3–5 hrs", label: t.landing.stats.adminTime },
-  ];
-
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/40 sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
@@ -88,19 +81,6 @@ export default async function LandingPage() {
             <strong className="text-yellow-400">{t.landing.eFakturaAlert}</strong>{" "}
             <span className="text-muted-foreground">{t.landing.eFakturaAlertDetail}</span>
           </span>
-        </div>
-      </section>
-
-      <Separator className="max-w-6xl mx-auto" />
-
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {stats.map((s) => (
-            <div key={s.label}>
-              <div className="text-2xl font-semibold text-foreground mb-1">{s.value}</div>
-              <div className="text-sm text-muted-foreground">{s.label}</div>
-            </div>
-          ))}
         </div>
       </section>
 
