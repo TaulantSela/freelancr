@@ -28,6 +28,7 @@ export const mk: Dictionary = {
     clients: "Клиенти",
     invoices: "Фактури",
     payments: "Плаќања",
+    menu: "Мени",
     settings: "Поставки",
   },
   auth: {

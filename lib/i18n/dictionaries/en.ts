@@ -28,6 +28,7 @@ export const en: Dictionary = {
     clients: "Clients",
     invoices: "Invoices",
     payments: "Payments",
+    menu: "Menu",
     settings: "Settings",
   },
   auth: {

@@ -28,6 +28,7 @@ export const sq: Dictionary = {
     clients: "Klientët",
     invoices: "Faturat",
     payments: "Pagesat",
+    menu: "Menyja",
     settings: "Cilësimet",
   },
   auth: {

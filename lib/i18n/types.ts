@@ -27,6 +27,7 @@ export type Dictionary = {
     clients: string;
     invoices: string;
     payments: string;
+    menu: string;
     settings: string;
   };
   auth: {
