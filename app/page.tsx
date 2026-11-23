@@ -7,17 +7,15 @@ import { getTranslations } from "@/lib/i18n/server";
 import {
   FileText,
   TrendingUp,
-  Bell,
   Shield,
   Globe,
   ArrowRight,
   Check,
-  Banknote,
   AlertTriangle,
   Calendar,
 } from "lucide-react";
 
-const FEATURE_ICONS = [FileText, Shield, Calendar, TrendingUp, Banknote, Globe, Bell];
+const FEATURE_ICONS = [FileText, Shield, Calendar, TrendingUp, Globe];
 
 export default async function LandingPage() {
   const { t } = await getTranslations();
@@ -124,8 +122,8 @@ export default async function LandingPage() {
                   : "border-border bg-card"
               }`}
             >
-              {plan.popular && (
-                <Badge className="self-start mb-3 text-xs">{plan.popular}</Badge>
+              {plan.badge && (
+                <Badge className="self-start mb-3 text-xs">{plan.badge}</Badge>
               )}
               <div className="mb-1">
                 <span className="text-lg font-semibold">{plan.name}</span>

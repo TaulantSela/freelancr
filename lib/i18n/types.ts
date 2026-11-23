@@ -73,7 +73,7 @@ export type Dictionary = {
       description: string;
       features: string[];
       cta: string;
-      popular?: string;
+      badge?: string;
     }[];
     complianceTitle: string;
     complianceSubtitle: string;
