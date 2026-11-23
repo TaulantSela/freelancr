@@ -162,6 +162,21 @@ marked as such, if it can't.
 | `npm run db:generate` | Generate a migration from `lib/db/schema.ts` |
 | `npm run lint` | ESLint |
 
+### Email (optional)
+
+Email goes out through [Resend](https://resend.com)'s HTTP API. Without the
+first two variables the app runs with email off, and the pages that would
+send something say so.
+
+| Variable | What it's for |
+|----------|---------------|
+| `RESEND_API_KEY` | The Resend API key; the sending domain must be verified there |
+| `MAIL_FROM` | The sender, `Name <address@your-domain>`. No address is built into the app. Invoice emails keep the address and show "<business name> via Freelancr" |
+| `APP_URL` | Optional: the base URL for links in emails. Defaults to `https://$VERCEL_PROJECT_PRODUCTION_URL`; links are never built from a request's host |
+| `CRON_SECRET` | The bearer token Vercel Cron sends to `/api/cron/daily`; anything else gets a 401 |
+
+`RESEND_API_BASE` exists only so tests can point the API at a local stub.
+
 ## Deploy
 
 ```bash
@@ -171,3 +186,5 @@ vercel deploy --prod
 ```
 
 On Vercel the `vercel-build` script runs the migrations before `next build`.
+For email, add `RESEND_API_KEY`, `MAIL_FROM` and `CRON_SECRET` (and
+`APP_URL` for a custom domain) with `vercel env add`.
