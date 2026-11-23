@@ -127,7 +127,11 @@ export default async function PaymentsPage({
               {total.creditMKD > 0 && <Line label={p.creditPart} value={formatMKD(total.creditMKD)} indent />}
               <Line label={p.alreadyPaidPart} value={formatMKD(total.alreadyPaidForYouMKD)} indent />
               {total.unpaidOwedMKD > 0 && (
-                <Line label={p.notPaidYet} value={formatMKD(total.unpaidOwedMKD)} warn />
+                <Line
+                  label={p.notPaidYet}
+                  value={formatMKD(total.unpaidOwedMKD)}
+                  warn={months.some((m) => m.status === "late")}
+                />
               )}
               <p className="text-xs text-muted-foreground pt-1">
                 {formatMessage(p.annualReturn, {

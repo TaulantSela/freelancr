@@ -359,36 +359,39 @@ export function PaymentForm({
         )}
       </div>
 
-      <div className="space-y-1.5">
-        <Label>{f.rate}</Label>
-        {nbrsm.status === "ready" ? (
-          <p className="text-sm font-mono">
-            {formatMessage(f.rateNbrsm, {
-              currency,
-              rate: String(nbrsm.rate),
-              date: formatTaxDate(nbrsm.date, t),
-            })}
-          </p>
-        ) : nbrsm.status === "loading" ? (
-          <p className="text-sm text-muted-foreground">{f.rateLoading}</p>
-        ) : (
-          <div className="space-y-1.5">
-            <p className="text-xs text-amber-400">
-              {formatMessage(f.rateUnavailable, { date: formatTaxDate(receivedOn || today, t) })}
+      {/* MKD needs no rate. */}
+      {currency !== "MKD" && (
+        <div className="space-y-1.5">
+          <Label>{f.rate}</Label>
+          {nbrsm.status === "ready" ? (
+            <p className="text-sm font-mono">
+              {formatMessage(f.rateNbrsm, {
+                currency,
+                rate: String(nbrsm.rate),
+                date: formatTaxDate(nbrsm.date, t),
+              })}
             </p>
-            <Input
-              id="manualRate"
-              name="manualRate"
-              inputMode="decimal"
-              value={manualRate}
-              onChange={(e) => setManualRate(e.target.value)}
-              placeholder={formatMessage(f.manualRate, { currency })}
-              required={!existing}
-              className="font-mono sm:w-1/2"
-            />
-          </div>
-        )}
-      </div>
+          ) : nbrsm.status === "loading" ? (
+            <p className="text-sm text-muted-foreground">{f.rateLoading}</p>
+          ) : (
+            <div className="space-y-1.5">
+              <p className="text-xs text-amber-400">
+                {formatMessage(f.rateUnavailable, { date: formatTaxDate(receivedOn || today, t) })}
+              </p>
+              <Input
+                id="manualRate"
+                name="manualRate"
+                inputMode="decimal"
+                value={manualRate}
+                onChange={(e) => setManualRate(e.target.value)}
+                placeholder={formatMessage(f.manualRate, { currency })}
+                required={!existing}
+                className="font-mono sm:w-1/2"
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       {treatment === "self_reported" && (
         <div className="space-y-1.5">
