@@ -50,6 +50,7 @@ export const sq: Dictionary = {
       emailPasswordRequired: "Email dhe fjalëkalimi janë të detyrueshëm",
       emailExists: "Ekziston tashmë një llogari me këtë email",
       invalidCredentials: "Email ose fjalëkalim i pavlefshëm",
+      passwordTooShort: "Fjalëkalimi duhet të ketë të paktën 8 karaktere",
     },
   },
   landing: {
@@ -674,6 +675,20 @@ export const sq: Dictionary = {
     monthlyAdvance: "Akontimi mujor (MKD)",
     monthlyAdvanceHint:
       "1/12 e tatimit në bilancin tatimor vjetor (ПДД-ДБ) të vitit të kaluar; kontabilisti mund të ta thotë. Lëre bosh nëse ende nuk e di dhe përditësoje pasi të dorëzosh bilancin në mars.",
+    password: {
+      title: "Ndrysho fjalëkalimin",
+      current: "Fjalëkalimi aktual",
+      new: "Fjalëkalimi i ri",
+      confirm: "Përsërit fjalëkalimin e ri",
+      submit: "Ndrysho fjalëkalimin",
+      changed: "Fjalëkalimi u ndryshua.",
+      errors: {
+        required: "Plotëso të tri fushat.",
+        wrongCurrent: "Fjalëkalimi aktual nuk është i saktë.",
+        tooShort: "Fjalëkalimi i ri duhet të ketë të paktën 8 karaktere.",
+        mismatch: "Dy fjalëkalimet e reja nuk përputhen.",
+      },
+    },
     errors: {
       nameRequired: "Emri është i detyrueshëm",
       advanceInvalid: "Shkruaj akontimin mujor si shumë në MKD, ose lëre bosh.",

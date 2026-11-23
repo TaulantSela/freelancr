@@ -50,6 +50,7 @@ export const en: Dictionary = {
       emailPasswordRequired: "Email and password are required",
       emailExists: "An account with this email already exists",
       invalidCredentials: "Invalid email or password",
+      passwordTooShort: "The password needs at least 8 characters",
     },
   },
   landing: {
@@ -674,6 +675,20 @@ export const en: Dictionary = {
     monthlyAdvance: "Monthly advance (MKD)",
     monthlyAdvanceHint:
       "1/12 of the tax in last year's annual tax balance (ПДД-ДБ); your accountant can tell you. Leave it empty if you don't know it yet, and update it after you file the balance in March.",
+    password: {
+      title: "Change password",
+      current: "Current password",
+      new: "New password",
+      confirm: "Repeat the new password",
+      submit: "Change password",
+      changed: "Your password is changed.",
+      errors: {
+        required: "Fill in all three fields.",
+        wrongCurrent: "The current password isn't right.",
+        tooShort: "The new password needs at least 8 characters.",
+        mismatch: "The two new passwords don't match.",
+      },
+    },
     errors: {
       nameRequired: "Name is required",
       advanceInvalid: "Enter the monthly advance as an amount in MKD, or leave it empty.",

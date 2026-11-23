@@ -49,6 +49,7 @@ export type Dictionary = {
       emailPasswordRequired: string;
       emailExists: string;
       invalidCredentials: string;
+      passwordTooShort: string;
     };
   };
   landing: {
@@ -602,6 +603,20 @@ export type Dictionary = {
     memberSince: string;
     monthlyAdvance: string;
     monthlyAdvanceHint: string;
+    password: {
+      title: string;
+      current: string;
+      new: string;
+      confirm: string;
+      submit: string;
+      changed: string;
+      errors: {
+        required: string;
+        wrongCurrent: string;
+        tooShort: string;
+        mismatch: string;
+      };
+    };
     errors: {
       nameRequired: string;
       advanceInvalid: string;

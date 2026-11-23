@@ -11,6 +11,7 @@ import { signUp } from "@/lib/actions/auth";
 import { useTranslations } from "@/lib/i18n/client";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import type { AuthErrorKey } from "@/lib/i18n/format";
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth/password";
 
 export default function SignUpPage() {
   const t = useTranslations();
@@ -74,7 +75,7 @@ export default function SignUpPage() {
                   type="password"
                   placeholder={t.auth.passwordHint}
                   required
-                  minLength={8}
+                  minLength={MIN_PASSWORD_LENGTH}
                   autoComplete="new-password"
                 />
               </div>
