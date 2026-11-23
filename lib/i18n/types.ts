@@ -61,7 +61,6 @@ export type Dictionary = {
     signInAccount: string;
     eFakturaAlert: string;
     eFakturaAlertDetail: string;
-    stats: { freelancers: string; hourlyRate: string; ddvThreshold: string; adminTime: string };
     featuresTitle: string;
     featuresSubtitle: string;
     features: { title: string; desc: string }[];
@@ -75,7 +74,7 @@ export type Dictionary = {
       description: string;
       features: string[];
       cta: string;
-      popular?: string;
+      badge?: string;
     }[];
     complianceTitle: string;
     complianceSubtitle: string;

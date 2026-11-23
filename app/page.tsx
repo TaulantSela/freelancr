@@ -7,27 +7,18 @@ import { getTranslations } from "@/lib/i18n/server";
 import {
   FileText,
   TrendingUp,
-  Bell,
   Shield,
   Globe,
   ArrowRight,
   Check,
-  Banknote,
   AlertTriangle,
   Calendar,
 } from "lucide-react";
 
-const FEATURE_ICONS = [FileText, Shield, Calendar, TrendingUp, Banknote, Globe, Bell];
+const FEATURE_ICONS = [FileText, Shield, Calendar, TrendingUp, Globe];
 
 export default async function LandingPage() {
   const { t } = await getTranslations();
-
-  const stats = [
-    { value: "50,000+", label: t.landing.stats.freelancers },
-    { value: "$19.8/hr", label: t.landing.stats.hourlyRate },
-    { value: "2M MKD", label: t.landing.stats.ddvThreshold },
-    { value: "3–5 hrs", label: t.landing.stats.adminTime },
-  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -93,19 +84,6 @@ export default async function LandingPage() {
 
       <Separator className="max-w-6xl mx-auto" />
 
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {stats.map((s) => (
-            <div key={s.label}>
-              <div className="text-2xl font-semibold text-foreground mb-1">{s.value}</div>
-              <div className="text-sm text-muted-foreground">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <Separator className="max-w-6xl mx-auto" />
-
       <section id="features" className="max-w-6xl mx-auto px-6 py-20">
         <div className="text-center mb-14">
           <h2 className="text-2xl font-semibold mb-3">{t.landing.featuresTitle}</h2>
@@ -144,8 +122,8 @@ export default async function LandingPage() {
                   : "border-border bg-card"
               }`}
             >
-              {plan.popular && (
-                <Badge className="self-start mb-3 text-xs">{plan.popular}</Badge>
+              {plan.badge && (
+                <Badge className="self-start mb-3 text-xs">{plan.badge}</Badge>
               )}
               <div className="mb-1">
                 <span className="text-lg font-semibold">{plan.name}</span>

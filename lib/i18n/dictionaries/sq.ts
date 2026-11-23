@@ -4,7 +4,7 @@ export const sq: Dictionary = {
   meta: {
     title: "Freelancr — Platformë faturimi dhe tatimesh për freelancerët",
     description:
-      "Platforma e vetme për faturim dhe përputhshmëri e ndërtuar për freelancerët e Maqedonisë së Veriut. Fatura shumëvalutore, monitorim i pragut TVSH, kujtesa tatimore tremujore.",
+      "Platformë për faturim dhe përputhshmëri e ndërtuar për freelancerët e Maqedonisë së Veriut. Fatura shumëvalutore, monitorim i pragut TVSH, kujtesa tatimore tremujore.",
   },
   common: {
     appName: "Freelancr",
@@ -68,12 +68,6 @@ export const sq: Dictionary = {
     eFakturaAlert: "Tetor 2026:",
     eFakturaAlertDetail:
       "Mandati e-Faktura hyn në fuqi për bizneset mbi 2.000.000 MKD/vit. A je gati?",
-    stats: {
-      freelancers: "Freelancerë në MK",
-      hourlyRate: "Tarifa mesatare/orë",
-      ddvThreshold: "Pragu TVSH/vit",
-      adminTime: "Kohë admin/muaj",
-    },
     featuresTitle: "Gjithçka që i nevojitet freelancerit maqedonas",
     featuresSubtitle:
       "Mjetet globale nuk dinë çfarë është TVSH. Excel-i yt nuk dërgon kujtesa tatimore. Freelancr bën të dyja.",
@@ -95,16 +89,8 @@ export const sq: Dictionary = {
         desc: "Të ardhurat vjetore sipas klientit dhe monedhës, me një vlerësim të tatimit mbi të ardhurat me normë të sheshtë 10%.",
       },
       {
-        title: "Pajtim Wise & PayPal",
-        desc: "Importo CSV për të përputhur automatikisht pagesat me faturat.",
-      },
-      {
         title: "Gatishmëri për e-Faktura",
         desc: "Lista kontrolluese dhe panel gatishmërie për mandatin e tetorit 2026.",
-      },
-      {
-        title: "Shabllone kontratash",
-        desc: "Shabllone marrëveshjesh shërbimi sipas ligjit maqedonas, dygjuhëshe MK/EN.",
       },
     ],
     pricingTitle: "Çmime të thjeshta dhe të ndershme në MKD",
@@ -134,11 +120,10 @@ export const sq: Dictionary = {
           "Monitorim i pragut TVSH",
           "Kujtesa tatimore tremujore",
           "Fatura MKD + EUR/USD",
-          "Import CSV Wise / PayPal",
           "Lista kontrolluese e-Faktura",
         ],
-        cta: "Fillo",
-        popular: "Më i popullarizuari",
+        cta: "Fillo falas",
+        badge: "Së shpejti",
       },
       {
         name: "Pro",
@@ -148,12 +133,11 @@ export const sq: Dictionary = {
         description: "Për biznese serioze",
         features: [
           "Gjithçka nga Starter",
-          "Shabllone kontratash (ligji MK)",
-          "Ndarje me kontabilist",
           "Mbështetje prioritare",
           "Pagesë vjetore: 2 muaj falas",
         ],
-        cta: "Zgjidh Pro",
+        cta: "Fillo falas",
+        badge: "Së shpejti",
       },
     ],
     complianceTitle: "Përgatitu për e-Faktura para mandatit",
@@ -175,7 +159,7 @@ export const sq: Dictionary = {
     ],
     ctaTitle: "Gati të zëvendësosh Excel + Word?",
     ctaSubtitle:
-      "Bashkohu me freelancerët maqedonas që kanë automatizuar faturimin dhe kanë pushuar së u shqetësuari për tatimet.",
+      "Automatizo faturimin dhe mos u shqetëso më për tatimet.",
     ctaButton: "Fillo falas — pa kartë",
     footerTagline: "Built for North Macedonia · Изградено за Македонија · Ndërtuar për Maqedoninë",
   },

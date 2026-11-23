@@ -4,7 +4,7 @@ export const en: Dictionary = {
   meta: {
     title: "Freelancr — Invoice & Tax Platform for Macedonian Freelancers",
     description:
-      "The only invoicing and compliance platform built for North Macedonia's freelancers. Multi-currency invoices, DDV threshold monitoring, quarterly tax reminders.",
+      "An invoicing and compliance platform built for North Macedonia's freelancers. Multi-currency invoices, DDV threshold monitoring, quarterly tax reminders.",
   },
   common: {
     appName: "Freelancr",
@@ -68,12 +68,6 @@ export const en: Dictionary = {
     eFakturaAlert: "October 2026:",
     eFakturaAlertDetail:
       "e-Faktura mandate takes effect for businesses above 2,000,000 MKD/year. Are you ready?",
-    stats: {
-      freelancers: "Freelancers in MK",
-      hourlyRate: "Avg hourly rate",
-      ddvThreshold: "DDV threshold/year",
-      adminTime: "Wasted on admin/month",
-    },
     featuresTitle: "Everything a Macedonian freelancer needs",
     featuresSubtitle:
       "Global tools don't know what DDV is. Your Excel doesn't send tax reminders. Freelancr does both.",
@@ -95,16 +89,8 @@ export const en: Dictionary = {
         desc: "Yearly income by client and currency, with an estimate of the flat 10% income tax.",
       },
       {
-        title: "Wise & PayPal reconciliation",
-        desc: "Import CSV statements to automatically match payments to invoices.",
-      },
-      {
         title: "e-Faktura readiness",
         desc: "Compliance checklist and readiness dashboard for the October 2026 mandate.",
-      },
-      {
-        title: "Contract templates",
-        desc: "Service agreement templates valid under Macedonian law, bilingual MK/EN.",
       },
     ],
     pricingTitle: "Simple, honest pricing in MKD",
@@ -134,11 +120,10 @@ export const en: Dictionary = {
           "DDV threshold monitoring",
           "Quarterly tax reminders",
           "MKD + EUR/USD invoicing",
-          "Wise / PayPal CSV import",
           "e-Faktura readiness checklist",
         ],
-        cta: "Get started",
-        popular: "Most popular",
+        cta: "Start free",
+        badge: "Coming soon",
       },
       {
         name: "Pro",
@@ -148,12 +133,11 @@ export const en: Dictionary = {
         description: "For serious businesses",
         features: [
           "Everything in Starter",
-          "Contract templates (MK law)",
-          "Accountant sharing mode",
           "Priority support",
           "Annual billing: 2 months free",
         ],
-        cta: "Go Pro",
+        cta: "Start free",
+        badge: "Coming soon",
       },
     ],
     complianceTitle: "Get e-Faktura ready before the mandate hits",
@@ -175,7 +159,7 @@ export const en: Dictionary = {
     ],
     ctaTitle: "Ready to replace Excel + Word?",
     ctaSubtitle:
-      "Join Macedonian freelancers who've automated their invoicing and stopped worrying about tax compliance.",
+      "Automate your invoicing and stop worrying about tax compliance.",
     ctaButton: "Start for free — no card required",
     footerTagline: "Built for North Macedonia · Изградено за Македонија · Ndërtuar për Maqedoninë",
   },
