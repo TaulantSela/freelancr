@@ -4,7 +4,7 @@ export const en: Dictionary = {
   meta: {
     title: "Freelancr — Invoice & Tax Platform for Macedonian Freelancers",
     description:
-      "The only invoicing and compliance platform built for North Macedonia's freelancers. Multi-currency invoices, DDV threshold monitoring, quarterly tax reminders.",
+      "An invoicing and compliance platform built for North Macedonia's freelancers. Multi-currency invoices, DDV threshold monitoring, quarterly tax reminders.",
   },
   common: {
     appName: "Freelancr",
@@ -158,7 +158,7 @@ export const en: Dictionary = {
     ],
     ctaTitle: "Ready to replace Excel + Word?",
     ctaSubtitle:
-      "Join Macedonian freelancers who've automated their invoicing and stopped worrying about tax compliance.",
+      "Automate your invoicing and stop worrying about tax compliance.",
     ctaButton: "Start for free — no card required",
     footerTagline: "Built for North Macedonia · Изградено за Македонија · Ndërtuar për Maqedoninë",
   },

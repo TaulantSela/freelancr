@@ -4,7 +4,7 @@ export const sq: Dictionary = {
   meta: {
     title: "Freelancr — Platformë faturimi dhe tatimesh për freelancerët",
     description:
-      "Platforma e vetme për faturim dhe përputhshmëri e ndërtuar për freelancerët e Maqedonisë së Veriut. Fatura shumëvalutore, monitorim i pragut TVSH, kujtesa tatimore tremujore.",
+      "Platformë për faturim dhe përputhshmëri e ndërtuar për freelancerët e Maqedonisë së Veriut. Fatura shumëvalutore, monitorim i pragut TVSH, kujtesa tatimore tremujore.",
   },
   common: {
     appName: "Freelancr",
@@ -158,7 +158,7 @@ export const sq: Dictionary = {
     ],
     ctaTitle: "Gati të zëvendësosh Excel + Word?",
     ctaSubtitle:
-      "Bashkohu me freelancerët maqedonas që kanë automatizuar faturimin dhe kanë pushuar së u shqetësuari për tatimet.",
+      "Automatizo faturimin dhe mos u shqetëso më për tatimet.",
     ctaButton: "Fillo falas — pa kartë",
     footerTagline: "Built for North Macedonia · Изградено за Македонија · Ndërtuar për Maqedoninë",
   },
