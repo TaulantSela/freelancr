@@ -401,7 +401,7 @@ export const en: Dictionary = {
     ],
     rules: {
       paid_from_abroad:
-        "For each month in which a client abroad or a private person in North Macedonia paid you, submit the tax calculation (е-ППД) to UJP by the 10th of the next month and pay the tax by the 15th. Companies in North Macedonia withhold the tax when they pay you, so their invoices don't add a month.",
+        "For each month in which a client abroad or a private person in North Macedonia paid you, submit the tax calculation (е-ПДД) to UJP by the 10th of the next month and pay the tax by the 15th. Companies in North Macedonia withhold the tax when they pay you, so their invoices don't add a month.",
       self_employed:
         "Pay an income tax advance by the 15th of each month for the previous month. File the annual tax balance (ПДД-ДБ) and the statement of income and expenses by 15 March of the next year, and pay any difference by 30 March.",
     },
@@ -442,7 +442,7 @@ export const en: Dictionary = {
       tileDue: "{month} income · pay by {date}",
       forMonth: "Tax on {month} income",
       soFar: "{month} so far",
-      fileAndPay: "File the calculation (е-ППД) by {reportBy}, pay by {payBy}",
+      fileAndPay: "File the calculation (е-ПДД) by {reportBy}, pay by {payBy}",
       nothing:
         "Nothing to pay yet. When a client abroad or a private person in North Macedonia pays an invoice and you mark it paid, the tax on it (10%) shows up here.",
       note:

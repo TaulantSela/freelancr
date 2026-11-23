@@ -400,7 +400,7 @@ export const sq: Dictionary = {
     ],
     rules: {
       paid_from_abroad:
-        "Për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut, dorëzo llogaritjen tatimore (е-ППД) në UJP deri më 10 dhe paguaj tatimin deri më 15 të muajit pasues. Kompanitë në Maqedoninë e Veriut e mbajnë tatimin kur të paguajnë, ndaj faturat e tyre nuk shtojnë muaj.",
+        "Për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut, dorëzo llogaritjen tatimore (е-ПДД) në UJP deri më 10 dhe paguaj tatimin deri më 15 të muajit pasues. Kompanitë në Maqedoninë e Veriut e mbajnë tatimin kur të paguajnë, ndaj faturat e tyre nuk shtojnë muaj.",
       self_employed:
         "Akontimi i tatimit paguhet deri më 15 të çdo muaji për muajin e kaluar. Bilanci tatimor vjetor (ПДД-ДБ) dhe pasqyra e të ardhurave dhe shpenzimeve dorëzohen deri më 15 mars të vitit pasues, dhe diferenca paguhet deri më 30 mars.",
     },
@@ -442,7 +442,7 @@ export const sq: Dictionary = {
       forMonth: "Tatimi për të ardhurat e muajit {month}",
       soFar: "Deri tani në muajin {month}",
       fileAndPay:
-        "Dorëzo llogaritjen (е-ППД) deri më {reportBy}, paguaj deri më {payBy}",
+        "Dorëzo llogaritjen (е-ПДД) deri më {reportBy}, paguaj deri më {payBy}",
       nothing:
         "Ende s'ka asgjë për të paguar. Kur një klient nga jashtë ose një person fizik në Maqedoninë e Veriut paguan një faturë dhe e shënon si të paguar, tatimi mbi të (10%) shfaqet këtu.",
       note:

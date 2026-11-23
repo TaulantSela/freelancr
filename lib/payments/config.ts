@@ -11,7 +11,7 @@ export type PaymentRateSource = (typeof PAYMENT_RATE_SOURCES)[number];
 
 // Who deals with the income tax on a payment, fixed when it's saved:
 // - "business": the user is a registered self-employed person; it's business
-//   income for the annual balance, with no monthly е-ППД and no withholding;
+//   income for the annual balance, with no monthly е-ПДД and no withholding;
 // - "withheld": a company in North Macedonia paid; it keeps business books, so
 //   it withheld the 10% when it paid (Art. 80(1));
 // - "self_reported": a client abroad (income from abroad, Art. 87(1) point 3)
@@ -20,7 +20,7 @@ export type PaymentRateSource = (typeof PAYMENT_RATE_SOURCES)[number];
 export const TAX_TREATMENTS = ["business", "withheld", "self_reported"] as const;
 export type TaxTreatment = (typeof TAX_TREATMENTS)[number];
 
-// Where a self-reported payment's monthly calculation (е-ППД) stands: filed
+// Where a self-reported payment's monthly calculation (е-ПДД) stands: filed
 // with UJP, approved (UJP issues a recapitulation with a folio number and a
 // PP53 payment order to pay against), then paid.
 export const UJP_STATUSES = ["to_file", "filed", "approved", "paid"] as const;

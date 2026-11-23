@@ -121,7 +121,7 @@ export function getDDVStatus(localSuppliesMKD: number): {
 // Which deadlines apply depends on the user's TaxStatus (above).
 //
 // "paid_from_abroad": for each month in which self-reported income was
-// received, submit the electronic calculation (е-ППД) by the 10th of the
+// received, submit the electronic calculation (е-ПДД) by the 10th of the
 // following month and pay the tax by the 15th of the following month
 // (Personal Income Tax law, Art. 88(1) points 4 and 7, Art. 93(1)).
 // https://biznisinfo.mk/kako-i-koga-da-prijavite-dohod-od-stranstvo-upatstvo-od-ujp-co-pravila-i-rokovi-za-prijavuvanje/
@@ -443,7 +443,7 @@ export type MonthlyTaxOwed = {
   incomeMKD: number;
   // 10% of it, rounded to the deni.
   taxMKD: number;
-  // "YYYY-MM-DD": submit the calculation (е-ППД) by this date...
+  // "YYYY-MM-DD": submit the calculation (е-ПДД) by this date...
   reportBy: string;
   // ...and pay the tax by this one.
   payBy: string;

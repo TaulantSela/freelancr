@@ -2,7 +2,7 @@
 // "ЗДЛД"). Pure: callers pass the payments and today's date.
 //
 // For a self-reported payment (a client abroad, or a private person in North
-// Macedonia; lib/payments/config.ts) the user files the calculation (е-ППД)
+// Macedonia; lib/payments/config.ts) the user files the calculation (е-ПДД)
 // by the 10th of the next month (Art. 88(1) points 4 and 7) and pays by the
 // 15th (Art. 93(1)). UJP's system converts the amount at the NBRSM middle
 // rate on the day the income was received (Art. 93(2)), which is the rate
@@ -99,7 +99,7 @@ function followingMonth(month: string): string {
 
 export type UjpMonthStatus = "nothing" | "to_file" | "filed" | "approved" | "paid" | "late";
 
-// Where a month's е-ППД stands, from its self-reported payments' statuses.
+// Where a month's е-ПДД stands, from its self-reported payments' statuses.
 // Late: something still not filed after the 10th, or not paid after the 15th.
 export function ujpMonthStatus(
   statuses: readonly (string | null)[],

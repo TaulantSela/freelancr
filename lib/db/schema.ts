@@ -194,7 +194,7 @@ export const payments = pgTable("payments", {
   deemedCostsRate: doublePrecision("deemed_costs_rate").notNull().default(0),
   channel: text("channel", { enum: PAYMENT_CHANNELS }),
   note: text("note"),
-  // Self-reported payments only: where the е-ППД calculation stands, its
+  // Self-reported payments only: where the е-ПДД calculation stands, its
   // number, UJP's folio number and the day the tax was paid.
   ujpStatus: text("ujp_status", { enum: UJP_STATUSES }),
   ujpReference: text("ujp_reference"),
