@@ -410,6 +410,8 @@ export const sq: Dictionary = {
       advance: "Paguaj akontimin e tatimit për muajin {period}",
       annualReturn: "Dorëzo bilancin tatimor vjetor (ПДД-ДБ) për vitin {period}",
       annualPayment: "Paguaj diferencën sipas bilancit tatimor për vitin {period}",
+      returnConfirm: "Konfirmo ose korrigjo deklaratën tatimore vjetore (ГДП) për vitin {period}",
+      returnPay: "Paguaj tatimin sipas deklaratës tatimore vjetore për vitin {period}",
     },
     actions: {
       report: "Dorëzo llogaritjen deri më {date}",
@@ -417,11 +419,14 @@ export const sq: Dictionary = {
       advance: "Paguaj deri më {date}",
       annualReturn: "Dorëzo ПДД-ДБ deri më {date}",
       annualPayment: "Paguaj diferencën deri më {date}",
+      returnConfirm: "Konfirmo ose korrigjo deri më {date}",
+      returnPay: "Paguaj deri më {date}",
     },
     groups: {
       income: "Të ardhurat e muajit {period}",
       advance: "Akontimi për muajin {period}",
       annual: "Bilanci tatimor vjetor {period}",
+      return: "Deklarata tatimore vjetore {period}",
     },
     basedOn: "Afatet për: {status}.",
     changeInSettings: "Ndrysho te Cilësimet",

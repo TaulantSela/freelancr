@@ -335,6 +335,8 @@ export type Dictionary = {
       advance: string;
       annualReturn: string;
       annualPayment: string;
+      returnConfirm: string;
+      returnPay: string;
     };
     actions: {
       report: string;
@@ -342,8 +344,10 @@ export type Dictionary = {
       advance: string;
       annualReturn: string;
       annualPayment: string;
+      returnConfirm: string;
+      returnPay: string;
     };
-    groups: { income: string; advance: string; annual: string };
+    groups: { income: string; advance: string; annual: string; return: string };
     basedOn: string;
     changeInSettings: string;
     noUpcoming: string;

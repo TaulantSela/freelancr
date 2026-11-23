@@ -129,6 +129,12 @@ export function getDDVStatus(localSuppliesMKD: number): {
 // (The republika.mk piece is UJP's reminder about the 31 March calculation
 // for salaries from work abroad, which isn't modelled here.)
 //
+// Also for "paid_from_abroad", for each tax year with income: UJP prepares
+// the annual tax return (годишна даночна пријава, ГДП) and sends it by
+// 30 April; the taxpayer confirms or corrects it by 31 May (otherwise it
+// counts as confirmed) and pays any tax it shows by 30 June (Art. 96(2)-(4),
+// Art. 100(2)).
+//
 // "self_employed": an income tax advance by the 15th of each month for the
 // previous month (1/12 of the tax in last year's annual balance); the annual
 // tax balance (ПДД-ДБ) and the statement of income and expenses by 15 March
@@ -155,10 +161,16 @@ const ADVANCE_DAY = 15;
 // balance (ПДД-ДБ), and for paying any difference (15 days after it).
 const ANNUAL_RETURN_DATE = "03-15";
 const ANNUAL_PAYMENT_DATE = "03-30";
+// Not registered: month and day in the following year to confirm or correct
+// UJP's annual tax return (ГДП), and to pay what it shows.
+const RETURN_CONFIRM_DATE = "05-31";
+const RETURN_PAYMENT_DATE = "06-30";
 
 export type TaxDeadlineKind =
   | "report" // not registered: submit the calculation for a month's income
   | "pay" // not registered: pay the tax on a month's income
+  | "returnConfirm" // not registered: confirm or correct the annual return (ГДП)
+  | "returnPay" // not registered: pay the tax the annual return shows
   | "advance" // self-employed: pay the monthly advance for a month
   | "annualReturn" // self-employed: file the annual tax balance for a year
   | "annualPayment"; // self-employed: pay any difference for a year
@@ -166,7 +178,7 @@ export type TaxDeadlineKind =
 export type TaxDeadline = {
   kind: TaxDeadlineKind;
   // What the deadline is for: a month ("YYYY-MM") for report, pay and
-  // advance; a tax year ("YYYY") for annualReturn and annualPayment.
+  // advance; a tax year ("YYYY") for the annual ones.
   period: string;
   // "YYYY-MM-DD"
   dueDate: string;
@@ -178,6 +190,8 @@ const KIND_ORDER: Record<TaxDeadlineKind, number> = {
   advance: 2,
   annualReturn: 3,
   annualPayment: 4,
+  returnConfirm: 5,
+  returnPay: 6,
 };
 
 function compareDeadlines(a: TaxDeadline, b: TaxDeadline): number {
@@ -201,11 +215,14 @@ function followingMonth(month: string): string {
 
 // Every deadline that one tax year leads to, soonest first. incomeMonths
 // ("YYYY-MM") only matters when not registered: a month without
-// self-reported income has nothing to report.
+// self-reported income has nothing to report. incomeYears are the years with
+// any income at all, withheld or not, which each lead to an annual return;
+// left out, they're the years of incomeMonths.
 export function getTaxDeadlinesForTaxYear(
   status: TaxStatus,
   taxYear: number,
-  incomeMonths: readonly string[]
+  incomeMonths: readonly string[],
+  incomeYears?: readonly number[]
 ): TaxDeadline[] {
   const deadlines: TaxDeadline[] = [];
 
@@ -218,6 +235,15 @@ export function getTaxDeadlinesForTaxYear(
       deadlines.push(
         { kind: "report", period: month, dueDate: `${next}-${pad2(ABROAD_REPORT_DAY)}` },
         { kind: "pay", period: month, dueDate: `${next}-${pad2(ABROAD_PAYMENT_DAY)}` }
+      );
+    }
+    const years =
+      incomeYears ??
+      incomeMonths.filter((m) => MONTH_PATTERN.test(m)).map((m) => Number(m.slice(0, 4)));
+    if (years.includes(taxYear)) {
+      deadlines.push(
+        { kind: "returnConfirm", period: String(taxYear), dueDate: `${taxYear + 1}-${RETURN_CONFIRM_DATE}` },
+        { kind: "returnPay", period: String(taxYear), dueDate: `${taxYear + 1}-${RETURN_PAYMENT_DATE}` }
       );
     }
   } else {
@@ -245,36 +271,39 @@ export function getTaxDeadlinesForTaxYear(
 export function getTaxCalendar(
   status: TaxStatus,
   year: number,
-  incomeMonths: readonly string[]
+  incomeMonths: readonly string[],
+  incomeYears?: readonly number[]
 ): TaxDeadline[] {
   return [
-    ...getTaxDeadlinesForTaxYear(status, year - 1, incomeMonths),
-    ...getTaxDeadlinesForTaxYear(status, year, incomeMonths),
+    ...getTaxDeadlinesForTaxYear(status, year - 1, incomeMonths, incomeYears),
+    ...getTaxDeadlinesForTaxYear(status, year, incomeMonths, incomeYears),
   ]
     .filter((d) => d.dueDate >= `${year}-01-01`)
     .sort(compareDeadlines);
 }
 
 // Deadlines due today or later, soonest first. Tax years before the previous
-// one have none left (the last deadline a tax year leads to is 30 March of
-// the year after), and next year's start in February, which matters in
-// December when the dashboard shows the deadline after the next one.
+// one have none left (the last deadline a tax year leads to is 30 June of the
+// year after), and next year's start in February, which matters in December
+// when the dashboard shows the deadline after the next one.
 export function getUpcomingTaxDeadlines(
   status: TaxStatus,
   today: string,
-  incomeMonths: readonly string[]
+  incomeMonths: readonly string[],
+  incomeYears?: readonly number[]
 ): TaxDeadline[] {
   const year = Number(today.slice(0, 4));
   return [year - 1, year, year + 1]
-    .flatMap((taxYear) => getTaxDeadlinesForTaxYear(status, taxYear, incomeMonths))
+    .flatMap((taxYear) => getTaxDeadlinesForTaxYear(status, taxYear, incomeMonths, incomeYears))
     .filter((d) => d.dueDate >= today)
     .sort(compareDeadlines);
 }
 
 export type TaxDeadlineGroup = {
-  // One month's self-reported income (report + pay), one month's advance, or
-  // one tax year's annual balance (return + payment).
-  kind: "income" | "advance" | "annual";
+  // One month's self-reported income (report + pay), one month's advance,
+  // one tax year's annual balance (return + payment), or one tax year's
+  // annual return (confirm + pay).
+  kind: "income" | "advance" | "annual" | "return";
   period: string;
   deadlines: TaxDeadline[];
 };
@@ -285,6 +314,8 @@ const GROUP_KIND: Record<TaxDeadlineKind, TaxDeadlineGroup["kind"]> = {
   advance: "advance",
   annualReturn: "annual",
   annualPayment: "annual",
+  returnConfirm: "return",
+  returnPay: "return",
 };
 
 // Groups deadlines that belong together, ordered by each group's first

@@ -411,6 +411,8 @@ export const en: Dictionary = {
       advance: "Pay the income tax advance for {period}",
       annualReturn: "File the annual tax balance (ПДД-ДБ) for {period}",
       annualPayment: "Pay any difference from the {period} tax balance",
+      returnConfirm: "Confirm or correct the annual tax return (ГДП) for {period}",
+      returnPay: "Pay the tax from the {period} annual tax return",
     },
     actions: {
       report: "Submit the calculation by {date}",
@@ -418,11 +420,14 @@ export const en: Dictionary = {
       advance: "Pay by {date}",
       annualReturn: "File ПДД-ДБ by {date}",
       annualPayment: "Pay any difference by {date}",
+      returnConfirm: "Confirm or correct it by {date}",
+      returnPay: "Pay by {date}",
     },
     groups: {
       income: "{period} income",
       advance: "Advance for {period}",
       annual: "Annual tax balance {period}",
+      return: "Annual tax return {period}",
     },
     basedOn: "Deadlines for: {status}.",
     changeInSettings: "Change in Settings",

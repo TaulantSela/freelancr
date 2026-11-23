@@ -413,6 +413,8 @@ export const mk: Dictionary = {
       advance: "Платете ја аконтацијата на данокот за {period}",
       annualReturn: "Поднесете го годишниот даночен биланс (ПДД-ДБ) за {period}",
       annualPayment: "Доплатете ја разликата по даночниот биланс за {period}",
+      returnConfirm: "Потврдете ја или коригирајте ја годишната даночна пријава (ГДП) за {period}",
+      returnPay: "Платете го данокот по годишната даночна пријава за {period}",
     },
     actions: {
       report: "Поднесете пресметка до {date}",
@@ -420,11 +422,14 @@ export const mk: Dictionary = {
       advance: "Платете до {date}",
       annualReturn: "Поднесете ПДД-ДБ до {date}",
       annualPayment: "Доплатете ја разликата до {date}",
+      returnConfirm: "Потврдете или коригирајте до {date}",
+      returnPay: "Платете до {date}",
     },
     groups: {
       income: "Доход во {period}",
       advance: "Аконтација за {period}",
       annual: "Годишен даночен биланс за {period}",
+      return: "Годишна даночна пријава за {period}",
     },
     basedOn: "Рокови за: {status}.",
     changeInSettings: "Промени во Поставки",
