@@ -27,9 +27,11 @@ export type InvoiceDetail = {
   }[];
   client: {
     name: string;
+    clientType: string;
     email: string | null;
     taxId: string | null;
     country: string;
+    invoiceLanguage: string | null;
     address: string | null;
     contactPerson: string | null;
   };
@@ -94,9 +96,11 @@ export async function getInvoiceDetail(
     })),
     client: {
       name: row.client.name,
+      clientType: row.client.clientType,
       email: row.client.email,
       taxId: row.client.taxId,
       country: row.client.country,
+      invoiceLanguage: row.client.invoiceLanguage,
       address: row.client.address,
       contactPerson: row.client.contactPerson,
     },

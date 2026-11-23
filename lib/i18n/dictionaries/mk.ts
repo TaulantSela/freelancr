@@ -155,6 +155,8 @@ export const mk: Dictionary = {
       personName: "Име и презиме",
       chooseCountry: "Изберете држава",
       countryRequired: "Изберете ја државата на клиентот",
+      invoiceLanguage: "Јазик на фактурите",
+      invoiceLanguageHint: "Јазикот на PDF фактурите за овој клиент, без оглед на јазикот на апликацијата.",
     },
     types: {
       company: "Компанија",

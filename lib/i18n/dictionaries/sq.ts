@@ -155,6 +155,8 @@ export const sq: Dictionary = {
       personName: "Emri dhe mbiemri",
       chooseCountry: "Zgjidh shtetin",
       countryRequired: "Zgjidh shtetin e klientit",
+      invoiceLanguage: "Gjuha e faturave",
+      invoiceLanguageHint: "Gjuha e faturave PDF për këtë klient, pavarësisht gjuhës që përdor në aplikacion.",
     },
     types: {
       company: "Kompani",

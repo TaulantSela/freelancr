@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import { getInvoiceDetail } from "@/lib/invoices/queries";
 import { InvoicePdfDocument } from "@/lib/pdf/invoice-document";
-import { getDictionary, getLocale } from "@/lib/i18n/server";
+import { getDictionary } from "@/lib/i18n/server";
+import { resolveInvoiceLanguage } from "@/lib/clients/config";
 
 export async function GET(
   _request: Request,
@@ -21,8 +22,8 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const locale = await getLocale();
-  const t = getDictionary(locale);
+  // The client's invoice language, not the language the app is in.
+  const t = getDictionary(resolveInvoiceLanguage(data.client));
   const labels = t.invoices.pdf;
 
   const buffer = await renderToBuffer(

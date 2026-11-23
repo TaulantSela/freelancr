@@ -10,7 +10,16 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n/client";
 import { SUPPORTED_CURRENCIES } from "@/lib/tax/calculator";
-import { CLIENT_TYPES, DEFAULT_CLIENT_TYPE, type ClientType } from "@/lib/clients/config";
+import {
+  CLIENT_TYPES,
+  DEFAULT_CLIENT_TYPE,
+  INVOICE_LANGUAGES,
+  defaultInvoiceLanguage,
+  resolveInvoiceLanguage,
+  type ClientType,
+  type InvoiceLanguage,
+} from "@/lib/clients/config";
+import { LOCALE_LABELS } from "@/lib/i18n/config";
 import type { Client } from "@/lib/db/schema";
 
 type State = {
@@ -57,6 +66,13 @@ export function ClientForm({
   const initialCountry = countries.some((c) => c.code === client?.country)
     ? client!.country
     : "";
+  // A new client's invoice language follows the country (Macedonian for
+  // North Macedonia, English otherwise) until it's picked by hand; an
+  // existing client keeps the one on file.
+  const [invoiceLanguage, setInvoiceLanguage] = useState<InvoiceLanguage>(
+    client ? resolveInvoiceLanguage(client) : defaultInvoiceLanguage(initialCountry)
+  );
+  const [languagePicked, setLanguagePicked] = useState(isEdit);
 
   return (
     <form action={action} className="space-y-5">
@@ -142,6 +158,9 @@ export function ClientForm({
             id="country"
             required
             defaultValue={initialCountry}
+            onChange={(e) => {
+              if (!languagePicked) setInvoiceLanguage(defaultInvoiceLanguage(e.target.value));
+            }}
             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
             <option value="" disabled className="bg-card">
@@ -169,6 +188,27 @@ export function ClientForm({
             ))}
           </select>
         </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="invoiceLanguage">{t.clients.form.invoiceLanguage}</Label>
+        <select
+          name="invoiceLanguage"
+          id="invoiceLanguage"
+          value={invoiceLanguage}
+          onChange={(e) => {
+            setInvoiceLanguage(e.target.value as InvoiceLanguage);
+            setLanguagePicked(true);
+          }}
+          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:w-1/2"
+        >
+          {INVOICE_LANGUAGES.map((lang) => (
+            <option key={lang} value={lang} className="bg-card">
+              {LOCALE_LABELS[lang]}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-muted-foreground">{t.clients.form.invoiceLanguageHint}</p>
       </div>
 
       <div className="space-y-1.5">

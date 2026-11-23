@@ -155,6 +155,8 @@ export const en: Dictionary = {
       personName: "Full name",
       chooseCountry: "Choose a country",
       countryRequired: "Choose the client's country",
+      invoiceLanguage: "Invoice language",
+      invoiceLanguageHint: "The language of this client's invoice PDFs, whatever language you use the app in.",
     },
     types: {
       company: "Company",

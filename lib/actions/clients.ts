@@ -6,7 +6,12 @@ import { getDb, clients, invoices } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId } from "@/lib/utils";
 import { isSupportedCurrency } from "@/lib/tax/calculator";
-import { DEFAULT_CLIENT_TYPE, isClientType } from "@/lib/clients/config";
+import {
+  DEFAULT_CLIENT_TYPE,
+  defaultInvoiceLanguage,
+  isClientType,
+  isInvoiceLanguage,
+} from "@/lib/clients/config";
 import { isCountryCode } from "@/lib/clients/countries";
 import { eq, and, count } from "drizzle-orm";
 
@@ -23,6 +28,11 @@ function readClientType(formData: FormData) {
       ? null
       : (formData.get("contactPerson") as string) || null,
   };
+}
+
+function readInvoiceLanguage(formData: FormData, country: string) {
+  const value = formData.get("invoiceLanguage");
+  return isInvoiceLanguage(value) ? value : defaultInvoiceLanguage(country);
 }
 
 export async function createClient(formData: FormData) {
@@ -50,6 +60,7 @@ export async function createClient(formData: FormData) {
     email: email || null,
     country,
     currency,
+    invoiceLanguage: readInvoiceLanguage(formData, country),
     address: address || null,
     notes: notes || null,
   });
@@ -79,6 +90,7 @@ export async function updateClient(id: string, formData: FormData) {
       email: (formData.get("email") as string) || null,
       country,
       currency,
+      invoiceLanguage: readInvoiceLanguage(formData, country),
       address: (formData.get("address") as string) || null,
       notes: (formData.get("notes") as string) || null,
     })

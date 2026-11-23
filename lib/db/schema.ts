@@ -5,7 +5,11 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 import { DEFAULT_TAX_STATUS, TAX_STATUSES } from "../tax/calculator";
-import { CLIENT_TYPES, DEFAULT_CLIENT_TYPE } from "../clients/config";
+import {
+  CLIENT_TYPES,
+  DEFAULT_CLIENT_TYPE,
+  INVOICE_LANGUAGES,
+} from "../clients/config";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -43,6 +47,10 @@ export const clients = pgTable("clients", {
   taxId: text("tax_id"),
   country: text("country").notNull().default("MK"),
   currency: text("currency").notNull().default("EUR"),
+  // "mk", "sq" or "en": the language of this client's invoice PDFs. Nullable
+  // so rows written by older code still insert; read it through
+  // resolveInvoiceLanguage() (lib/clients/config.ts).
+  invoiceLanguage: text("invoice_language", { enum: INVOICE_LANGUAGES }),
   address: text("address"),
   contactPerson: text("contact_person"),
   notes: text("notes"),

@@ -130,6 +130,8 @@ export type Dictionary = {
       personName: string;
       chooseCountry: string;
       countryRequired: string;
+      invoiceLanguage: string;
+      invoiceLanguageHint: string;
     };
     types: { company: string; person: string };
     deleteTitle: string;
