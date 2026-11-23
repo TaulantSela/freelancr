@@ -10,6 +10,7 @@ const colors: Record<InvoiceDisplayStatus, string> = {
   partly_paid: "text-amber-400 border-amber-400/30",
   paid: "text-emerald-400 border-emerald-400/30",
   overdue: "text-red-400 border-red-400/30",
+  credited: "text-violet-400 border-violet-400/30",
   cancelled: "text-zinc-500 border-zinc-500/30",
 };
 

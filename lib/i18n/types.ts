@@ -250,6 +250,7 @@ export type Dictionary = {
       partly_paid: string;
       paid: string;
       overdue: string;
+      credited: string;
       cancelled: string;
     };
     payments: {
@@ -284,7 +285,53 @@ export type Dictionary = {
       cancelled: string;
       notIssued: string;
       hasPayments: string;
+      hasCreditNotes: string;
       note: string;
+    };
+  };
+  creditNotes: {
+    title: string;
+    none: string;
+    credited: string;
+    creditedShort: string;
+    issue: string;
+    date: string;
+    amount: string;
+    amountPlain: string;
+    amountHint: string;
+    ddvSplit: string;
+    reason: string;
+    reasonPlaceholder: string;
+    numberNote: string;
+    submit: string;
+    issued: string;
+    downloadPdf: string;
+    delete: string;
+    deleteTitle: string;
+    deleteDesc: string;
+    incomeTaxNote: string;
+    cancelHint: string;
+    errors: {
+      dateInvalid: string;
+      dateFuture: string;
+      dateBeforeInvoice: string;
+      amountInvalid: string;
+      amountTooHigh: string;
+      reasonRequired: string;
+      notIssued: string;
+      notLatest: string;
+    };
+    pdf: {
+      title: string;
+      number: string;
+      date: string;
+      invoice: string;
+      forInvoice: string;
+      customer: string;
+      reason: string;
+      base: string;
+      amount: string;
+      invoiceRate: string;
     };
   };
   payments: {

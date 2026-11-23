@@ -287,6 +287,7 @@ export const sq: Dictionary = {
       partly_paid: "Paguar pjesërisht",
       paid: "Paguar",
       overdue: "Vonuar",
+      credited: "Kredituar",
       cancelled: "Anuluar",
     },
     payments: {
@@ -327,8 +328,58 @@ export const sq: Dictionary = {
       notIssued: "Mund të anulohen vetëm faturat e lëshuara.",
       hasPayments:
         "Kjo faturë ka pagesa të regjistruara. Fshiji fillimisht pagesat, pastaj anuloje.",
+      hasCreditNotes: "Kjo faturë ka nota krediti, ndaj nuk anulohet: ato tashmë e korrigjojnë.",
       note:
         "E anuluar. Mbetet në evidencën tënde për pesë vitet që faturat duhet të ruhen (Ligji për TVSH, neni 56).",
+    },
+  },
+  creditNotes: {
+    title: "Notat e kreditit",
+    none:
+      "Nuk ka nota krediti. Lësho një për të ulur atë që detyrohet klienti: zbritje, mall i kthyer ose gabim në faturë.",
+    credited: "Notat e kreditit",
+    creditedShort: "kredituar {amount}",
+    issue: "Lësho notë krediti",
+    date: "Data",
+    amount: "Shuma ({currency}), me TVSH",
+    amountPlain: "Shuma ({currency})",
+    amountHint: "Më së shumti {amount}.",
+    ddvSplit: "Nga kjo baza {base} dhe TVSH {ddv}.",
+    reason: "Arsyeja",
+    reasonPlaceholder: "Zbritje e rënë dakord pas faturës, artikull i kthyer, gabim në faturë…",
+    numberNote:
+      "Merr numrin e radhës për vitin e saj (CN-YYYY-NNN) kur lëshohet dhe pastaj nuk mund të ndryshohet.",
+    submit: "Lësho notën e kreditit",
+    issued: "U lëshua nota e kreditit {number}",
+    downloadPdf: "PDF",
+    delete: "Fshi",
+    deleteTitle: "Të fshihet {number}?",
+    deleteDesc:
+      "Mund të fshihet vetëm nota jote e fundit e kreditit, që numrat të mos kenë boshllëqe. Kjo nuk mund të kthehet.",
+    incomeTaxNote:
+      "Nota e kreditit ul atë që detyrohet klienti dhe, me TVSH, bazën dhe TVSH-në në muajin e datës së saj (Ligji për TVSH, neni 22). Nuk e ndryshon tatimin mbi të ardhurat, i cili ndjek pagesat që pranon; kthimet e parave ende nuk regjistrohen.",
+    cancelHint: "Fatura me nota krediti nuk anulohet: ato tashmë e korrigjojnë.",
+    errors: {
+      dateInvalid: "Shkruaj një datë të vlefshme.",
+      dateFuture: "Data nuk mund të jetë pas datës së sotme.",
+      dateBeforeInvoice: "Data nuk mund të jetë para datës së faturës.",
+      amountInvalid: "Shkruaj një shumë mbi 0.",
+      amountTooHigh: "Në këtë faturë mund të kreditohen ende më së shumti {amount}.",
+      reasonRequired: "Shkruaj arsyen: ajo shkon në notën e kreditit.",
+      notIssued: "Notat e kreditit lëshohen vetëm për fatura të lëshuara që nuk janë anuluar.",
+      notLatest: "Mund të fshihet vetëm nota jote e fundit e kreditit.",
+    },
+    pdf: {
+      title: "Notë krediti",
+      number: "Numri i notës së kreditit",
+      date: "Data e lëshimit",
+      invoice: "Fatura",
+      forInvoice: "Për faturën {number} të datës {date}",
+      customer: "Blerësi",
+      reason: "Arsyeja",
+      base: "Baza",
+      amount: "Kredituar",
+      invoiceRate: "1 {currency} = {rate} MKD (kursi i faturës)",
     },
   },
   payments: {

@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getDb, clients, invoices, invoiceItems, payments, users } from "@/lib/db";
+import { getDb, clients, creditNotes, invoices, invoiceItems, payments, users } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId } from "@/lib/utils";
 import {
@@ -249,9 +249,9 @@ const OPEN_STATUSES = ["sent", "paid", "overdue"] as const;
 // Cancels an issued invoice. It isn't deleted: invoices have to be kept for
 // five years after the end of their year (VAT law Art. 56(1)), so it stays,
 // marked cancelled, and stops counting toward the DDV threshold. There's no
-// way back and no credit note yet. An invoice with payments isn't cancelled:
-// its payments have to be deleted first, so no income is left pointing at a
-// cancelled invoice.
+// way back. An invoice with payments isn't cancelled (its payments have to
+// be deleted first, so no income is left pointing at a cancelled invoice),
+// and neither is one with credit notes, which already correct it.
 export async function cancelInvoice(id: string) {
   const session = await getSession();
   if (!session) redirect("/sign-in");
@@ -264,17 +264,31 @@ export async function cancelInvoice(id: string) {
         eq(invoices.id, id),
         eq(invoices.userId, session.userId),
         inArray(invoices.status, OPEN_STATUSES),
-        sql`not exists (select 1 from ${payments} where ${payments.invoiceId} = ${invoices.id})`
+        sql`not exists (select 1 from ${payments} where ${payments.invoiceId} = ${invoices.id})`,
+        sql`not exists (select 1 from ${creditNotes} where ${creditNotes.invoiceId} = ${invoices.id})`
       )
     )
     .returning({ id: invoices.id });
   if (cancelled.length === 0) {
-    const [paid] = await getDb()
-      .select({ id: payments.id })
-      .from(payments)
-      .where(and(eq(payments.invoiceId, id), eq(payments.userId, session.userId)))
-      .limit(1);
-    return { errorKey: paid ? ("hasPayments" as const) : ("notIssued" as const) };
+    const [[paid], [credited]] = await Promise.all([
+      getDb()
+        .select({ id: payments.id })
+        .from(payments)
+        .where(and(eq(payments.invoiceId, id), eq(payments.userId, session.userId)))
+        .limit(1),
+      getDb()
+        .select({ id: creditNotes.id })
+        .from(creditNotes)
+        .where(and(eq(creditNotes.invoiceId, id), eq(creditNotes.userId, session.userId)))
+        .limit(1),
+    ]);
+    return {
+      errorKey: paid
+        ? ("hasPayments" as const)
+        : credited
+        ? ("hasCreditNotes" as const)
+        : ("notIssued" as const),
+    };
   }
 
   revalidatePath("/invoices");

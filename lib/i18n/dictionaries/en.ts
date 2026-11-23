@@ -288,6 +288,7 @@ export const en: Dictionary = {
       partly_paid: "Partly paid",
       paid: "Paid",
       overdue: "Overdue",
+      credited: "Credited",
       cancelled: "Cancelled",
     },
     payments: {
@@ -326,8 +327,60 @@ export const en: Dictionary = {
       cancelled: "Invoice cancelled",
       notIssued: "Only issued invoices can be cancelled.",
       hasPayments: "This invoice has payments recorded. Delete its payments first, then cancel it.",
+      hasCreditNotes:
+        "This invoice has credit notes, so it isn't cancelled: they already correct it.",
       note:
         "Cancelled. It stays in your records for the five years invoices have to be kept (VAT law Art. 56).",
+    },
+  },
+  creditNotes: {
+    title: "Credit notes",
+    none:
+      "No credit notes. Issue one to lower what the client owes: a discount, a return, or a mistake on the invoice.",
+    credited: "Credit notes",
+    creditedShort: "credited {amount}",
+    issue: "Issue a credit note",
+    date: "Date",
+    amount: "Amount ({currency}), DDV included",
+    amountPlain: "Amount ({currency})",
+    amountHint: "At most {amount}.",
+    ddvSplit: "Of which base {base} and DDV {ddv}.",
+    reason: "Reason",
+    reasonPlaceholder:
+      "A discount agreed after the invoice, a returned item, a mistake on the invoice…",
+    numberNote:
+      "It gets the next number for its year (CN-YYYY-NNN) as it's issued, and can't be edited after.",
+    submit: "Issue credit note",
+    issued: "Credit note {number} issued",
+    downloadPdf: "PDF",
+    delete: "Delete",
+    deleteTitle: "Delete {number}?",
+    deleteDesc:
+      "Only your most recent credit note can be deleted, so the numbers stay without gaps. This can't be undone.",
+    incomeTaxNote:
+      "A credit note lowers what the client owes and, with DDV, the base and DDV in the month of its date (VAT law Art. 22). It doesn't change your income tax, which follows the payments you receive; refunds aren't recorded yet.",
+    cancelHint: "An invoice with credit notes isn't cancelled: they already correct it.",
+    errors: {
+      dateInvalid: "Enter a valid date.",
+      dateFuture: "The date can't be after today.",
+      dateBeforeInvoice: "The date can't be before the invoice's.",
+      amountInvalid: "Enter an amount above 0.",
+      amountTooHigh: "At most {amount} can still be credited on this invoice.",
+      reasonRequired: "Say why: the reason goes on the credit note.",
+      notIssued: "Credit notes only go on issued invoices that aren't cancelled.",
+      notLatest: "Only your most recent credit note can be deleted.",
+    },
+    pdf: {
+      title: "Credit note",
+      number: "Credit note number",
+      date: "Date of issue",
+      invoice: "Invoice",
+      forInvoice: "For invoice {number} of {date}",
+      customer: "Customer",
+      reason: "Reason",
+      base: "Base",
+      amount: "Credited",
+      invoiceRate: "1 {currency} = {rate} MKD (the invoice's rate)",
     },
   },
   payments: {

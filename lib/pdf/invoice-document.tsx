@@ -27,7 +27,7 @@ Font.register({
   ],
 });
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   page: {
     fontFamily: "NotoSans",
     fontSize: 10,
@@ -206,7 +206,7 @@ const NUMBER_LOCALES: Record<InvoiceLanguage, string> = {
 
 // With the currency code, which is unambiguous on an invoice ("$" could be
 // any dollar): "1.234,50 EUR" in mk, "EUR 1,234.50" in en.
-function formatMoney(amount: number, currency: string, lang: InvoiceLanguage) {
+export function formatMoney(amount: number, currency: string, lang: InvoiceLanguage) {
   return new Intl.NumberFormat(NUMBER_LOCALES[lang], {
     style: "currency",
     currency,
@@ -215,7 +215,7 @@ function formatMoney(amount: number, currency: string, lang: InvoiceLanguage) {
 }
 
 // "YYYY-MM-DD" -> "20.11.2026" in mk and sq, "20 Nov 2026" in en.
-function formatDate(date: string, lang: InvoiceLanguage) {
+export function formatDate(date: string, lang: InvoiceLanguage) {
   const [year, month, day] = date.slice(0, 10).split("-");
   if (lang !== "en") return `${day}.${month}.${year}`;
   return new Intl.DateTimeFormat("en-GB", {

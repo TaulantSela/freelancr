@@ -214,6 +214,40 @@ export const payments = pgTable("payments", {
   ),
 ]);
 
+// A credit note (книжно одобрение) on an issued invoice: it lowers what the
+// client owes, and the base and DDV with it, in the period of its date (VAT
+// law Art. 22(1): the supplier corrects the tax "во текот на даночниот
+// период на извршената промена"). Numbered CN-YYYY-NNN per user by the
+// credit note's year when it's created (lib/credit-notes/write.ts); there
+// are no drafts, and only the user's latest can be deleted, so numbers run
+// without gaps.
+export const creditNotes = pgTable("credit_notes", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  invoiceId: text("invoice_id")
+    .notNull()
+    .references(() => invoices.id),
+  number: text("number").notNull(),
+  // "YYYY-MM-DD"
+  date: text("date").notNull(),
+  // In the invoice's currency, DDV included.
+  amount: doublePrecision("amount").notNull(),
+  // The DDV part of `amount`, in the invoice's proportion; 0 without DDV.
+  ddvAmount: doublePrecision("ddv_amount").notNull().default(0),
+  reason: text("reason").notNull(),
+  // The invoice's rate, so the MKD figures net off against it.
+  rateToMKD: doublePrecision("rate_to_mkd").notNull(),
+  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+}, (table) => [
+  uniqueIndex("credit_notes_user_id_number_unique").on(table.userId, table.number),
+  index("credit_notes_invoice_id_idx").on(table.invoiceId),
+  check("credit_notes_amount_positive", sql`${table.amount} > 0`),
+  check("credit_notes_ddv_amount_not_negative", sql`${table.ddvAmount} >= 0`),
+  check("credit_notes_rate_positive", sql`${table.rateToMKD} > 0`),
+]);
+
 // The National Bank's middle rates, cached per day and currency
 // (lib/rates/queries.ts).
 export const exchangeRateCache = pgTable("exchange_rate_cache", {
@@ -235,3 +269,5 @@ export type InvoiceItem = typeof invoiceItems.$inferSelect;
 export type NewInvoiceItem = typeof invoiceItems.$inferInsert;
 export type Payment = typeof payments.$inferSelect;
 export type NewPayment = typeof payments.$inferInsert;
+export type CreditNote = typeof creditNotes.$inferSelect;
+export type NewCreditNote = typeof creditNotes.$inferInsert;
