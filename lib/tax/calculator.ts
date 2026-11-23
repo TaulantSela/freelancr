@@ -16,6 +16,23 @@ export const DDV_THRESHOLD_MKD = 2_000_000;
 // so it overestimates for anyone with deductible expenses.
 export const PERSONAL_INCOME_TAX_RATE = 0.1;
 
+// How a user is registered for tax, which decides their UJP deadlines. They
+// pick it in Settings and it's stored in users.tax_status.
+// "paid_from_abroad" (the default): an individual who isn't registered for an
+// independent activity and is paid by clients abroad.
+// "self_employed": a registered self-employed person (самостоен вршител на
+// дејност).
+export const TAX_STATUSES = ["paid_from_abroad", "self_employed"] as const;
+export type TaxStatus = (typeof TAX_STATUSES)[number];
+export const DEFAULT_TAX_STATUS: TaxStatus = "paid_from_abroad";
+
+export function isTaxStatus(value: unknown): value is TaxStatus {
+  return (
+    typeof value === "string" &&
+    (TAX_STATUSES as readonly string[]).includes(value)
+  );
+}
+
 // Quarterly tax deadlines
 export const QUARTERLY_DEADLINES = [
   { quarter: "Q1", deadline: "April 30", months: [1, 2, 3] },
