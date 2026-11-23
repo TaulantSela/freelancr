@@ -294,4 +294,10 @@ export type Dictionary = {
     checklist: string[];
     businessTypes: { value: string; label: string }[];
   };
+  tax: {
+    statusLabel: string;
+    statusHint: string;
+    statuses: { paid_from_abroad: string; self_employed: string };
+    statusDescriptions: { paid_from_abroad: string; self_employed: string };
+  };
 };

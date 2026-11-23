@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getDb, users } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { eq } from "drizzle-orm";
+import { isTaxStatus } from "@/lib/tax/calculator";
 
 export async function updateProfile(
   formData: FormData
@@ -14,6 +15,9 @@ export async function updateProfile(
 
   const name = formData.get("name") as string;
   if (!name?.trim()) return { error: "Name is required" };
+
+  // Only a known status is saved; anything else leaves the stored one as is.
+  const taxStatus = formData.get("taxStatus");
 
   await getDb()
     .update(users)
@@ -25,6 +29,7 @@ export async function updateProfile(
       address: (formData.get("address") as string) || null,
       bankAccount: (formData.get("bankAccount") as string) || null,
       bankName: (formData.get("bankName") as string) || null,
+      ...(isTaxStatus(taxStatus) ? { taxStatus } : {}),
     })
     .where(eq(users.id, session.userId));
 

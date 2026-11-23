@@ -411,4 +411,19 @@ export const en: Dictionary = {
       { value: "trade", label: "Trade / craft" },
     ],
   },
+  tax: {
+    statusLabel: "How are you registered for tax?",
+    statusHint:
+      "This decides which tax deadlines the dashboard and the Income & Tax page show.",
+    statuses: {
+      paid_from_abroad: "Paid from abroad, not registered",
+      self_employed: "Registered self-employed",
+    },
+    statusDescriptions: {
+      paid_from_abroad:
+        "An individual paid by clients outside North Macedonia, with no registered independent activity.",
+      self_employed:
+        "Registered with UJP as a self-employed person (самостоен вршител на дејност).",
+    },
+  },
 };

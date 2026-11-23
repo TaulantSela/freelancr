@@ -411,4 +411,19 @@ export const sq: Dictionary = {
       { value: "trade", label: "Zanat / tregti" },
     ],
   },
+  tax: {
+    statusLabel: "Si je regjistruar për tatime?",
+    statusHint:
+      "Nga kjo varet se cilat afate tatimore shfaqen në panel dhe në faqen „Të ardhurat & Tatimi”.",
+    statuses: {
+      paid_from_abroad: "Të ardhura nga jashtë, pa veprimtari të regjistruar",
+      self_employed: "Vetëpunësim i regjistruar",
+    },
+    statusDescriptions: {
+      paid_from_abroad:
+        "Person fizik që paguhet nga klientë jashtë Maqedonisë së Veriut, pa veprimtari të pavarur të regjistruar.",
+      self_employed:
+        "Je regjistruar në UJP si person që ushtron veprimtari të pavarur (самостоен вршител на дејност).",
+    },
+  },
 };
