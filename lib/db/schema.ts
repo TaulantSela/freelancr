@@ -5,6 +5,7 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 import { DEFAULT_TAX_STATUS, TAX_STATUSES } from "../tax/calculator";
+import { CLIENT_TYPES, DEFAULT_CLIENT_TYPE } from "../clients/config";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -33,6 +34,11 @@ export const clients = pgTable("clients", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
+  // "company" or "person" (lib/clients/config.ts). Existing rows get the
+  // default.
+  clientType: text("client_type", { enum: CLIENT_TYPES })
+    .notNull()
+    .default(DEFAULT_CLIENT_TYPE),
   email: text("email"),
   taxId: text("tax_id"),
   country: text("country").notNull().default("MK"),

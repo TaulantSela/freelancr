@@ -20,6 +20,7 @@ export default async function ClientsPage() {
     .select({
       id: clients.id,
       name: clients.name,
+      clientType: clients.clientType,
       email: clients.email,
       country: clients.country,
       currency: clients.currency,
@@ -82,6 +83,11 @@ export default async function ClientsPage() {
                       <span className="font-medium text-sm">{client.name}</span>
                       <Badge variant="outline" className="text-xs font-mono">{client.currency}</Badge>
                       <Badge variant="outline" className="text-xs">{client.country}</Badge>
+                      {client.clientType === "person" && (
+                        <Badge variant="outline" className="text-xs">
+                          {t.clients.types.person}
+                        </Badge>
+                      )}
                     </div>
                     <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                       {client.email && (

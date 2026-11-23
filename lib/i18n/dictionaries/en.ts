@@ -149,6 +149,14 @@ export const en: Dictionary = {
       submit: "Add client",
       nameRequired: "Client name is required",
       currencyUnsupported: "Choose one of the listed currencies",
+      clientType: "Client type",
+      clientTypeHint:
+        "Used for your tax deadlines: when you aren't registered for an activity, companies in North Macedonia withhold the income tax for you, but private persons and clients abroad don't, so you report that income yourself.",
+      personName: "Full name",
+    },
+    types: {
+      company: "Company",
+      person: "Private person",
     },
     deleteTitle: "Delete {name}?",
     deleteDesc:

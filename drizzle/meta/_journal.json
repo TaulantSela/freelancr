@@ -15,6 +15,13 @@
       "when": 1795447192086,
       "tag": "0001_user_tax_status",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795456912886,
+      "tag": "0002_client_type",
+      "breakpoints": true
     }
   ]
 }

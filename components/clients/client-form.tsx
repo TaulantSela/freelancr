@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n/client";
 import { SUPPORTED_CURRENCIES } from "@/lib/tax/calculator";
+import { CLIENT_TYPES, DEFAULT_CLIENT_TYPE, type ClientType } from "@/lib/clients/config";
 import type { Client } from "@/lib/db/schema";
 
 const COUNTRY_CODES = ["MK", "US", "DE", "NL", "GB", "FR", "CH", "AU", "CA", "XK", "RS", "HR", "OTHER"] as const;
@@ -40,53 +41,86 @@ export function ClientForm({ client }: { client?: Client }) {
       : createClientAction,
     null
   );
+  const [clientType, setClientType] = useState<ClientType>(
+    client?.clientType ?? DEFAULT_CLIENT_TYPE
+  );
+  const isPerson = clientType === "person";
 
   return (
     <form action={action} className="space-y-5">
+      <fieldset className="space-y-2">
+        <legend className="text-sm leading-none font-medium">{t.clients.form.clientType}</legend>
+        <div className="grid sm:grid-cols-2 gap-2">
+          {CLIENT_TYPES.map((type) => (
+            <label
+              key={type}
+              className="flex items-center gap-3 rounded-md border border-input px-3 py-2 text-sm cursor-pointer has-checked:border-primary has-checked:bg-primary/5"
+            >
+              <input
+                type="radio"
+                name="clientType"
+                value={type}
+                checked={clientType === type}
+                onChange={() => setClientType(type)}
+                className="accent-primary"
+              />
+              {t.clients.types[type]}
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">{t.clients.form.clientTypeHint}</p>
+      </fieldset>
+
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label htmlFor="name">
-            {t.clients.form.name} <span className="text-destructive">*</span>
+            {isPerson ? t.clients.form.personName : t.clients.form.name}{" "}
+            <span className="text-destructive">*</span>
           </Label>
           <Input
             id="name"
             name="name"
-            placeholder="Acme Corp"
+            placeholder={isPerson ? undefined : "Acme Corp"}
             defaultValue={client?.name}
             required
           />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="contactPerson">{t.clients.form.contactPerson}</Label>
-          <Input
-            id="contactPerson"
-            name="contactPerson"
-            defaultValue={client?.contactPerson ?? ""}
-          />
-        </div>
-      </div>
-
-      <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label htmlFor="email">{t.clients.form.email}</Label>
           <Input
             id="email"
             name="email"
             type="email"
-            placeholder="billing@acme.com"
+            placeholder={isPerson ? undefined : "billing@acme.com"}
             defaultValue={client?.email ?? ""}
           />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="taxId">{t.clients.form.taxId}</Label>
-          <Input
-            id="taxId"
-            name="taxId"
-            placeholder="DE123456789"
-            defaultValue={client?.taxId ?? ""}
-          />
-        </div>
       </div>
+
+      {/* A private person has no contact person, and their only identifier
+          would be the personal ID number (ЕМБГ), which the app never asks
+          for. */}
+      {!isPerson && (
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="contactPerson">{t.clients.form.contactPerson}</Label>
+            <Input
+              id="contactPerson"
+              name="contactPerson"
+              defaultValue={client?.contactPerson ?? ""}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="taxId">{t.clients.form.taxId}</Label>
+            <Input
+              id="taxId"
+              name="taxId"
+              placeholder="DE123456789"
+              defaultValue={client?.taxId ?? ""}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">

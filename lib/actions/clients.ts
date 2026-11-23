@@ -6,7 +6,23 @@ import { getDb, clients, invoices } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId } from "@/lib/utils";
 import { isSupportedCurrency } from "@/lib/tax/calculator";
+import { DEFAULT_CLIENT_TYPE, isClientType } from "@/lib/clients/config";
 import { eq, and, count } from "drizzle-orm";
+
+// A private person has no tax ID or contact person on file: the form hides
+// both, and anything posted for them anyway is dropped.
+function readClientType(formData: FormData) {
+  const value = formData.get("clientType");
+  const clientType = isClientType(value) ? value : DEFAULT_CLIENT_TYPE;
+  const isPerson = clientType === "person";
+  return {
+    clientType,
+    taxId: isPerson ? null : (formData.get("taxId") as string) || null,
+    contactPerson: isPerson
+      ? null
+      : (formData.get("contactPerson") as string) || null,
+  };
+}
 
 export async function createClient(formData: FormData) {
   const session = await getSession();
@@ -14,11 +30,9 @@ export async function createClient(formData: FormData) {
 
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
-  const taxId = formData.get("taxId") as string;
   const country = formData.get("country") as string;
   const currency = (formData.get("currency") as string) || "EUR";
   const address = formData.get("address") as string;
-  const contactPerson = formData.get("contactPerson") as string;
   const notes = formData.get("notes") as string;
 
   if (!name) return { errorKey: "nameRequired" as const };
@@ -30,12 +44,11 @@ export async function createClient(formData: FormData) {
     id: generateId(),
     userId: session.userId,
     name,
+    ...readClientType(formData),
     email: email || null,
-    taxId: taxId || null,
     country: country || "MK",
     currency,
     address: address || null,
-    contactPerson: contactPerson || null,
     notes: notes || null,
   });
 
@@ -58,12 +71,11 @@ export async function updateClient(id: string, formData: FormData) {
     .update(clients)
     .set({
       name,
+      ...readClientType(formData),
       email: (formData.get("email") as string) || null,
-      taxId: (formData.get("taxId") as string) || null,
       country: (formData.get("country") as string) || "MK",
       currency,
       address: (formData.get("address") as string) || null,
-      contactPerson: (formData.get("contactPerson") as string) || null,
       notes: (formData.get("notes") as string) || null,
     })
     .where(and(eq(clients.id, id), eq(clients.userId, session.userId)));

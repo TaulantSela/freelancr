@@ -149,6 +149,14 @@ export const sq: Dictionary = {
       submit: "Shto klient",
       nameRequired: "Emri i klientit është i detyrueshëm",
       currencyUnsupported: "Zgjidh një nga monedhat e listuara",
+      clientType: "Lloji i klientit",
+      clientTypeHint:
+        "Përdoret për afatet tatimore: kur nuk ke veprimtari të regjistruar, kompanitë në Maqedoninë e Veriut e mbajnë tatimin mbi të ardhurat për ty, por personat fizikë dhe klientët nga jashtë jo, ndaj ato të ardhura i deklaron vetë.",
+      personName: "Emri dhe mbiemri",
+    },
+    types: {
+      company: "Kompani",
+      person: "Person fizik",
     },
     deleteTitle: "Fshi {name}?",
     deleteDesc:

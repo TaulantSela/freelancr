@@ -125,7 +125,11 @@ export type Dictionary = {
       submit: string;
       nameRequired: string;
       currencyUnsupported: string;
+      clientType: string;
+      clientTypeHint: string;
+      personName: string;
     };
+    types: { company: string; person: string };
     deleteTitle: string;
     deleteDesc: string;
     deleteBlockedTitle: string;
