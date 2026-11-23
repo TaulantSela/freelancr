@@ -532,6 +532,8 @@ export const en: Dictionary = {
       deleteTitle: "Delete this payment?",
       deleteDesc:
         "Its invoice goes back to unpaid or partly paid, and the month's tax changes. This can't be undone.",
+      filedWarning:
+        "This payment's month was already filed with UJP. Changing it changes that month's tax; you may need to file a corrected calculation.",
       errors: {
         dateInvalid: "Enter a valid date for when the money arrived.",
         dateFuture: "The day the money arrived can't be in the future.",

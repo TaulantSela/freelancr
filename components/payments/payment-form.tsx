@@ -89,6 +89,7 @@ export function PaymentForm({
   clients,
   presetInvoiceId,
   existing,
+  filed = false,
 }: {
   taxStatus: string;
   today: string;
@@ -96,6 +97,8 @@ export function PaymentForm({
   clients: PayerClient[];
   presetInvoiceId?: string;
   existing?: ExistingPayment;
+  // Editing a payment whose month is already filed with UJP.
+  filed?: boolean;
 }) {
   const t = useTranslations();
   const f = t.payments.form;
@@ -214,6 +217,11 @@ export function PaymentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {filed && (
+        <p className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-400">
+          {f.filedWarning}
+        </p>
+      )}
       {existing ? (
         <div className="rounded-md border border-border px-3 py-2 text-sm">
           <div className="font-medium">{existing.clientName}</div>

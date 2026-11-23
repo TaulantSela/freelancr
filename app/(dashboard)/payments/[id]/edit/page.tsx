@@ -29,6 +29,8 @@ export default async function EditPaymentPage({
     getPaymentAttachments(id, session.userId),
   ]);
   if (!payment) notFound();
+  // Its month is already with UJP: changing it changes that month's tax.
+  const filed = payment.ujpStatus === "filed" || payment.ujpStatus === "approved" || payment.ujpStatus === "paid";
   const back = payment.invoiceId
     ? { href: `/invoices/${payment.invoiceId}`, label: payment.invoiceNumber ?? t.payments.title }
     : { href: `/payments?year=${payment.receivedOn.slice(0, 4)}`, label: t.payments.title };
@@ -41,7 +43,7 @@ export default async function EditPaymentPage({
             <ArrowLeft className="h-4 w-4" /> {back.label}
           </Button>
         </Link>
-        <DeletePaymentButton id={payment.id} attachmentCount={files.length} />
+        <DeletePaymentButton id={payment.id} attachmentCount={files.length} filed={filed} />
       </div>
       <Card>
         <CardHeader>
@@ -54,6 +56,7 @@ export default async function EditPaymentPage({
             invoices={[]}
             clients={[]}
             existing={{ ...payment, taxTreatment: payment.taxTreatment }}
+            filed={filed}
           />
         </CardContent>
       </Card>

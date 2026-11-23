@@ -532,6 +532,8 @@ export const sq: Dictionary = {
       deleteTitle: "Të fshihet kjo pagesë?",
       deleteDesc:
         "Fatura e saj kthehet në të papaguar ose të paguar pjesërisht, dhe tatimi i muajit ndryshon. Kjo nuk mund të kthehet.",
+      filedWarning:
+        "Muaji i kësaj pagese është dorëzuar tashmë në UJP. Nëse e ndryshon, ndryshon tatimi i atij muaji; mund të të duhet të dorëzosh një llogaritje të korrigjuar.",
       errors: {
         dateInvalid: "Shkruaj një datë të vlefshme kur arritën paratë.",
         dateFuture: "Dita kur arritën paratë nuk mund të jetë në të ardhmen.",

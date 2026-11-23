@@ -22,10 +22,13 @@ import { formatMessage } from "@/lib/i18n/format";
 export function DeletePaymentButton({
   id,
   attachmentCount,
+  filed,
 }: {
   id: string;
   // Its files are deleted with it (ON DELETE CASCADE).
   attachmentCount: number;
+  // Its month is already filed with UJP.
+  filed: boolean;
 }) {
   const t = useTranslations();
   const f = t.payments.form;
@@ -48,6 +51,7 @@ export function DeletePaymentButton({
             {f.deleteDesc}
             {attachmentCount > 0 && ` ${formatMessage(t.attachments.deleteWithPayment, { count: attachmentCount })}`}
           </AlertDialogDescription>
+          {filed && <p className="text-sm text-amber-400">{f.filedWarning}</p>}
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
