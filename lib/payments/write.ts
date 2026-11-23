@@ -8,9 +8,10 @@ type Db = ReturnType<typeof getDb>;
 // it settles is brought in step in the same statement, so there's never a
 // payment without its invoice's status, or the other way round. The invoice
 // becomes 'paid' (paid_at = the latest payment's day) once its payments cover
-// the total within half a cent, and goes back to 'sent' otherwise. A
-// cancelled invoice is left alone. Ownership is checked in the statement
-// itself: a payment, invoice or client that isn't the user's matches nothing.
+// the total less its credit notes within half a cent, and goes back to
+// 'sent' otherwise. A cancelled invoice is left alone. Ownership is checked
+// in the statement itself: a payment, invoice or client that isn't the
+// user's matches nothing.
 //
 // In a statement with data-modifying CTEs every part sees the table as it was
 // before the statement, so the totals below take the payments as they were
@@ -30,20 +31,28 @@ export type PaymentFields = {
 };
 
 // "settle as (...)": brings the invoice in `totals` (invoice_id, settled,
-// last_received) in step.
-const SETTLE = (tolerance: number) => sql`
+// last_received, credited) in step: paid once the payments cover the total
+// less the credit notes. Also used for credit notes (lib/credit-notes).
+export const SETTLE = (tolerance: number) => sql`
   settle as (
     update invoices as i set
       status = case
-        when totals.settled > 0 and totals.settled >= i.total - ${tolerance}::double precision then 'paid'
+        when totals.settled > 0
+          and totals.settled >= i.total - totals.credited - ${tolerance}::double precision then 'paid'
         else 'sent' end,
       paid_at = case
-        when totals.settled > 0 and totals.settled >= i.total - ${tolerance}::double precision then totals.last_received
+        when totals.settled > 0
+          and totals.settled >= i.total - totals.credited - ${tolerance}::double precision then totals.last_received
         else null end
     from totals
     where i.id = totals.invoice_id and i.status <> 'cancelled'
     returning i.id
   )`;
+
+// The credit notes on an invoice (`invoiceId` is an SQL expression), for
+// the totals CTEs.
+export const CREDITED = (invoiceId: SQL) =>
+  sql`coalesce((select sum(cn.amount) from credit_notes as cn where cn.invoice_id = ${invoiceId}), 0)`;
 
 function values(id: string, userId: string, f: PaymentFields) {
   return {
@@ -93,7 +102,8 @@ export async function insertInvoicePayment(
             coalesce((select sum(q.amount + q.fees + q.tax_withheld) from payments as q
                       where q.invoice_id = ins.invoice_id), 0) + ins.part as settled,
             greatest(coalesce((select max(q.received_on) from payments as q
-                               where q.invoice_id = ins.invoice_id), ''), ins.received_on) as last_received
+                               where q.invoice_id = ins.invoice_id), ''), ins.received_on) as last_received,
+            ${CREDITED(sql`ins.invoice_id`)} as credited
           from ins
         ), ${SETTLE(SETTLED_TOLERANCE)}
         select (select count(*) from ins)::int as n
@@ -156,7 +166,8 @@ export async function updatePayment(
             coalesce((select sum(q.amount + q.fees + q.tax_withheld) from payments as q
                       where q.invoice_id = upd.invoice_id and q.id <> ${p.id}), 0) + upd.part as settled,
             greatest(coalesce((select max(q.received_on) from payments as q
-                               where q.invoice_id = upd.invoice_id and q.id <> ${p.id}), ''), upd.received_on) as last_received
+                               where q.invoice_id = upd.invoice_id and q.id <> ${p.id}), ''), upd.received_on) as last_received,
+            ${CREDITED(sql`upd.invoice_id`)} as credited
           from upd where upd.invoice_id is not null
         ), ${SETTLE(SETTLED_TOLERANCE)}
         select (select count(*) from upd)::int as n
@@ -180,7 +191,8 @@ export async function deletePayment(db: Db, id: string, userId: string): Promise
             coalesce((select sum(q.amount + q.fees + q.tax_withheld) from payments as q
                       where q.invoice_id = del.invoice_id and q.id <> ${id}), 0) as settled,
             (select max(q.received_on) from payments as q
-             where q.invoice_id = del.invoice_id and q.id <> ${id}) as last_received
+             where q.invoice_id = del.invoice_id and q.id <> ${id}) as last_received,
+            ${CREDITED(sql`del.invoice_id`)} as credited
           from del where del.invoice_id is not null
         ), ${SETTLE(SETTLED_TOLERANCE)}
         select (select count(*) from del)::int as n

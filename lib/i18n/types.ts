@@ -49,6 +49,7 @@ export type Dictionary = {
       emailPasswordRequired: string;
       emailExists: string;
       invalidCredentials: string;
+      passwordTooShort: string;
     };
   };
   landing: {
@@ -250,6 +251,7 @@ export type Dictionary = {
       partly_paid: string;
       paid: string;
       overdue: string;
+      credited: string;
       cancelled: string;
     };
     payments: {
@@ -271,6 +273,10 @@ export type Dictionary = {
       notDraft: string;
       ddvNotRegistered: string;
     };
+    duplicate: {
+      button: string;
+      failed: string;
+    };
     cancel: {
       button: string;
       title: string;
@@ -280,7 +286,53 @@ export type Dictionary = {
       cancelled: string;
       notIssued: string;
       hasPayments: string;
+      hasCreditNotes: string;
       note: string;
+    };
+  };
+  creditNotes: {
+    title: string;
+    none: string;
+    credited: string;
+    creditedShort: string;
+    issue: string;
+    date: string;
+    amount: string;
+    amountPlain: string;
+    amountHint: string;
+    ddvSplit: string;
+    reason: string;
+    reasonPlaceholder: string;
+    numberNote: string;
+    submit: string;
+    issued: string;
+    downloadPdf: string;
+    delete: string;
+    deleteTitle: string;
+    deleteDesc: string;
+    incomeTaxNote: string;
+    cancelHint: string;
+    errors: {
+      dateInvalid: string;
+      dateFuture: string;
+      dateBeforeInvoice: string;
+      amountInvalid: string;
+      amountTooHigh: string;
+      reasonRequired: string;
+      notIssued: string;
+      notLatest: string;
+    };
+    pdf: {
+      title: string;
+      number: string;
+      date: string;
+      invoice: string;
+      forInvoice: string;
+      customer: string;
+      reason: string;
+      base: string;
+      amount: string;
+      invoiceRate: string;
     };
   };
   payments: {
@@ -416,6 +468,7 @@ export type Dictionary = {
       delete: string;
       deleteTitle: string;
       deleteDesc: string;
+      filedWarning: string;
       errors: {
         dateInvalid: string;
         dateFuture: string;
@@ -430,6 +483,94 @@ export type Dictionary = {
         deemedInvalid: string;
         notFound: string;
       };
+    };
+  };
+  exports: {
+    paymentsCsv: string;
+    invoicesCsv: string;
+    creditNotesCsv: string;
+    yearLabel: string;
+    invoiceRateSources: {
+      nbrsm: string;
+      approximate: string;
+    };
+    payments: {
+      received_on: string;
+      client: string;
+      client_country: string;
+      invoice_number: string;
+      currency: string;
+      amount_credited: string;
+      fees: string;
+      tax_withheld: string;
+      rate_to_mkd: string;
+      rate_source: string;
+      received_mkd: string;
+      gross_mkd: string;
+      treatment: string;
+      deemed_costs_rate: string;
+      base_mkd: string;
+      tax_mkd: string;
+      credit_mkd: string;
+      owed_mkd: string;
+      already_paid_for_you_mkd: string;
+      ujp_status: string;
+      ujp_reference: string;
+      ujp_folio: string;
+      tax_paid_on: string;
+      channel: string;
+      note: string;
+    };
+    invoices: {
+      number: string;
+      standing: string;
+      date: string;
+      supply_date: string;
+      due_date: string;
+      client: string;
+      client_country: string;
+      currency: string;
+      subtotal: string;
+      ddv_rate: string;
+      ddv_amount: string;
+      total: string;
+      credited: string;
+      paid: string;
+      balance: string;
+      rate_to_mkd: string;
+      rate_source: string;
+      total_mkd: string;
+    };
+    creditNotes: {
+      number: string;
+      date: string;
+      invoice_number: string;
+      client: string;
+      currency: string;
+      amount: string;
+      ddv_amount: string;
+      reason: string;
+      amount_mkd: string;
+    };
+  };
+  attachments: {
+    proofTitle: string;
+    contractsTitle: string;
+    none: string;
+    upload: string;
+    limits: string;
+    uploaded: string;
+    delete: string;
+    deleteTitle: string;
+    deleteDesc: string;
+    deleteWithPayment: string;
+    deleteWithClient: string;
+    errors: {
+      tooLarge: string;
+      type: string;
+      quota: string;
+      notFound: string;
+      invalid: string;
     };
   };
   settings: {
@@ -462,6 +603,20 @@ export type Dictionary = {
     memberSince: string;
     monthlyAdvance: string;
     monthlyAdvanceHint: string;
+    password: {
+      title: string;
+      current: string;
+      new: string;
+      confirm: string;
+      submit: string;
+      changed: string;
+      errors: {
+        required: string;
+        wrongCurrent: string;
+        tooShort: string;
+        mismatch: string;
+      };
+    };
     errors: {
       nameRequired: string;
       advanceInvalid: string;

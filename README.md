@@ -26,7 +26,11 @@ is. Freelancr puts the invoices and the local tax picture in one place.
 | VAT (DDV) | Only a user registered for VAT gets the DDV rate choice (0%, 5% or 18%); everyone else's invoices carry none, whatever the form sends (VAT law Art. 51(3), Art. 55) |
 | Currencies | EUR, USD, GBP, CHF, AUD, CAD and MKD, from one shared list; each client has a default currency |
 | Payments | Each payment is the money that reached your account, on the day it did: against an issued invoice, or a payout without one (a platform such as Upwork is a client). It records what was credited, fees the bank or platform took, and tax withheld at source, converted at the NBRSM middle rate on the day received, looked up live (you type the rate only if the National Bank can't be reached). How its tax is handled is fixed when it's saved: business income if you're registered self-employed, withheld by the client for a company in North Macedonia, otherwise reported by you |
-| Invoice status | Paid, partly paid and overdue come from the payments: an invoice is paid once its payments (credited + fees + tax withheld) cover the total, and overdue once it's past its due date unpaid. The invoice shows its payments, the balance due, or what was overpaid; recording, editing or deleting a payment updates the invoice in the same statement |
+| Invoice status | Paid, partly paid, overdue and credited come from the payments and credit notes: an invoice is paid once its payments (credited + fees + tax withheld) cover the total less its credit notes, overdue once it's past its due date unpaid, and credited when credit notes cover all of it and nothing was paid. The invoice shows its payments and credit notes, the balance due, or what was overpaid; recording, editing or deleting a payment or a credit note updates the invoice in the same statement |
+| Duplicate | Any invoice, in any state, copies into a new draft dated today: the client, currency, line items, notes and payment term, the rate for today, and its DDV rate only if you're registered for VAT now |
+| Credit notes | A credit note (книжно одобрение) on an issued invoice: a date, an amount up to what's left to credit (DDV included, split in the invoice's proportion) and a reason. Numbered CN-YYYY-NNN per year when it's issued; only your latest one can be deleted, so the numbers stay without gaps. It lowers what the client owes and, with DDV, the base and DDV in the period of its date (VAT law Art. 22(1)), and comes off the DDV threshold for a client in North Macedonia. The PDF is in the client's language. An invoice with credit notes isn't cancelled. Income tax follows payments, so a credit note doesn't change it; refunds aren't recorded |
+| Exports | CSV for a year: payments (with each one's tax), invoices (credited, paid, balance) and credit notes. UTF-8 with a BOM so Excel shows Cyrillic, headers in your language, plain numbers, and text that a spreadsheet would run as a formula neutralised |
+| Attachments | Proof for е-ПДД on each payment (the bank statement, the contract or confirmation) and contracts on each client: PDF, PNG or JPEG (told from the file's first bytes), up to 4 MB each and 100 MB in all, kept in the database and downloaded only by their owner. A file goes when its payment or client does |
 | PDF | In the client's invoice language, with what an invoice has to state: number, date and place of issue, date of supply, the issuer's VAT number or "The issuer is not registered for VAT.", the signatory with a line to sign, and bank, IBAN and BIC/SWIFT |
 | Clients | Company or private person, any country (ISO 3166 plus Kosovo), invoice language (Macedonian by default for clients in North Macedonia, English otherwise), tax ID, contact person and notes, and for clients whose payments you report yourself, the deemed costs their payments start with (author's rights only, Art. 40; 0% by default); a client with invoices or payments can't be deleted, and the app says why |
 | Dashboard | What you owe UJP (late months in red, the month due by the 15th, this month so far, and what companies already paid for you this year), what you received this year, outstanding invoices with their balance, the DDV monitor, the next tax deadline still to meet, and recent invoices with their balance |
@@ -34,7 +38,7 @@ is. Freelancr puts the invoices and the local tax picture in one place.
 | DDV monitor | Your issued invoices to clients in North Macedonia this year, paid or not, by date of supply, plus their payments without an invoice by the day received, against 2,000,000 MKD, with warnings at 70%, 85% and over the threshold. Services to clients abroad don't count; hidden once you're registered for VAT or while there's no local supply |
 | Payments page | A year at a time, newest month first: each month's payments, its income and tax, what's owed to UJP with the deadlines and where the calculation stands, the steps to mark it filed, approved and paid, and a flag (with a one-click fix for backfilled ones) on months where a rate isn't the National Bank's for its day. Above them, the year's totals and income by client; below, the year's tax deadlines |
 | Tax deadlines | UJP's deadlines for how you're registered for tax. Not registered for an activity (the default): for each month in which a client abroad or a private person in North Macedonia paid you, submit the calculation by the 10th and pay the tax by the 15th of the next month (companies in North Macedonia withhold the tax themselves), and for each year with income, confirm or correct UJP's annual tax return (ГДП) by 31 May and pay what it shows by 30 June of the next year (Art. 96(3), 100(2)). Registered self-employed: the monthly advance by the 15th for the previous month, the annual tax balance (ПДД-ДБ) by 15 March and any difference by 30 March |
-| Settings | Business profile (EDB, address, place of issue, signatory, bank, IBAN, BIC/SWIFT, local account number), how you're registered for tax (and the monthly advance if self-employed), and VAT registration with the VAT number. The personal ID number (ЕМБГ) is never asked for, and is refused as a tax or VAT number |
+| Settings | Business profile (EDB, address, place of issue, signatory, bank, IBAN, BIC/SWIFT, local account number), how you're registered for tax (and the monthly advance if self-employed), and VAT registration with the VAT number; changing your password. The personal ID number (ЕМБГ) is never asked for, and is refused as a tax or VAT number |
 | Languages | Macedonian (default), Albanian and English |
 
 ## Known limitations
@@ -56,7 +60,12 @@ is. Freelancr puts the invoices and the local tax picture in one place.
   contract or confirmation and the bank statement).
 - **Nothing is emailed.** There's no email sending at all, and tax
   deadlines show up in the app only.
-- **No credit notes.** Cancelling an issued invoice just marks it cancelled.
+- **No refunds.** A credit note on an invoice that was already paid shows
+  what was overpaid; paying it back isn't recorded, and income tax follows
+  the payments received.
+- **Attachments live in Postgres.** 4 MB per file (Vercel takes request
+  bodies up to 4.5 MB) and 100 MB per user; there's no virus scanning, and
+  files are only ever served as downloads.
 - **Tax rules are constants.** The DDV threshold, the flat 10% income tax
   rate and the deadlines are hardcoded in `lib/tax/calculator.ts`, the tax
   maths in `lib/tax/payments.ts`. UJP's approved calculation is the final
@@ -73,26 +82,32 @@ is. Freelancr puts the invoices and the local tax picture in one place.
   has deadlines once you record a self-reported payment received in it.
 - **No e-Faktura.** Nothing talks to UJP's systems.
 - **No billing or plans.**
-- **No password reset.**
+- **No password reset.** You can change your password in Settings, but
+  there's no reset by email, and changing it doesn't sign out other
+  sessions.
 
 ## How it works
 
 1. **Next.js 16 App Router.** Pages in `app/(dashboard)` are server components
    that query the database directly; writes go through Server Actions in
-   `lib/actions/` (auth, clients, invoices, payments, rates, settings,
-   locale).
+   `lib/actions/` (auth, clients, invoices, credit notes, payments,
+   attachments, rates, settings, locale). Uploads, downloads, PDFs and CSV
+   exports are route handlers under `app/api/`.
 2. **Auth.** Email and password with bcrypt hashes. The session is a JWT signed
    with `jose` in an httpOnly cookie that lasts 30 days, and `proxy.ts` sends
    signed-out visitors to `/sign-in`.
 3. **Data.** Drizzle ORM on Neon Postgres over Neon's serverless HTTP driver.
-   Tables: users, clients, invoices, invoice items, payments, and the rate
-   cache. Each invoice stores its rate (with where it came from and its day)
+   Tables: users, clients, invoices, invoice items, payments, credit notes,
+   attachments, and the rate cache. Each invoice stores its rate (with where it came from and its day)
    and MKD total when it's saved. A draft gets its number when it's issued,
    in one `UPDATE` (`lib/invoices/numbering.ts`), with a unique index on
    (user, number); saving a draft only matches drafts
-   (`lib/invoices/drafts.ts`). Every payment write is one SQL statement that
-   also sets the invoice's status and paid date from all its payments
-   (`lib/payments/write.ts`), so the two never disagree. Migrations only add
+   (`lib/invoices/drafts.ts`). Every payment or credit note write is one SQL
+   statement that also sets the invoice's status and paid date from all its
+   payments and credit notes (`lib/payments/write.ts`,
+   `lib/credit-notes/write.ts`), so they never disagree; a credit note's
+   number is worked out in the same statement, like an invoice's. Files are
+   stored as `bytea` and only the download route reads them back. Migrations only add
    tables, columns and indexes, since preview deployments run them on the
    production database while the old code is still live; the one that added
    payments also created a payment for every invoice already marked paid.
@@ -104,9 +119,10 @@ is. Freelancr puts the invoices and the local tax picture in one place.
    and the deadlines, `lib/tax/payments.ts` for each payment's tax and each
    month's and year's totals, and `lib/payments/settlement.ts` for how far
    payments settle an invoice.
-6. **PDFs.** `GET /api/invoices/[id]/pdf` renders the invoice with
-   `@react-pdf/renderer` in the client's invoice language, using the full
-   Noto Sans for Latin and Cyrillic.
+6. **PDFs.** `GET /api/invoices/[id]/pdf` and
+   `GET /api/credit-notes/[id]/pdf` render with `@react-pdf/renderer` in the
+   client's invoice language, using the full Noto Sans for Latin and
+   Cyrillic.
 7. **i18n.** Typed dictionaries in `lib/i18n/dictionaries/` (`mk`, `en`,
    `sq`); the chosen language is kept in a cookie.
 
@@ -133,7 +149,8 @@ After `npm run setup` you can sign in with the demo account,
 `demo@freelancr.mk` / `demo1234`, which comes with sample clients, invoices
 and six months of payments dated from today (a partial payment, a company in
 North Macedonia paying net of withholding, a payment with tax withheld abroad,
-platform payouts without an invoice, older months filed and paid with UJP).
+platform payouts without an invoice, a credit note on the overdue invoice,
+older months filed and paid with UJP).
 It fetches the National Bank's rates for those days, or uses the fixed ones,
 marked as such, if it can't.
 

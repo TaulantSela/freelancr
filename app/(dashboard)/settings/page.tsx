@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SettingsForm } from "@/components/dashboard/settings-form";
+import { ChangePasswordForm } from "@/components/dashboard/change-password-form";
 import { getTranslations } from "@/lib/i18n/server";
 
 export default async function SettingsPage() {
@@ -39,7 +40,7 @@ export default async function SettingsPage() {
   if (!user) redirect("/sign-in");
 
   return (
-    <div className="p-6 max-w-2xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-2xl mx-auto space-y-6">
       <div>
         <h1 className="text-xl font-semibold">{t.settings.title}</h1>
         <p className="text-sm text-muted-foreground">{t.settings.subtitle}</p>
@@ -68,6 +69,15 @@ export default async function SettingsPage() {
             <span className="text-muted-foreground">{t.settings.memberSince}</span>
             <span className="text-xs text-muted-foreground">{user.createdAt?.slice(0, 10)}</span>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">{t.settings.password.title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ChangePasswordForm />
         </CardContent>
       </Card>
     </div>

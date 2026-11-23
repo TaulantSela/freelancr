@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Pencil, Plus } from "lucide-react";
+import { ArrowLeft, Download, Pencil, Plus } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { getInvoiceDetail } from "@/lib/invoices/queries";
 import { formatDate } from "@/lib/utils";
@@ -13,6 +13,11 @@ import { DeleteInvoiceButton } from "@/components/invoices/delete-invoice-button
 import { DownloadPdfButton } from "@/components/invoices/download-pdf-button";
 import { IssueInvoiceButton } from "@/components/invoices/issue-invoice-button";
 import { CancelInvoiceButton } from "@/components/invoices/cancel-invoice-button";
+import { DuplicateInvoiceButton } from "@/components/invoices/duplicate-invoice-button";
+import { CreditNoteForm } from "@/components/credit-notes/credit-note-form";
+import { DeleteCreditNoteButton } from "@/components/credit-notes/delete-credit-note-button";
+import { getInvoiceCreditNotes, getLatestCreditNoteId } from "@/lib/credit-notes/queries";
+import { creditableAmount } from "@/lib/credit-notes/amounts";
 import { getTranslations } from "@/lib/i18n/server";
 import { LOCALE_LABELS } from "@/lib/i18n/config";
 import { resolveInvoiceLanguage } from "@/lib/clients/config";
@@ -33,9 +38,11 @@ export default async function InvoiceDetailPage({
   const { id } = await params;
   const { t } = await getTranslations();
 
-  const [data, payments] = await Promise.all([
+  const [data, payments, creditNotes, latestCreditNoteId] = await Promise.all([
     getInvoiceDetail(id, session.userId),
     getInvoicePayments(id, session.userId),
+    getInvoiceCreditNotes(id, session.userId),
+    getLatestCreditNoteId(session.userId),
   ]);
   if (!data) notFound();
 
@@ -47,10 +54,15 @@ export default async function InvoiceDetailPage({
   // Labels for the issuer's details, in the app's language.
   const pdf = t.invoices.pdf;
   const invoiceLanguage = resolveInvoiceLanguage(client);
-  // Paid, partly paid or overdue come from the payments and the due date.
-  const standing = invoiceStanding(invoice, settledAmount(payments), toSkopjeDate(new Date()));
+  // Paid, partly paid, overdue or credited come from the payments, the
+  // credit notes and the due date.
+  const today = toSkopjeDate(new Date());
+  const credited = creditNotes.reduce((sum, c) => sum + c.amount, 0);
+  const standing = invoiceStanding(invoice, settledAmount(payments), today, credited);
   const issued = !isDraft && invoice.status !== "cancelled" && invoice.number !== null;
+  const creditable = creditableAmount(invoice.total, credited);
   const ip = t.invoices.payments;
+  const cnt = t.creditNotes;
 
   return (
     <div className="p-4 sm:p-6 max-w-3xl mx-auto space-y-6">
@@ -75,11 +87,12 @@ export default async function InvoiceDetailPage({
           )}
           {isDraft && <IssueInvoiceButton id={invoice.id} year={invoice.date.slice(0, 4)} />}
           <DownloadPdfButton invoiceId={invoice.id} />
+          <DuplicateInvoiceButton id={invoice.id} />
           {/* Drafts can be deleted; issued invoices only cancelled, since
               they're kept for five years (VAT law Art. 56). */}
           {isDraft && <DeleteInvoiceButton id={invoice.id} number={invoice.number} />}
-          {/* With payments recorded it can't be cancelled (delete them first). */}
-          {issued && invoice.number && payments.length === 0 && (
+          {/* With payments or credit notes it can't be cancelled. */}
+          {issued && invoice.number && payments.length === 0 && creditNotes.length === 0 && (
             <CancelInvoiceButton id={invoice.id} number={invoice.number} />
           )}
         </div>
@@ -346,6 +359,12 @@ export default async function InvoiceDetailPage({
                 <span className="text-muted-foreground">{t.invoices.form.total}</span>
                 <span className="font-mono">{formatCurrency(invoice.total, invoice.currency)}</span>
               </div>
+              {credited > 0 && (
+                <div className="flex justify-between gap-4">
+                  <span className="text-muted-foreground">{cnt.credited}</span>
+                  <span className="font-mono">− {formatCurrency(credited, invoice.currency)}</span>
+                </div>
+              )}
               <div className="flex justify-between gap-4">
                 <span className="text-muted-foreground">{ip.settled}</span>
                 <span className="font-mono">{formatCurrency(standing.settled, invoice.currency)}</span>
@@ -371,6 +390,61 @@ export default async function InvoiceDetailPage({
             <p className="text-xs text-muted-foreground">
               {ip.settledNote}
               {issued && payments.length > 0 && ` ${ip.cancelHint}`}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {(issued || creditNotes.length > 0) && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">{cnt.title}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {creditNotes.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{cnt.none}</p>
+            ) : (
+              <ul className="divide-y divide-border rounded-md border border-border">
+                {creditNotes.map((c) => (
+                  <li key={c.id} className="px-3 py-2.5 text-sm space-y-1">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                      <span className="font-mono font-medium">{c.number}</span>
+                      <span className="font-mono">− {formatCurrency(c.amount, invoice.currency)}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {formatTaxDate(c.date, t)}
+                      {c.ddvAmount > 0 &&
+                        ` · ${formatMessage(cnt.ddvSplit, {
+                          base: formatCurrency(c.amount - c.ddvAmount, invoice.currency),
+                          ddv: formatCurrency(c.ddvAmount, invoice.currency),
+                        })}`}
+                    </div>
+                    <div className="text-xs whitespace-pre-wrap">{c.reason}</div>
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <a href={`/api/credit-notes/${c.id}/pdf`} download>
+                        <Button size="sm" variant="outline" className="h-7 gap-1.5 text-xs">
+                          <Download className="h-3 w-3" /> {cnt.downloadPdf}
+                        </Button>
+                      </a>
+                      {c.id === latestCreditNoteId && <DeleteCreditNoteButton id={c.id} number={c.number} />}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {issued && creditable > 0 && (
+              <CreditNoteForm
+                invoiceId={invoice.id}
+                currency={invoice.currency}
+                ddvRate={invoice.ddvRate}
+                creditable={creditable}
+                today={today}
+                invoiceDate={invoice.date}
+              />
+            )}
+            <p className="text-xs text-muted-foreground">
+              {cnt.incomeTaxNote}
+              {issued && creditNotes.length > 0 && ` ${cnt.cancelHint}`}
             </p>
           </CardContent>
         </Card>

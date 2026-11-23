@@ -74,6 +74,16 @@ export type ThresholdPayout = {
   valueMKD: number;
 };
 
+// A credit note on an invoice: it takes its amount off the supplies of the
+// year it's dated in, when the change was made (VAT law Art. 22(1)).
+export type ThresholdCreditNote = {
+  clientCountry: string;
+  // "YYYY-MM-DD"
+  date: string;
+  // DDV included, at the invoice's rate, as invoices count their total.
+  amountMKD: number;
+};
+
 // What counts toward the DDV threshold in `year`. "Total turnover" is the
 // turnover taxable under Art. 2(1), i.e. supplies made in North Macedonia
 // (Art. 51(2)). A service to a taxable person abroad is supplied where that
@@ -84,11 +94,13 @@ export type ThresholdPayout = {
 // a client in North Macedonia": every issued, not cancelled invoice to a
 // client there, paid or not, by its date of supply in the year, and every
 // payment without an invoice from a client there, by the day it was received
-// (there's no date of supply without an invoice).
+// (there's no date of supply without an invoice), less the credit notes on
+// invoices to clients there dated in the year. The total never goes below 0.
 export function getLocalSupplies(
   invoices: readonly ThresholdInvoice[],
   year: number,
-  payouts: readonly ThresholdPayout[] = []
+  payouts: readonly ThresholdPayout[] = [],
+  creditNotes: readonly ThresholdCreditNote[] = []
 ): { totalMKD: number; count: number } {
   let totalMKD = 0;
   let count = 0;
@@ -106,7 +118,12 @@ export function getLocalSupplies(
     totalMKD += payout.valueMKD;
     count++;
   }
-  return { totalMKD, count };
+  for (const creditNote of creditNotes) {
+    if (creditNote.clientCountry !== "MK") continue;
+    if (!creditNote.date.startsWith(`${year}-`)) continue;
+    totalMKD -= creditNote.amountMKD;
+  }
+  return { totalMKD: Math.max(0, totalMKD), count };
 }
 
 export function getDDVStatus(localSuppliesMKD: number): {

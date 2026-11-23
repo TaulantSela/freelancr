@@ -28,6 +28,8 @@ export type PayableInvoice = {
   number: string;
   currency: string;
   total: number;
+  // Credit notes on it; what's left to pay is total - credited - settled.
+  credited: number;
   settled: number;
   clientId: string;
   clientName: string;
@@ -87,6 +89,7 @@ export function PaymentForm({
   clients,
   presetInvoiceId,
   existing,
+  filed = false,
 }: {
   taxStatus: string;
   today: string;
@@ -94,6 +97,8 @@ export function PaymentForm({
   clients: PayerClient[];
   presetInvoiceId?: string;
   existing?: ExistingPayment;
+  // Editing a payment whose month is already filed with UJP.
+  filed?: boolean;
 }) {
   const t = useTranslations();
   const f = t.payments.form;
@@ -105,7 +110,7 @@ export function PaymentForm({
   // Macedonia pays 90% of it and withholds the other 10% (Art. 80(1)).
   const prefill = (inv: PayableInvoice | undefined) => {
     if (!inv) return { amount: "", taxWithheld: "" };
-    const balance = Math.max(0, round2(inv.total - inv.settled));
+    const balance = Math.max(0, round2(inv.total - inv.credited - inv.settled));
     if (taxTreatmentFor(taxStatus, { country: inv.clientCountry, clientType: inv.clientType }) === "withheld") {
       const amount = round2(balance * 0.9);
       return { amount: amountText(amount), taxWithheld: amountText(round2(balance - amount)) };
@@ -212,6 +217,11 @@ export function PaymentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {filed && (
+        <p className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-400">
+          {f.filedWarning}
+        </p>
+      )}
       {existing ? (
         <div className="rounded-md border border-border px-3 py-2 text-sm">
           <div className="font-medium">{existing.clientName}</div>
@@ -243,7 +253,10 @@ export function PaymentForm({
               <p className="text-xs text-muted-foreground">
                 {formatMessage(f.balanceHint, {
                   number: invoice.number,
-                  amount: formatCurrency(Math.max(0, invoice.total - invoice.settled), invoice.currency),
+                  amount: formatCurrency(
+                    Math.max(0, round2(invoice.total - invoice.credited - invoice.settled)),
+                    invoice.currency
+                  ),
                 })}
               </p>
             )}

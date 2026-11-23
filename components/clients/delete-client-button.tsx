@@ -23,11 +23,14 @@ export function DeleteClientButton({
   id,
   name,
   recordCount,
+  attachmentCount = 0,
 }: {
   id: string;
   name: string;
   // Invoices plus payments: either keeps the client.
   recordCount: number;
+  // Contracts: deleted with the client.
+  attachmentCount?: number;
 }) {
   const t = useTranslations();
   const [pending, startTransition] = useTransition();
@@ -84,7 +87,11 @@ export function DeleteClientButton({
               <AlertDialogTitle>
                 {formatMessage(t.clients.deleteTitle, { name })}
               </AlertDialogTitle>
-              <AlertDialogDescription>{t.clients.deleteDesc}</AlertDialogDescription>
+              <AlertDialogDescription>
+                {t.clients.deleteDesc}
+                {attachmentCount > 0 &&
+                  ` ${formatMessage(t.attachments.deleteWithClient, { count: attachmentCount })}`}
+              </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>

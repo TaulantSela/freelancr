@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Users, Globe, Mail } from "lucide-react";
 import { DeleteClientButton } from "@/components/clients/delete-client-button";
+import { getClientAttachmentCounts } from "@/lib/attachments/queries";
 import { getTranslations } from "@/lib/i18n/server";
 import { formatMessage } from "@/lib/i18n/format";
 
@@ -30,7 +31,7 @@ export default async function ClientsPage() {
     .from(clients)
     .where(eq(clients.userId, session.userId));
 
-  const [invoiceCounts, paymentCounts] = await Promise.all([
+  const [invoiceCounts, paymentCounts, contractCounts] = await Promise.all([
     Promise.all(
       clientList.map((c) =>
         getDb()
@@ -49,6 +50,7 @@ export default async function ClientsPage() {
           .then((rows) => rows[0])
       )
     ),
+    getClientAttachmentCounts(session.userId),
   ]);
 
   return (
@@ -130,6 +132,7 @@ export default async function ClientsPage() {
                       id={client.id}
                       name={client.name}
                       recordCount={(invoiceCounts[i]?.cnt ?? 0) + (paymentCounts[i]?.cnt ?? 0)}
+                      attachmentCount={contractCounts.get(client.id) ?? 0}
                     />
                   </div>
                 </div>

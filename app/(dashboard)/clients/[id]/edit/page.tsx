@@ -10,6 +10,8 @@ import { eq, and } from "drizzle-orm";
 import { getTranslations } from "@/lib/i18n/server";
 import { getCountryOptions } from "@/lib/clients/countries";
 import { getTaxProfile } from "@/lib/tax/queries";
+import { AttachmentList } from "@/components/attachments/attachment-list";
+import { getClientAttachments } from "@/lib/attachments/queries";
 
 export default async function EditClientPage({
   params,
@@ -22,13 +24,14 @@ export default async function EditClientPage({
   const { id } = await params;
   const { t, locale } = await getTranslations();
 
-  const [[client], { taxStatus }] = await Promise.all([
+  const [[client], { taxStatus }, contracts] = await Promise.all([
     getDb()
       .select()
       .from(clients)
       .where(and(eq(clients.id, id), eq(clients.userId, session.userId)))
       .limit(1),
     getTaxProfile(session.userId),
+    getClientAttachments(id, session.userId),
   ]);
 
   if (!client) notFound();
@@ -51,6 +54,14 @@ export default async function EditClientPage({
         </CardHeader>
         <CardContent>
           <ClientForm client={client} countries={getCountryOptions(locale)} taxStatus={taxStatus} />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t.attachments.contractsTitle}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AttachmentList owner={{ clientId: client.id }} items={contracts} />
         </CardContent>
       </Card>
     </div>

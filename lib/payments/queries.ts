@@ -1,5 +1,6 @@
 import { and, desc, eq, gte, inArray, isNotNull, lte, or, sql } from "drizzle-orm";
 import { getDb, payments, clients, invoices } from "@/lib/db";
+import { getCreditedByInvoice } from "@/lib/credit-notes/queries";
 
 // A payment as the pages and the tax maths read it.
 const paymentColumns = {
@@ -109,7 +110,10 @@ export async function getSettledByInvoice(userId: string): Promise<Map<string, n
 // The user's issued invoices a payment can go against (not drafts, not
 // cancelled), with what's settled so far, newest first.
 export async function getPayableInvoices(userId: string) {
-  const settled = await getSettledByInvoice(userId);
+  const [settled, credited] = await Promise.all([
+    getSettledByInvoice(userId),
+    getCreditedByInvoice(userId),
+  ]);
   const rows = await getDb()
     .select({
       id: invoices.id,
@@ -133,5 +137,10 @@ export async function getPayableInvoices(userId: string) {
       )
     )
     .orderBy(desc(invoices.date));
-  return rows.map((r) => ({ ...r, number: r.number as string, settled: settled.get(r.id) ?? 0 }));
+  return rows.map((r) => ({
+    ...r,
+    number: r.number as string,
+    settled: settled.get(r.id) ?? 0,
+    credited: credited.get(r.id) ?? 0,
+  }));
 }

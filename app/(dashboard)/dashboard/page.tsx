@@ -18,6 +18,7 @@ import {
 } from "@/lib/tax/queries";
 import { formatTaxDate, formatTaxPeriod, taxDeadlineLabel } from "@/lib/tax/labels";
 import { getPaymentsReceived, getPaymentYears, getSettledByInvoice } from "@/lib/payments/queries";
+import { getCreditNotesForThreshold, getCreditedByInvoice } from "@/lib/credit-notes/queries";
 import { invoiceStanding } from "@/lib/payments/settlement";
 import {
   deadlineMet,
@@ -56,7 +57,7 @@ export default async function DashboardPage() {
   const thisYear = Number(today.slice(0, 4));
   const yearStart = `${thisYear}-01-01`;
 
-  const [profile, rows, paymentYears, issued, settledByInvoice, recent] = await Promise.all([
+  const [profile, rows, paymentYears, issued, settledByInvoice, creditedByInvoice, recent] = await Promise.all([
     getTaxProfile(session.userId),
     // This year's payments, plus earlier self-reported ones UJP isn't paid
     // for yet: those are still owed.
@@ -79,6 +80,7 @@ export default async function DashboardPage() {
         )
       ),
     getSettledByInvoice(session.userId),
+    getCreditedByInvoice(session.userId),
     getDb()
       .select({
         id: invoices.id,
@@ -113,7 +115,15 @@ export default async function DashboardPage() {
   // Outstanding: issued invoices with something left to pay, in MKD at each
   // invoice's rate.
   const unpaid = issued
-    .map((inv) => ({ inv, standing: invoiceStanding(inv, settledByInvoice.get(inv.id) ?? 0, today) }))
+    .map((inv) => ({
+      inv,
+      standing: invoiceStanding(
+        inv,
+        settledByInvoice.get(inv.id) ?? 0,
+        today,
+        creditedByInvoice.get(inv.id) ?? 0
+      ),
+    }))
     .filter(({ standing }) => standing.balance > 0);
   const outstandingMKD = unpaid.reduce((s, { inv, standing }) => s + standing.balance * inv.exchangeRateMKD, 0);
 
@@ -125,7 +135,8 @@ export default async function DashboardPage() {
     : getLocalSupplies(
         await getInvoicesForThreshold(session.userId, thisYear),
         thisYear,
-        await getPayoutsForThreshold(session.userId, thisYear)
+        await getPayoutsForThreshold(session.userId, thisYear),
+        await getCreditNotesForThreshold(session.userId, thisYear)
       );
   const showDdv = !vatRegistered && localSupplies.count > 0;
   const ddvStatus = getDDVStatus(localSupplies.totalMKD);
@@ -477,7 +488,12 @@ export default async function DashboardPage() {
           ) : (
             <div className="space-y-0">
               {recent.map((inv, i) => {
-                const standing = invoiceStanding(inv, settledByInvoice.get(inv.id) ?? 0, today);
+                const standing = invoiceStanding(
+                  inv,
+                  settledByInvoice.get(inv.id) ?? 0,
+                  today,
+                  creditedByInvoice.get(inv.id) ?? 0
+                );
                 const showBalance = inv.status !== "draft" && inv.status !== "cancelled" && standing.balance > 0;
                 return (
                   <div key={inv.id}>
