@@ -535,12 +535,17 @@ export function getRateToMKD(currency: string): number {
   return APPROXIMATE_RATES_TO_MKD[currency];
 }
 
+// "1.234.567,89 ден.": the Macedonian format, from the en-US one with the
+// separators swapped. Browsers whose Intl has no Macedonian data (Chrome's
+// doesn't) printed "1,234,567.89" for "mk-MK" in client components, which
+// also broke hydration against the server's output; en-US data is always
+// there, and rounds the same way.
 export function formatMKD(amount: number): string {
-  return new Intl.NumberFormat("mk-MK", {
-    style: "decimal",
+  const enUS = new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount) + " ден.";
+  }).format(amount);
+  return enUS.replace(/[,.]/g, (sep) => (sep === "," ? "." : ",")) + " ден.";
 }
 
 export function formatCurrency(amount: number, currency: string): string {
