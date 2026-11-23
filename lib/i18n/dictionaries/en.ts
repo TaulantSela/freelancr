@@ -299,6 +299,7 @@ export const en: Dictionary = {
       overpaid: "Overpaid by",
       settledNote:
         "Fees the bank or platform took and tax the client withheld count toward the invoice: the client paid them, even though they didn't reach your account.",
+      cancelHint: "To cancel this invoice, delete its payments first.",
     },
     issue: {
       button: "Issue invoice",

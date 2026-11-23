@@ -361,7 +361,10 @@ export default async function InvoiceDetailPage({
                 </div>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">{ip.settledNote}</p>
+            <p className="text-xs text-muted-foreground">
+              {ip.settledNote}
+              {issued && payments.length > 0 && ` ${ip.cancelHint}`}
+            </p>
           </CardContent>
         </Card>
       )}

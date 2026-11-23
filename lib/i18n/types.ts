@@ -260,6 +260,7 @@ export type Dictionary = {
       balanceDue: string;
       overpaid: string;
       settledNote: string;
+      cancelHint: string;
     };
     issue: {
       button: string;

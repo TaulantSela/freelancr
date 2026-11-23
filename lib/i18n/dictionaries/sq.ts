@@ -299,6 +299,7 @@ export const sq: Dictionary = {
       overpaid: "Paguar tepër",
       settledNote:
         "Provizionet që mori banka ose platforma dhe tatimi që mbajti klienti numërohen në faturë: klienti i pagoi, edhe pse nuk arritën në llogarinë tënde.",
+      cancelHint: "Për ta anuluar faturën, fshiji fillimisht pagesat.",
     },
     issue: {
       button: "Lësho faturën",
