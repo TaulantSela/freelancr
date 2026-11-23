@@ -109,7 +109,11 @@ export default async function ClientsPage() {
                         {t.common.edit}
                       </Button>
                     </Link>
-                    <DeleteClientButton id={client.id} name={client.name} />
+                    <DeleteClientButton
+                      id={client.id}
+                      name={client.name}
+                      invoiceCount={invoiceCounts[i]?.cnt ?? 0}
+                    />
                   </div>
                 </div>
               </CardContent>

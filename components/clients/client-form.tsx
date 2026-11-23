@@ -9,12 +9,12 @@ import { createClient, updateClient } from "@/lib/actions/clients";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n/client";
+import { SUPPORTED_CURRENCIES } from "@/lib/tax/calculator";
 import type { Client } from "@/lib/db/schema";
 
 const COUNTRY_CODES = ["MK", "US", "DE", "NL", "GB", "FR", "CH", "AU", "CA", "XK", "RS", "HR", "OTHER"] as const;
-const CURRENCIES = ["EUR", "USD", "GBP", "MKD", "CHF", "AUD", "CAD"];
 
-type State = { errorKey?: "nameRequired" } | null;
+type State = { errorKey?: "nameRequired" | "currencyUnsupported" } | null;
 
 async function createClientAction(_prev: State, formData: FormData): Promise<State> {
   const result = await createClient(formData);
@@ -112,7 +112,7 @@ export function ClientForm({ client }: { client?: Client }) {
             defaultValue={client?.currency ?? "EUR"}
             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
-            {CURRENCIES.map((c) => (
+            {SUPPORTED_CURRENCIES.map((c) => (
               <option key={c} value={c} className="bg-card">
                 {c}
               </option>

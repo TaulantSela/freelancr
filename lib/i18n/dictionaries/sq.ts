@@ -9,6 +9,7 @@ export const sq: Dictionary = {
   common: {
     appName: "Freelancr",
     cancel: "Anulo",
+    close: "Mbyll",
     save: "Ruaj",
     delete: "Fshi",
     edit: "Ndrysho",
@@ -91,7 +92,7 @@ export const sq: Dictionary = {
       },
       {
         title: "Ndjekës i të ardhurave vjetore",
-        desc: "Të ardhurat vjetore sipas klientit dhe monedhës, shkallët tatimore dhe detyrimi i vlerësuar.",
+        desc: "Të ardhurat vjetore sipas klientit dhe monedhës, me një vlerësim të tatimit mbi të ardhurat me normë të sheshtë 10%.",
       },
       {
         title: "Pajtim Wise & PayPal",
@@ -251,10 +252,14 @@ export const sq: Dictionary = {
       notes: "Shënime",
       submit: "Shto klient",
       nameRequired: "Emri i klientit është i detyrueshëm",
+      currencyUnsupported: "Zgjidh një nga monedhat e listuara",
     },
     deleteTitle: "Fshi {name}?",
     deleteDesc:
-      "Kjo do ta fshijë përgjithmonë klientin. Faturat ekzistuese do të mbeten por nuk do të lidhen më me këtë regjistër.",
+      "Kjo do ta fshijë përgjithmonë klientin. Ky veprim nuk mund të kthehet.",
+    deleteBlockedTitle: "{name} nuk mund të fshihet",
+    deleteBlockedDesc:
+      "{name} ka {count} faturë(a). Klientët me fatura nuk mund të fshihen, sepse faturat janë pjesë e evidencës së të ardhurave dhe tatimeve të tua.",
     countries: {
       MK: "Maqedonia e Veriut",
       US: "Shtetet e Bashkuara",
@@ -342,6 +347,7 @@ export const sq: Dictionary = {
       notesPlaceholder: "Llogaria bankare, kushtet, falenderim…",
       submit: "Krijo faturë",
       fillItems: "Plotëso të gjithë artikujt me përshkrim dhe çmim",
+      currencyUnsupported: "Kjo monedhë nuk mbështetet. Zgjidh një nga monedhat e listuara.",
     },
     status: {
       draft: "Draft",
@@ -374,7 +380,7 @@ export const sq: Dictionary = {
     totalEstTax: "Tatimi total i vlerësuar",
     effectiveRate: "Shkalla efektive",
     taxNote:
-      "Tatim progresiv MK: 10% mbi 1.080.000 MKD të parë, 18% mbi. Kjo është vlerësim — konsulto kontabilistin.",
+      "Tatimi mbi të ardhurat personale në MK është me normë të sheshtë 10%. Ky vlerësim e llogarit mbi faturat e paguara, por baza tatimore për veprimtarinë e pavarur janë të ardhurat neto pas shpenzimeve — konsulto kontabilistin.",
     quarterlyDeadlines: "Afatet tatimore tremujore {year}",
     passed: "Kaluar",
     daysAway: "për {days} ditë",

@@ -9,10 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { createInvoice } from "@/lib/actions/invoices";
 import {
-  FALLBACK_RATES,
+  SUPPORTED_CURRENCIES,
   formatCurrency,
   formatMKD,
-  toMKD,
+  getRateToMKD,
 } from "@/lib/tax/calculator";
 import { Plus, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -24,8 +24,6 @@ type LineItem = {
   quantity: number;
   unitPrice: number;
 };
-
-const CURRENCIES = ["EUR", "USD", "GBP", "MKD", "CHF", "AUD"];
 
 export function NewInvoiceForm({
   clients,
@@ -54,8 +52,8 @@ export function NewInvoiceForm({
   const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   const ddvAmount = subtotal * ddvRate;
   const total = subtotal + ddvAmount;
-  const rate = FALLBACK_RATES[currency] ?? 1;
-  const totalMKD = toMKD(total, currency, rate);
+  const rate = getRateToMKD(currency);
+  const totalMKD = total * rate;
 
   function addItem() {
     setItems((prev) => [...prev, { description: "", quantity: 1, unitPrice: 0 }]);
@@ -86,7 +84,8 @@ export function NewInvoiceForm({
 
     startTransition(async () => {
       const result = await createInvoice(fd);
-      if (result?.error) toast.error(result.error);
+      if (result?.errorKey) toast.error(f[result.errorKey]);
+      else if (result?.error) toast.error(result.error);
     });
   }
 
@@ -122,7 +121,7 @@ export function NewInvoiceForm({
             onChange={(e) => setCurrency(e.target.value)}
             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
-            {CURRENCIES.map((c) => (
+            {SUPPORTED_CURRENCIES.map((c) => (
               <option key={c} value={c} className="bg-card">
                 {c}
               </option>

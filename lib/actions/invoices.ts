@@ -2,10 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getDb, invoices, invoiceItems } from "@/lib/db";
+import { getDb, clients, invoices, invoiceItems } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId, generateInvoiceNumber } from "@/lib/utils";
-import { FALLBACK_RATES, toMKD } from "@/lib/tax/calculator";
+import { getRateToMKD, isSupportedCurrency } from "@/lib/tax/calculator";
 import { eq, and } from "drizzle-orm";
 
 export async function createInvoice(formData: FormData) {
@@ -27,6 +27,21 @@ export async function createInvoice(formData: FormData) {
     return { error: "Client, date, and at least one item are required" };
   }
 
+  if (!isSupportedCurrency(currency)) {
+    return { errorKey: "currencyUnsupported" as const };
+  }
+
+  // The client id comes from the form, so make sure it is one of this
+  // user's clients before attaching an invoice to it.
+  const [ownClient] = await getDb()
+    .select({ id: clients.id })
+    .from(clients)
+    .where(and(eq(clients.id, clientId), eq(clients.userId, session.userId)))
+    .limit(1);
+  if (!ownClient) {
+    return { error: "Client, date, and at least one item are required" };
+  }
+
   const existingInvoices = await getDb()
     .select({ number: invoices.number })
     .from(invoices)
@@ -37,8 +52,8 @@ export async function createInvoice(formData: FormData) {
   const subtotal = items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
   const ddvAmount = subtotal * ddvRate;
   const total = subtotal + ddvAmount;
-  const rate = FALLBACK_RATES[currency] ?? 1;
-  const totalMKD = toMKD(total, currency, rate);
+  const rate = getRateToMKD(currency);
+  const totalMKD = total * rate;
 
   const invoiceId = generateId();
 

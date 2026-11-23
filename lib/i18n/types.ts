@@ -8,6 +8,7 @@ export type Dictionary = {
   common: {
     appName: string;
     cancel: string;
+    close: string;
     save: string;
     delete: string;
     edit: string;
@@ -150,9 +151,12 @@ export type Dictionary = {
       notes: string;
       submit: string;
       nameRequired: string;
+      currencyUnsupported: string;
     };
     deleteTitle: string;
     deleteDesc: string;
+    deleteBlockedTitle: string;
+    deleteBlockedDesc: string;
     countries: Record<string, string>;
   };
   invoices: {
@@ -224,6 +228,7 @@ export type Dictionary = {
       notesPlaceholder: string;
       submit: string;
       fillItems: string;
+      currencyUnsupported: string;
     };
     status: {
       draft: string;

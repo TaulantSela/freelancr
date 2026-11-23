@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
-import { FALLBACK_RATES } from "@/lib/tax/calculator";
+import { getRateToMKD, isSupportedCurrency } from "@/lib/tax/calculator";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const currency = searchParams.get("currency")?.toUpperCase() ?? "EUR";
+
+  if (!isSupportedCurrency(currency)) {
+    return NextResponse.json(
+      { error: `Unsupported currency: ${currency}` },
+      { status: 400 }
+    );
+  }
 
   // Try to fetch from a free exchange rate API
   try {
@@ -32,7 +39,7 @@ export async function GET(request: Request) {
   }
 
   // Return fallback rate
-  const fallbackRate = FALLBACK_RATES[currency] ?? 61.5;
+  const fallbackRate = getRateToMKD(currency);
   return NextResponse.json({
     currency,
     rate: fallbackRate,

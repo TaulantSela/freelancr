@@ -9,6 +9,7 @@ export const en: Dictionary = {
   common: {
     appName: "Freelancr",
     cancel: "Cancel",
+    close: "Close",
     save: "Save",
     delete: "Delete",
     edit: "Edit",
@@ -91,7 +92,7 @@ export const en: Dictionary = {
       },
       {
         title: "Annual income tracker",
-        desc: "Yearly income by client and currency, tax bracket breakdown, and estimated liability.",
+        desc: "Yearly income by client and currency, with an estimate of the flat 10% income tax.",
       },
       {
         title: "Wise & PayPal reconciliation",
@@ -208,7 +209,7 @@ export const en: Dictionary = {
     eFakturaDeadline: "e-Faktura deadline",
     taxSummary: "Tax Summary",
     grossIncome: "Gross income ({year})",
-    bracketTax: "{bracket} bracket tax",
+    bracketTax: "Income tax ({bracket})",
     totalEstTax: "Estimated total tax",
     netIncome: "Net income (after tax)",
     nextDeadline: "Next deadline: {quarter}",
@@ -251,10 +252,14 @@ export const en: Dictionary = {
       notes: "Notes",
       submit: "Add client",
       nameRequired: "Client name is required",
+      currencyUnsupported: "Choose one of the listed currencies",
     },
     deleteTitle: "Delete {name}?",
     deleteDesc:
-      "This will permanently delete this client. Existing invoices will remain but will no longer be linked to this client record.",
+      "This will permanently delete this client. This action cannot be undone.",
+    deleteBlockedTitle: "Can't delete {name}",
+    deleteBlockedDesc:
+      "{name} has {count} invoice(s). Clients with invoices can't be deleted, because the invoices are part of your income and tax records.",
     countries: {
       MK: "North Macedonia",
       US: "United States",
@@ -342,6 +347,7 @@ export const en: Dictionary = {
       notesPlaceholder: "Bank account details, payment terms, thank you note…",
       submit: "Create invoice",
       fillItems: "Fill in all line items with a description and price",
+      currencyUnsupported: "This currency isn't supported. Choose one of the listed currencies.",
     },
     status: {
       draft: "Draft",
@@ -374,7 +380,7 @@ export const en: Dictionary = {
     totalEstTax: "Total estimated tax",
     effectiveRate: "Effective rate",
     taxNote:
-      "MK progressive tax: 10% on first 1,080,000 MKD, 18% above. This is an estimate — consult your accountant.",
+      "MK personal income tax is a flat 10%. This estimate applies it to your paid invoices, but the tax base for independent activity is net income after expenses — consult your accountant.",
     quarterlyDeadlines: "Quarterly Tax Deadlines {year}",
     passed: "Passed",
     daysAway: "{days} days away",
