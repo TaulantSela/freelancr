@@ -8,6 +8,7 @@ import { BCRYPT_COST, MIN_PASSWORD_LENGTH } from "@/lib/auth/password";
 import { generateId } from "@/lib/utils";
 import { eq, sql } from "drizzle-orm";
 import type { AuthErrorKey } from "@/lib/i18n/format";
+import { getLocale } from "@/lib/i18n/server";
 
 export async function signUp(formData: FormData) {
   const email = formData.get("email") as string;
@@ -32,7 +33,9 @@ export async function signUp(formData: FormData) {
   const passwordHash = await bcrypt.hash(password, BCRYPT_COST);
   const id = generateId();
 
-  await getDb().insert(users).values({ id, email, passwordHash, name });
+  // Emails to the user go out in the language they signed up in.
+  const locale = await getLocale();
+  await getDb().insert(users).values({ id, email, passwordHash, name, locale });
 
   await createSession({ userId: id, email, name, sv: 0 });
   redirect("/dashboard");

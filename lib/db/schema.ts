@@ -73,6 +73,9 @@ export const users = pgTable("users", {
   // Carried in the session token as `sv`; a password change or reset bumps
   // it, which ends every session issued before (lib/auth/session.ts).
   sessionVersion: integer("session_version").notNull().default(0),
+  // The language emails to the user are written in: the UI language at
+  // sign-up, then whatever they switch to while signed in.
+  locale: text("locale").notNull().default("mk"),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 });
 
