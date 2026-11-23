@@ -9,6 +9,7 @@ export const sq: Dictionary = {
   common: {
     appName: "Freelancr",
     cancel: "Anulo",
+    close: "Mbyll",
     save: "Ruaj",
     delete: "Fshi",
     edit: "Ndrysho",
@@ -255,7 +256,10 @@ export const sq: Dictionary = {
     },
     deleteTitle: "Fshi {name}?",
     deleteDesc:
-      "Kjo do ta fshijë përgjithmonë klientin. Faturat ekzistuese do të mbeten por nuk do të lidhen më me këtë regjistër.",
+      "Kjo do ta fshijë përgjithmonë klientin. Ky veprim nuk mund të kthehet.",
+    deleteBlockedTitle: "{name} nuk mund të fshihet",
+    deleteBlockedDesc:
+      "{name} ka {count} faturë(a). Klientët me fatura nuk mund të fshihen, sepse faturat janë pjesë e evidencës së të ardhurave dhe tatimeve të tua.",
     countries: {
       MK: "Maqedonia e Veriut",
       US: "Shtetet e Bashkuara",

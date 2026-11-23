@@ -2,11 +2,11 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getDb, clients } from "@/lib/db";
+import { getDb, clients, invoices } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId } from "@/lib/utils";
 import { isSupportedCurrency } from "@/lib/tax/calculator";
-import { eq, and } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 
 export async function createClient(formData: FormData) {
   const session = await getSession();
@@ -72,13 +72,51 @@ export async function updateClient(id: string, formData: FormData) {
   redirect("/clients");
 }
 
+async function countClientInvoices(clientId: string, userId: string) {
+  const [row] = await getDb()
+    .select({ value: count() })
+    .from(invoices)
+    .where(and(eq(invoices.clientId, clientId), eq(invoices.userId, userId)));
+  return row?.value ?? 0;
+}
+
+// Postgres foreign_key_violation. Drizzle wraps the driver error, so the
+// code is on error.cause.
+function isForeignKeyViolation(error: unknown): boolean {
+  const cause = error instanceof Error ? error.cause : undefined;
+  return [error, cause].some(
+    (e) =>
+      typeof e === "object" && e !== null && "code" in e && e.code === "23503"
+  );
+}
+
+function deleteBlocked(invoiceCount: number) {
+  // Refresh the list so the dialog switches to the "can't delete" message.
+  revalidatePath("/clients");
+  return { errorKey: "deleteBlocked" as const, invoiceCount };
+}
+
+// Invoices are income records, so invoices.client_id has no ON DELETE
+// action and Postgres refuses to delete a client that still has any.
+// Check first so the user gets a clear message instead of a failed query.
 export async function deleteClient(id: string) {
   const session = await getSession();
   if (!session) redirect("/sign-in");
 
-  await getDb()
-    .delete(clients)
-    .where(and(eq(clients.id, id), eq(clients.userId, session.userId)));
+  const invoiceCount = await countClientInvoices(id, session.userId);
+  if (invoiceCount > 0) return deleteBlocked(invoiceCount);
+
+  try {
+    await getDb()
+      .delete(clients)
+      .where(and(eq(clients.id, id), eq(clients.userId, session.userId)));
+  } catch (error) {
+    // An invoice created after the count above still trips the constraint.
+    if (isForeignKeyViolation(error)) {
+      return deleteBlocked(await countClientInvoices(id, session.userId));
+    }
+    throw error;
+  }
 
   revalidatePath("/clients");
 }

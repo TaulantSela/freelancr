@@ -9,6 +9,7 @@ export const en: Dictionary = {
   common: {
     appName: "Freelancr",
     cancel: "Cancel",
+    close: "Close",
     save: "Save",
     delete: "Delete",
     edit: "Edit",
@@ -255,7 +256,10 @@ export const en: Dictionary = {
     },
     deleteTitle: "Delete {name}?",
     deleteDesc:
-      "This will permanently delete this client. Existing invoices will remain but will no longer be linked to this client record.",
+      "This will permanently delete this client. This action cannot be undone.",
+    deleteBlockedTitle: "Can't delete {name}",
+    deleteBlockedDesc:
+      "{name} has {count} invoice(s). Clients with invoices can't be deleted, because the invoices are part of your income and tax records.",
     countries: {
       MK: "North Macedonia",
       US: "United States",
