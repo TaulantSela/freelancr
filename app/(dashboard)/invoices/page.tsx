@@ -11,6 +11,7 @@ import { formatCurrency, formatMKD, toSkopjeDate } from "@/lib/tax/calculator";
 import { InvoiceStandingBadge } from "@/components/invoices/invoice-standing-badge";
 import { getSettledByInvoice } from "@/lib/payments/queries";
 import { invoiceStanding } from "@/lib/payments/settlement";
+import { getCreditedByInvoice } from "@/lib/credit-notes/queries";
 import { getTranslations } from "@/lib/i18n/server";
 import { formatMessage } from "@/lib/i18n/format";
 
@@ -20,7 +21,7 @@ export default async function InvoicesPage() {
 
   const { t } = await getTranslations();
 
-  const [rows, settledByInvoice] = await Promise.all([
+  const [rows, settledByInvoice, creditedByInvoice] = await Promise.all([
     getDb()
       .select({
         id: invoices.id,
@@ -39,19 +40,26 @@ export default async function InvoicesPage() {
       .where(eq(invoices.userId, session.userId))
       .orderBy(invoices.createdAt),
     getSettledByInvoice(session.userId),
+    getCreditedByInvoice(session.userId),
   ]);
 
-  // Where each invoice stands, from its payments and due date.
+  // Where each invoice stands, from its payments, credit notes and due date.
   const today = toSkopjeDate(new Date());
   const invoiceList = rows.map((inv) => ({
     ...inv,
-    standing: invoiceStanding(inv, settledByInvoice.get(inv.id) ?? 0, today),
+    standing: invoiceStanding(
+      inv,
+      settledByInvoice.get(inv.id) ?? 0,
+      today,
+      creditedByInvoice.get(inv.id) ?? 0
+    ),
   }));
   const counted = invoiceList.filter((i) => i.status !== "draft" && i.status !== "cancelled");
-  // In MKD at each invoice's rate: what its payments covered (up to the
-  // total), and what's still to pay.
+  // In MKD at each invoice's rate: what its payments covered (up to what's
+  // due after credit notes), and what's still to pay.
   const paidTotal = counted.reduce(
-    (s, i) => s + Math.min(i.standing.settled, i.total) * i.exchangeRateMKD,
+    (s, i) =>
+      s + Math.min(i.standing.settled, Math.max(0, i.total - i.standing.credited)) * i.exchangeRateMKD,
     0
   );
   const outstandingTotal = counted.reduce((s, i) => s + i.standing.balance * i.exchangeRateMKD, 0);
@@ -59,7 +67,7 @@ export default async function InvoicesPage() {
 
   return (
     <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">{t.invoices.title}</h1>
           <p className="text-sm text-muted-foreground">
@@ -153,6 +161,13 @@ export default async function InvoicesPage() {
                         <>
                           <span className="sm:hidden text-muted-foreground">{t.invoices.colBalance}: </span>
                           {formatCurrency(inv.standing.balance, inv.currency)}
+                          {inv.standing.credited > 0 && (
+                            <div className="text-xs text-muted-foreground max-sm:inline max-sm:ml-2">
+                              {formatMessage(t.creditNotes.creditedShort, {
+                                amount: formatCurrency(inv.standing.credited, inv.currency),
+                              })}
+                            </div>
+                          )}
                         </>
                       )}
                     </div>
