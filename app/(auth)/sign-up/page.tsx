@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Loader2, Check } from "lucide-react";
+import { FileText, Loader2 } from "lucide-react";
 import { signUp } from "@/lib/actions/auth";
 import { useTranslations } from "@/lib/i18n/client";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -90,15 +90,6 @@ export default function SignUpPage() {
                 {t.auth.signUp}
               </Button>
             </form>
-
-            <ul className="mt-5 space-y-1.5">
-              {t.auth.freePerks.map((item) => (
-                <li key={item} className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Check className="h-3 w-3 text-emerald-500" />
-                  {item}
-                </li>
-              ))}
-            </ul>
 
             <p className="text-center text-sm text-muted-foreground mt-6">
               {t.auth.hasAccount}{" "}

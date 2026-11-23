@@ -1,19 +1,24 @@
 import { getSession } from "@/lib/auth/session";
 import { getDb, invoices, clients } from "@/lib/db";
-import { eq, sum, count, and, gte } from "drizzle-orm";
+import { eq, sum, count, and, gte, inArray, desc } from "drizzle-orm";
 import {
   getDDVStatus,
+  getLocalSupplies,
   getUpcomingTaxDeadlines,
-  getForeignIncomeMonths,
+  getSelfReportedIncomeMonths,
+  getOwedToUjp,
   toSkopjeDate,
   daysBetween,
-  calculateIncomeTax,
   formatMKD,
   formatCurrency,
   DDV_THRESHOLD_MKD,
 } from "@/lib/tax/calculator";
-import { getTaxStatus, getPaidInvoicesForDeadlines } from "@/lib/tax/queries";
-import { formatTaxDate, taxDeadlineLabel } from "@/lib/tax/labels";
+import {
+  getTaxProfile,
+  getPaidInvoicesForDeadlines,
+  getInvoicesForThreshold,
+} from "@/lib/tax/queries";
+import { formatTaxDate, formatTaxPeriod, taxDeadlineLabel } from "@/lib/tax/labels";
 import { formatDate, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,10 +29,8 @@ import {
   AlertTriangle,
   TrendingUp,
   FileText,
-  Users,
   Plus,
   Calendar,
-  CheckCircle2,
   Clock,
   CircleDollarSign,
 } from "lucide-react";
@@ -58,10 +61,16 @@ export default async function DashboardPage() {
 
   const annualIncomeMKD = Number(annualStats?.totalMKD ?? 0);
 
+  // Issued and not paid yet, overdue or not.
   const [outstandingStats] = await getDb()
     .select({ cnt: count() })
     .from(invoices)
-    .where(and(eq(invoices.userId, session.userId), eq(invoices.status, "sent")));
+    .where(
+      and(
+        eq(invoices.userId, session.userId),
+        inArray(invoices.status, ["sent", "overdue"])
+      )
+    );
 
   const recentInvoices = await getDb()
     .select({
@@ -76,28 +85,36 @@ export default async function DashboardPage() {
     .from(invoices)
     .leftJoin(clients, eq(invoices.clientId, clients.id))
     .where(eq(invoices.userId, session.userId))
-    .orderBy(invoices.createdAt)
+    .orderBy(desc(invoices.createdAt))
     .limit(5);
 
-  const [clientCount] = await getDb()
-    .select({ cnt: count() })
-    .from(clients)
-    .where(eq(clients.userId, session.userId));
-
-  const ddvStatus = getDDVStatus(annualIncomeMKD);
-  const taxCalc = calculateIncomeTax(annualIncomeMKD);
-
-  // The next UJP deadline for how the user is registered for tax. When paid
-  // from abroad, only months in which a client abroad paid have deadlines.
+  // The next UJP deadline for how the user is registered for tax. When not
+  // registered, only months with self-reported income (a client abroad or a
+  // private person in North Macedonia paid) have deadlines, and the tax owed
+  // is 10% of that income (approximate; see getOwedToUjp).
   const today = toSkopjeDate(new Date());
-  const taxStatus = await getTaxStatus(session.userId);
-  const incomeMonths =
-    taxStatus === "paid_from_abroad"
-      ? getForeignIncomeMonths(
-          await getPaidInvoicesForDeadlines(session.userId, Number(today.slice(0, 4)))
-        )
-      : [];
+  const { taxStatus, monthlyAdvanceMKD, vatRegistered } = await getTaxProfile(session.userId);
+
+  // The DDV threshold counts this year's supplies in North Macedonia only
+  // (getLocalSupplies). It doesn't apply once registered for VAT, and
+  // there's nothing to show without a local supply.
+  const thisYear = Number(today.slice(0, 4));
+  const localSupplies = vatRegistered
+    ? { totalMKD: 0, count: 0 }
+    : getLocalSupplies(await getInvoicesForThreshold(session.userId, thisYear), thisYear);
+  const showDdv = !vatRegistered && localSupplies.count > 0;
+  const ddvStatus = getDDVStatus(localSupplies.totalMKD);
+  const notRegistered = taxStatus === "paid_from_abroad";
+  const payments = notRegistered
+    ? await getPaidInvoicesForDeadlines(session.userId, Number(today.slice(0, 4)))
+    : [];
+  const incomeMonths = getSelfReportedIncomeMonths(payments);
+  const owed = getOwedToUjp(payments, today);
+  // The payment coming up: last month's until the 15th, then this month's.
+  const owedNext = owed.due ?? owed.current;
+  const hasOwed = owed.due !== null || owed.current.incomeMKD > 0;
   const upcomingDeadlines = getUpcomingTaxDeadlines(taxStatus, today, incomeMonths);
+  const nextAdvance = upcomingDeadlines.find((d) => d.kind === "advance");
   const [nextDeadline] = upcomingDeadlines;
   // Everything due on the next date (an advance and the annual balance can
   // share 15 March), then the first deadline after it.
@@ -140,8 +157,6 @@ export default async function DashboardPage() {
     exceeded: { label: t.dashboard.ddvExceeded, variant: "destructive" as const },
   };
 
-  const checklistDone = [true, true, false, false, false, false];
-
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
@@ -158,7 +173,7 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {ddvStatus.alertLevel !== "safe" && (
+      {showDdv && ddvStatus.alertLevel !== "safe" && (
         <div
           className={cn(
             "flex items-start gap-3 rounded-lg border px-4 py-3 text-sm",
@@ -179,7 +194,41 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="pt-5">
+            <div className="flex items-center gap-2 mb-1">
+              <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                {t.tax.owed.title}
+              </span>
+            </div>
+            {notRegistered ? (
+              <>
+                <div className="text-xl font-mono font-semibold">{formatMKD(owedNext.taxMKD)}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  {formatMessage(t.tax.owed.tileDue, {
+                    month: formatTaxPeriod(owedNext.month, t),
+                    date: formatTaxDate(owedNext.payBy, t),
+                  })}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-xl font-mono font-semibold">
+                  {monthlyAdvanceMKD !== null ? formatMKD(monthlyAdvanceMKD) : "—"}
+                </div>
+                {nextAdvance && (
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    {formatMessage(t.tax.owed.advanceTile, {
+                      date: formatTaxDate(nextAdvance.dueDate, t),
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
         <Card>
           <CardContent className="pt-5">
             <div className="flex items-center gap-2 mb-1">
@@ -206,115 +255,81 @@ export default async function DashboardPage() {
             <div className="text-xs text-muted-foreground mt-0.5">{t.dashboard.awaitingPayment}</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-5">
-            <div className="flex items-center gap-2 mb-1">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                {t.dashboard.clients}
-              </span>
-            </div>
-            <div className="text-xl font-mono font-semibold">{clientCount?.cnt ?? 0}</div>
-            <div className="text-xs text-muted-foreground mt-0.5">{t.dashboard.activeClients}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-5">
-            <div className="flex items-center gap-2 mb-1">
-              <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                {t.dashboard.estTax}
-              </span>
-            </div>
-            <div className="text-xl font-mono font-semibold">{formatMKD(taxCalc.totalTax)}</div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              {(taxCalc.effectiveRate * 100).toFixed(1)}% {t.dashboard.effectiveRate}
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className={cn("grid gap-4", showDdv && "md:grid-cols-2")}>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center justify-between">
-              {t.dashboard.ddvMonitor}
-              <Badge variant={ddvBadge[ddvStatus.alertLevel].variant} className="text-xs font-normal">
-                {ddvBadge[ddvStatus.alertLevel].label}
-              </Badge>
+              {t.tax.owed.title}
+              {notRegistered && (
+                <Badge variant="outline" className="text-xs font-normal">
+                  {t.tax.owed.approximate}
+                </Badge>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">{t.dashboard.annualIncomeMkd}</span>
-                <span className="font-mono text-sm">{formatMKD(annualIncomeMKD)}</span>
-              </div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className={cn("h-full rounded-full transition-all", ddvColors[ddvStatus.alertLevel])}
-                  style={{ width: `${Math.min(ddvStatus.percentage, 100)}%` }}
-                />
-              </div>
-              <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>{ddvStatus.percentage.toFixed(1)}%</span>
-                <span>
-                  {formatMKD(ddvStatus.remaining)} {t.dashboard.remaining}
-                </span>
-              </div>
-            </div>
-            <Separator />
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t.dashboard.ddvThreshold}</span>
-                <span className="font-mono text-xs">{formatMKD(DDV_THRESHOLD_MKD)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t.dashboard.ddvStatus}</span>
-                <span className="text-xs">
-                  {ddvStatus.isRegistered ? t.dashboard.mustRegister : t.dashboard.notRequired}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t.dashboard.eFakturaDeadline}</span>
-                <span className="text-xs text-yellow-400">{t.landing.eFakturaAlert}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">{t.dashboard.taxSummary}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {formatMessage(t.dashboard.grossIncome, { year })}
-                </span>
-                <span className="font-mono text-xs">{formatMKD(annualIncomeMKD)}</span>
-              </div>
-              {taxCalc.breakdown.map((b, i) => (
-                <div key={i} className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    {formatMessage(t.dashboard.bracketTax, { bracket: b.bracket })}
-                  </span>
-                  <span className="font-mono text-xs">{formatMKD(b.tax)}</span>
+            {notRegistered ? (
+              hasOwed ? (
+                <div className="space-y-2">
+                  <div className="rounded-lg border border-border px-3 py-2.5 space-y-0.5">
+                    <div className="text-xs text-muted-foreground">
+                      {formatMessage(owed.due ? t.tax.owed.forMonth : t.tax.owed.soFar, {
+                        month: formatTaxPeriod(owedNext.month, t),
+                      })}
+                    </div>
+                    <div className="text-xl font-mono font-semibold">
+                      {formatMKD(owedNext.taxMKD)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {formatMessage(t.tax.owed.fileAndPay, {
+                        reportBy: formatTaxDate(owedNext.reportBy, t),
+                        payBy: formatTaxDate(owedNext.payBy, t),
+                      })}
+                    </div>
+                  </div>
+                  {owed.due && (
+                    <div className="flex justify-between gap-4 text-sm px-3">
+                      <span className="text-muted-foreground">
+                        {formatMessage(t.tax.owed.soFar, {
+                          month: formatTaxPeriod(owed.current.month, t),
+                        })}
+                      </span>
+                      <span className="font-mono text-xs">{formatMKD(owed.current.taxMKD)}</span>
+                    </div>
+                  )}
                 </div>
-              ))}
-              <Separator />
-              <div className="flex justify-between font-medium">
-                <span>{t.dashboard.totalEstTax}</span>
-                <span className="font-mono text-xs">{formatMKD(taxCalc.totalTax)}</span>
+              ) : (
+                <p className="text-xs text-muted-foreground">{t.tax.owed.nothing}</p>
+              )
+            ) : (
+              <div className="space-y-2">
+                {nextAdvance && (
+                  <div className="rounded-lg border border-border px-3 py-2.5 space-y-0.5">
+                    <div className="text-xs text-muted-foreground">
+                      {formatMessage(t.tax.owed.advanceFor, {
+                        month: formatTaxPeriod(nextAdvance.period, t),
+                      })}
+                    </div>
+                    <div className="text-xl font-mono font-semibold">
+                      {monthlyAdvanceMKD !== null ? formatMKD(monthlyAdvanceMKD) : "—"}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {formatMessage(t.tax.owed.advancePayBy, {
+                        date: formatTaxDate(nextAdvance.dueDate, t),
+                      })}
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {monthlyAdvanceMKD !== null ? t.tax.owed.advanceSet : t.tax.owed.advanceHint}{" "}
+                  <Link href="/settings" className="underline underline-offset-2 hover:text-foreground">
+                    {monthlyAdvanceMKD !== null ? t.tax.changeInSettings : t.tax.owed.addInSettings}
+                  </Link>
+                </p>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t.dashboard.netIncome}</span>
-                <span className="font-mono text-xs text-emerald-400">
-                  {formatMKD(annualIncomeMKD - taxCalc.totalTax)}
-                </span>
-              </div>
-            </div>
+            )}
             <Separator />
             <div className="flex items-start gap-3 bg-muted/50 rounded-lg px-3 py-2">
               <Calendar className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
@@ -351,8 +366,59 @@ export default async function DashboardPage() {
                 <AlertTriangle className="h-4 w-4 text-yellow-500 ml-auto shrink-0" />
               )}
             </div>
+            {notRegistered && hasOwed && (
+              <p className="text-xs text-muted-foreground">{t.tax.owed.note}</p>
+            )}
           </CardContent>
         </Card>
+        {showDdv && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center justify-between">
+                {t.dashboard.ddvMonitor}
+                <Badge variant={ddvBadge[ddvStatus.alertLevel].variant} className="text-xs font-normal">
+                  {ddvBadge[ddvStatus.alertLevel].label}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-muted-foreground">
+                    {formatMessage(t.dashboard.localSupplies, { year: thisYear })}
+                  </span>
+                  <span className="font-mono text-sm">{formatMKD(localSupplies.totalMKD)}</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className={cn("h-full rounded-full transition-all", ddvColors[ddvStatus.alertLevel])}
+                    style={{ width: `${Math.min(ddvStatus.percentage, 100)}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>{ddvStatus.percentage.toFixed(1)}%</span>
+                  <span>
+                    {formatMKD(ddvStatus.remaining)} {t.dashboard.remaining}
+                  </span>
+                </div>
+              </div>
+              <Separator />
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t.dashboard.ddvThreshold}</span>
+                  <span className="font-mono text-xs">{formatMKD(DDV_THRESHOLD_MKD)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t.dashboard.ddvStatus}</span>
+                  <span className="text-xs">
+                    {ddvStatus.mustRegister ? t.dashboard.mustRegister : t.dashboard.notRequired}
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">{t.dashboard.ddvLocalOnly}</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <Card>
@@ -385,13 +451,23 @@ export default async function DashboardPage() {
                     <div className="flex items-center gap-4 py-2.5">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium font-mono">{inv.number}</span>
-                          <Badge
-                            variant="outline"
-                            className={cn("text-xs border-0 px-1.5", statusColors[inv.status])}
+                          <span
+                            className={cn(
+                              "text-sm font-medium",
+                              inv.number ? "font-mono" : "italic text-muted-foreground"
+                            )}
                           >
-                            {statusLabel}
-                          </Badge>
+                            {inv.number ?? t.invoices.status.draft}
+                          </span>
+                          {/* A draft without a number already reads "Draft". */}
+                          {inv.number && (
+                            <Badge
+                              variant="outline"
+                              className={cn("text-xs border-0 px-1.5", statusColors[inv.status])}
+                            >
+                              {statusLabel}
+                            </Badge>
+                          )}
                         </div>
                         <div className="text-xs text-muted-foreground">{inv.clientName}</div>
                       </div>
@@ -408,34 +484,6 @@ export default async function DashboardPage() {
               })}
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-yellow-500" />
-            {t.dashboard.eFakturaChecklist}
-            <Badge variant="outline" className="text-xs text-yellow-500 border-yellow-500/30 ml-1">
-              {t.landing.eFakturaAlert}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-2">
-            {t.dashboard.checklistItems.map((text, i) => (
-              <div key={text} className="flex items-center gap-3 text-sm py-1">
-                {checklistDone[i] ? (
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                ) : (
-                  <div className="h-4 w-4 rounded-full border border-muted-foreground shrink-0" />
-                )}
-                <span className={checklistDone[i] ? "text-muted-foreground line-through" : ""}>
-                  {text}
-                </span>
-              </div>
-            ))}
-          </div>
         </CardContent>
       </Card>
     </div>

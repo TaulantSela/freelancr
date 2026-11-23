@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import { getInvoiceDetail } from "@/lib/invoices/queries";
 import { InvoicePdfDocument } from "@/lib/pdf/invoice-document";
-import { getDictionary, getLocale } from "@/lib/i18n/server";
+import { getDictionary } from "@/lib/i18n/server";
+import { resolveInvoiceLanguage } from "@/lib/clients/config";
 
 export async function GET(
   _request: Request,
@@ -21,18 +22,18 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const locale = await getLocale();
-  const t = getDictionary(locale);
-  const labels = t.invoices.pdf;
+  // The client's invoice language, not the language the app is in.
+  const lang = resolveInvoiceLanguage(data.client);
+  const labels = getDictionary(lang).invoices.pdf;
 
   const buffer = await renderToBuffer(
-    <InvoicePdfDocument data={data} labels={labels} />
+    <InvoicePdfDocument data={data} labels={labels} lang={lang} />
   );
 
   return new NextResponse(new Uint8Array(buffer), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${data.invoice.number}.pdf"`,
+      "Content-Disposition": `attachment; filename="${data.invoice.number ?? "draft"}.pdf"`,
     },
   });
 }

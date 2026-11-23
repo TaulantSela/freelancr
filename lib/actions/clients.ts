@@ -6,7 +6,35 @@ import { getDb, clients, invoices } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId } from "@/lib/utils";
 import { isSupportedCurrency } from "@/lib/tax/calculator";
+import {
+  DEFAULT_CLIENT_TYPE,
+  defaultInvoiceLanguage,
+  isClientType,
+  isInvoiceLanguage,
+} from "@/lib/clients/config";
+import { isCountryCode } from "@/lib/clients/countries";
+import { looksLikeEmbg } from "@/lib/profile";
 import { eq, and, count } from "drizzle-orm";
+
+// A private person has no tax ID or contact person on file: the form hides
+// both, and anything posted for them anyway is dropped.
+function readClientType(formData: FormData) {
+  const value = formData.get("clientType");
+  const clientType = isClientType(value) ? value : DEFAULT_CLIENT_TYPE;
+  const isPerson = clientType === "person";
+  return {
+    clientType,
+    taxId: isPerson ? null : (formData.get("taxId") as string) || null,
+    contactPerson: isPerson
+      ? null
+      : (formData.get("contactPerson") as string) || null,
+  };
+}
+
+function readInvoiceLanguage(formData: FormData, country: string) {
+  const value = formData.get("invoiceLanguage");
+  return isInvoiceLanguage(value) ? value : defaultInvoiceLanguage(country);
+}
 
 export async function createClient(formData: FormData) {
   const session = await getSession();
@@ -14,28 +42,29 @@ export async function createClient(formData: FormData) {
 
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
-  const taxId = formData.get("taxId") as string;
   const country = formData.get("country") as string;
   const currency = (formData.get("currency") as string) || "EUR";
   const address = formData.get("address") as string;
-  const contactPerson = formData.get("contactPerson") as string;
   const notes = formData.get("notes") as string;
 
   if (!name) return { errorKey: "nameRequired" as const };
+  if (!isCountryCode(country)) return { errorKey: "countryRequired" as const };
   if (!isSupportedCurrency(currency)) {
     return { errorKey: "currencyUnsupported" as const };
   }
+  const typeFields = readClientType(formData);
+  if (looksLikeEmbg(typeFields.taxId)) return { errorKey: "looksLikeEmbg" as const };
 
   await getDb().insert(clients).values({
     id: generateId(),
     userId: session.userId,
     name,
+    ...typeFields,
     email: email || null,
-    taxId: taxId || null,
-    country: country || "MK",
+    country,
     currency,
+    invoiceLanguage: readInvoiceLanguage(formData, country),
     address: address || null,
-    contactPerson: contactPerson || null,
     notes: notes || null,
   });
 
@@ -48,22 +77,26 @@ export async function updateClient(id: string, formData: FormData) {
   if (!session) redirect("/sign-in");
 
   const name = formData.get("name") as string;
+  const country = formData.get("country");
   const currency = (formData.get("currency") as string) || "EUR";
   if (!name) return { errorKey: "nameRequired" as const };
+  if (!isCountryCode(country)) return { errorKey: "countryRequired" as const };
   if (!isSupportedCurrency(currency)) {
     return { errorKey: "currencyUnsupported" as const };
   }
+  const typeFields = readClientType(formData);
+  if (looksLikeEmbg(typeFields.taxId)) return { errorKey: "looksLikeEmbg" as const };
 
   await getDb()
     .update(clients)
     .set({
       name,
+      ...typeFields,
       email: (formData.get("email") as string) || null,
-      taxId: (formData.get("taxId") as string) || null,
-      country: (formData.get("country") as string) || "MK",
+      country,
       currency,
+      invoiceLanguage: readInvoiceLanguage(formData, country),
       address: (formData.get("address") as string) || null,
-      contactPerson: (formData.get("contactPerson") as string) || null,
       notes: (formData.get("notes") as string) || null,
     })
     .where(and(eq(clients.id, id), eq(clients.userId, session.userId)));

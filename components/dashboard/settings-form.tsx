@@ -1,29 +1,51 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { updateProfile } from "@/lib/actions/settings";
+import { updateProfile, type SettingsErrorKey } from "@/lib/actions/settings";
 import { Loader2 } from "lucide-react";
 import type { User } from "@/lib/db/schema";
-import { TAX_STATUSES } from "@/lib/tax/calculator";
+import { TAX_STATUSES, type TaxStatus } from "@/lib/tax/calculator";
+import { resolveBankDetails } from "@/lib/profile";
 import { useTranslations } from "@/lib/i18n/client";
-import { formatMessage } from "@/lib/i18n/format";
 
-type State = { success?: boolean; error?: string } | null;
+type State = { success?: boolean; errorKey?: SettingsErrorKey } | null;
 
 async function updateProfileAction(_prev: State, formData: FormData): Promise<State> {
   const result = await updateProfile(formData);
-  if (result && "error" in result) return result;
+  if (result && "errorKey" in result) return result;
   return { success: true };
 }
 
-export function SettingsForm({ user }: { user: User }) {
+// Only what the form shows; never the password hash.
+export type SettingsUser = Pick<
+  User,
+  | "name"
+  | "businessName"
+  | "taxStatus"
+  | "monthlyAdvanceMKD"
+  | "vatRegistered"
+  | "vatNumber"
+  | "taxNumber"
+  | "address"
+  | "placeOfIssue"
+  | "signatoryName"
+  | "bankName"
+  | "bankAccount"
+  | "iban"
+  | "bic"
+>;
+
+export function SettingsForm({ user }: { user: SettingsUser }) {
   const t = useTranslations();
   const [state, action, pending] = useActionState(updateProfileAction, null);
+  const [taxStatus, setTaxStatus] = useState<TaxStatus>(user.taxStatus);
+  const [vatRegistered, setVatRegistered] = useState(user.vatRegistered);
+  // An IBAN saved in the old "Bank account (IBAN)" field shows up as the IBAN.
+  const bank = resolveBankDetails(user);
 
   return (
     <form action={action} className="space-y-5">
@@ -43,22 +65,6 @@ export function SettingsForm({ user }: { user: User }) {
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="businessType">{t.settings.businessType}</Label>
-        <select
-          id="businessType"
-          name="businessType"
-          defaultValue={user.businessType ?? "personal"}
-          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-        >
-          {t.settings.businessTypes.map((bt) => (
-            <option key={bt.value} value={bt.value} className="bg-card">
-              {bt.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
       <fieldset className="space-y-2">
         <legend className="text-sm leading-none font-medium">{t.tax.statusLabel}</legend>
         <p className="text-xs text-muted-foreground">{t.tax.statusHint}</p>
@@ -72,7 +78,8 @@ export function SettingsForm({ user }: { user: User }) {
                 type="radio"
                 name="taxStatus"
                 value={status}
-                defaultChecked={user.taxStatus === status}
+                checked={taxStatus === status}
+                onChange={() => setTaxStatus(status)}
                 className="mt-0.5 accent-primary"
               />
               <span className="space-y-0.5">
@@ -84,16 +91,56 @@ export function SettingsForm({ user }: { user: User }) {
             </label>
           ))}
         </div>
+        {taxStatus === "self_employed" && (
+          <div className="space-y-1.5 pt-2">
+            <Label htmlFor="monthlyAdvanceMKD">{t.settings.monthlyAdvance}</Label>
+            <Input
+              id="monthlyAdvanceMKD"
+              name="monthlyAdvanceMKD"
+              inputMode="decimal"
+              defaultValue={user.monthlyAdvanceMKD ?? ""}
+              placeholder="0"
+              className="font-mono sm:w-1/2"
+            />
+            <p className="text-xs text-muted-foreground">{t.settings.monthlyAdvanceHint}</p>
+          </div>
+        )}
+      </fieldset>
+
+      <fieldset className="space-y-2">
+        <label className="flex items-start gap-3 rounded-md border border-input px-3 py-2 text-sm cursor-pointer has-checked:border-primary has-checked:bg-primary/5">
+          <input
+            type="checkbox"
+            name="vatRegistered"
+            checked={vatRegistered}
+            onChange={(e) => setVatRegistered(e.target.checked)}
+            className="mt-0.5 accent-primary"
+          />
+          <span className="space-y-0.5">
+            <span className="block font-medium">{t.settings.vatRegistered}</span>
+            <span className="block text-xs text-muted-foreground">
+              {t.settings.vatRegisteredHint}
+            </span>
+          </span>
+        </label>
+        {vatRegistered && (
+          <div className="space-y-1.5 pt-2">
+            <Label htmlFor="vatNumber">{t.settings.vatNumber}</Label>
+            <Input
+              id="vatNumber"
+              name="vatNumber"
+              defaultValue={user.vatNumber ?? ""}
+              placeholder="MK4012345678901"
+              required
+              className="font-mono sm:w-1/2"
+            />
+          </div>
+        )}
       </fieldset>
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="taxNumber">
-            {t.settings.taxNumber}
-            <Badge variant="outline" className="ml-2 text-xs font-normal">
-              {t.settings.taxNumberBadge}
-            </Badge>
-          </Label>
+          <Label htmlFor="taxNumber">{t.settings.taxNumber}</Label>
           <Input
             id="taxNumber"
             name="taxNumber"
@@ -101,10 +148,30 @@ export function SettingsForm({ user }: { user: User }) {
             placeholder="4012345678901"
             className="font-mono"
           />
+          <p className="text-xs text-muted-foreground">{t.settings.taxNumberHint}</p>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="address">{t.settings.address}</Label>
           <Input id="address" name="address" defaultValue={user.address ?? ""} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="placeOfIssue">{t.settings.placeOfIssue}</Label>
+          <Input
+            id="placeOfIssue"
+            name="placeOfIssue"
+            defaultValue={user.placeOfIssue ?? ""}
+            placeholder={t.settings.placeOfIssuePlaceholder}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="signatoryName">{t.settings.signatoryName}</Label>
+          <Input
+            id="signatoryName"
+            name="signatoryName"
+            defaultValue={user.signatoryName ?? ""}
+            placeholder={user.name}
+          />
+          <p className="text-xs text-muted-foreground">{t.settings.signatoryNameHint}</p>
         </div>
       </div>
 
@@ -112,23 +179,45 @@ export function SettingsForm({ user }: { user: User }) {
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="bankAccount">{t.settings.bankAccount}</Label>
+          <Label htmlFor="bankName">{t.settings.bankName}</Label>
+          <Input id="bankName" name="bankName" defaultValue={bank.bankName ?? ""} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="iban">{t.settings.iban}</Label>
           <Input
-            id="bankAccount"
-            name="bankAccount"
-            defaultValue={user.bankAccount ?? ""}
+            id="iban"
+            name="iban"
+            defaultValue={bank.iban ?? ""}
+            placeholder="MK07 2501 2000 0058 984"
             className="font-mono"
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="bankName">{t.settings.bankName}</Label>
-          <Input id="bankName" name="bankName" defaultValue={user.bankName ?? ""} />
+          <Label htmlFor="bic">{t.settings.bic}</Label>
+          <Input
+            id="bic"
+            name="bic"
+            defaultValue={bank.bic ?? ""}
+            placeholder="KOBSMK2X"
+            className="font-mono"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="bankAccount">{t.settings.bankAccount}</Label>
+          <Input
+            id="bankAccount"
+            name="bankAccount"
+            defaultValue={bank.accountNumber ?? ""}
+            placeholder="300000000123456"
+            className="font-mono"
+          />
+          <p className="text-xs text-muted-foreground">{t.settings.bankAccountHint}</p>
         </div>
       </div>
 
-      {state?.error && (
+      {state?.errorKey && (
         <p className="text-sm text-destructive bg-destructive/10 rounded px-3 py-2">
-          {state.error}
+          {t.settings.errors[state.errorKey]}
         </p>
       )}
       {state?.success && (

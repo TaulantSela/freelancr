@@ -1,9 +1,12 @@
 // North Macedonia tax constants (2026)
 
-// DDV (VAT) threshold in MKD per year
+// DDV (VAT) registration threshold: total turnover over 2,000,000 MKD in a
+// calendar year (VAT law, "ЗДДВ", Art. 51(1)). See getLocalSupplies() for
+// what counts toward it.
 export const DDV_THRESHOLD_MKD = 2_000_000;
 
-// MK personal income tax (2026): a flat 10%, with no brackets.
+// MK personal income tax (2026): a flat 10%, with no brackets (Personal
+// Income Tax law, "ЗДЛД", Art. 11(1); 15% applies only to gambling winnings).
 // UJP's guide on income from independent activity gives the rate as 10%:
 // https://ujp.gov.mk/en/vodic/category/546
 // The 10%/18% progressive rates that applied in 2019 were suspended for
@@ -11,15 +14,14 @@ export const DDV_THRESHOLD_MKD = 2_000_000;
 // 274/2022). PwC Worldwide Tax Summaries (reviewed 23 July 2026) lists the
 // same flat 10% for self-employment income:
 // https://taxsummaries.pwc.com/north-macedonia/individual/taxes-on-personal-income
-// The legal base for independent activity is net income (revenue minus
-// expenses); calculateIncomeTax() applies the rate to paid invoice totals,
-// so it overestimates for anyone with deductible expenses.
+// getMonthlyTaxOwed() below applies it to the gross amount clients paid.
 export const PERSONAL_INCOME_TAX_RATE = 0.1;
 
 // How a user is registered for tax, which decides their UJP deadlines. They
 // pick it in Settings and it's stored in users.tax_status.
-// "paid_from_abroad" (the default): an individual who isn't registered for an
-// independent activity and is paid by clients abroad.
+// "paid_from_abroad" (the default; the name predates local private persons):
+// an individual who isn't registered for an independent activity and reports
+// self-reported income (isSelfReportedIncome below) month by month.
 // "self_employed": a registered self-employed person (самостоен вршител на
 // дејност).
 export const TAX_STATUSES = ["paid_from_abroad", "self_employed"] as const;
@@ -37,46 +39,77 @@ export function isTaxStatus(value: unknown): value is TaxStatus {
 export const DDV_RATE_STANDARD = 0.18; // 18%
 export const DDV_RATE_REDUCED = 0.05; // 5%
 
-export function calculateIncomeTax(annualIncomeMKD: number): {
-  totalTax: number;
-  effectiveRate: number;
-  breakdown: { bracket: string; amount: number; tax: number }[];
-} {
-  if (annualIncomeMKD <= 0) {
-    return { totalTax: 0, effectiveRate: 0, breakdown: [] };
-  }
+// The rates a VAT-registered user can put on an invoice. Everyone else's
+// invoices carry no DDV at all: only a taxpayer registered for VAT may show
+// it (VAT law Art. 51(3)), and showing it anyway makes the issuer owe the
+// amount shown (Art. 55). The invoice actions enforce this from
+// users.vat_registered, whatever the form sends.
+export const DDV_RATES = [0, DDV_RATE_REDUCED, DDV_RATE_STANDARD] as const;
 
-  const totalTax = annualIncomeMKD * PERSONAL_INCOME_TAX_RATE;
-  return {
-    totalTax,
-    effectiveRate: PERSONAL_INCOME_TAX_RATE,
-    breakdown: [
-      {
-        bracket: `${PERSONAL_INCOME_TAX_RATE * 100}%`,
-        amount: annualIncomeMKD,
-        tax: totalTax,
-      },
-    ],
-  };
+export function isDdvRate(value: number): boolean {
+  return (DDV_RATES as readonly number[]).includes(value);
 }
 
-export function getDDVStatus(annualIncomeMKD: number): {
+// Invoice statuses that count as issued: numbered and sent to the client,
+// whether paid or not. Drafts and cancelled invoices are neither.
+export const ISSUED_STATUSES = ["sent", "paid", "overdue"] as const;
+
+export type ThresholdInvoice = {
+  clientCountry: string;
+  status: string;
+  // Date of supply, "YYYY-MM-DD"; null on rows saved before it existed.
+  supplyDate: string | null;
+  // Invoice date, "YYYY-MM-DD", used when there's no date of supply.
+  date: string;
+  totalMKD: number;
+};
+
+// What counts toward the DDV threshold in `year`. "Total turnover" is the
+// turnover taxable under Art. 2(1), i.e. supplies made in North Macedonia
+// (Art. 51(2)). A service to a taxable person abroad is supplied where that
+// person is established (Art. 14-а(2)), and so are most services a freelancer
+// sells to private persons abroad (Art. 14-а(6): consulting, engineering,
+// data processing, electronic services, copyright and the like), so they
+// don't count. The app takes "supplied in North Macedonia" to mean "invoiced
+// to a client in North Macedonia": every issued, not cancelled invoice to a
+// client there, paid or not, by its date of supply in the year.
+export function getLocalSupplies(
+  invoices: readonly ThresholdInvoice[],
+  year: number
+): { totalMKD: number; count: number } {
+  let totalMKD = 0;
+  let count = 0;
+  for (const invoice of invoices) {
+    if (invoice.clientCountry !== "MK") continue;
+    if (!(ISSUED_STATUSES as readonly string[]).includes(invoice.status)) continue;
+    const supplied = invoice.supplyDate ?? invoice.date;
+    if (!supplied.startsWith(`${year}-`)) continue;
+    totalMKD += invoice.totalMKD;
+    count++;
+  }
+  return { totalMKD, count };
+}
+
+export function getDDVStatus(localSuppliesMKD: number): {
   percentage: number;
-  isRegistered: boolean;
+  // Over the threshold: registration is due (Art. 51(1), (11)).
+  mustRegister: boolean;
   alertLevel: "safe" | "warning" | "critical" | "exceeded";
   remaining: number;
 } {
-  const percentage = (annualIncomeMKD / DDV_THRESHOLD_MKD) * 100;
-  const remaining = DDV_THRESHOLD_MKD - annualIncomeMKD;
+  const percentage = (localSuppliesMKD / DDV_THRESHOLD_MKD) * 100;
+  const remaining = DDV_THRESHOLD_MKD - localSuppliesMKD;
+  // The law says "exceeded" (надминал), so exactly 2,000,000 isn't over.
+  const mustRegister = localSuppliesMKD > DDV_THRESHOLD_MKD;
 
   let alertLevel: "safe" | "warning" | "critical" | "exceeded" = "safe";
-  if (percentage >= 100) alertLevel = "exceeded";
+  if (mustRegister) alertLevel = "exceeded";
   else if (percentage >= 85) alertLevel = "critical";
   else if (percentage >= 70) alertLevel = "warning";
 
   return {
     percentage: Math.min(percentage, 100),
-    isRegistered: annualIncomeMKD >= DDV_THRESHOLD_MKD,
+    mustRegister,
     alertLevel,
     remaining: Math.max(0, remaining),
   };
@@ -87,9 +120,10 @@ export function getDDVStatus(annualIncomeMKD: number): {
 //
 // Which deadlines apply depends on the user's TaxStatus (above).
 //
-// "paid_from_abroad": for each month in which income was received, submit
-// the electronic calculation (е-ППД) by the 10th of the following month and
-// pay the tax by the 15th of the following month.
+// "paid_from_abroad": for each month in which self-reported income was
+// received, submit the electronic calculation (е-ППД) by the 10th of the
+// following month and pay the tax by the 15th of the following month
+// (Personal Income Tax law, Art. 88(1) points 4 and 7, Art. 93(1)).
 // https://biznisinfo.mk/kako-i-koga-da-prijavite-dohod-od-stranstvo-upatstvo-od-ujp-co-pravila-i-rokovi-za-prijavuvanje/
 // https://republika.mk/vesti/ekonomija/ujp-se-priblizhuva-rokot-za-podnesuvane-presmetki-za-dohod-ostvaren-od-rabota-vo-stranstvo-vo-2025-godina/
 // (The republika.mk piece is UJP's reminder about the 31 March calculation
@@ -111,7 +145,7 @@ export function getDDVStatus(annualIncomeMKD: number): {
 // had income, so they can be tested without a clock or a database.
 // ---------------------------------------------------------------------------
 
-// Paid from abroad: day of the following month to submit the calculation by,
+// Not registered: day of the following month to submit the calculation by,
 // and to pay the tax by.
 const ABROAD_REPORT_DAY = 10;
 const ABROAD_PAYMENT_DAY = 15;
@@ -123,8 +157,8 @@ const ANNUAL_RETURN_DATE = "03-15";
 const ANNUAL_PAYMENT_DATE = "03-30";
 
 export type TaxDeadlineKind =
-  | "report" // paid from abroad: submit the calculation for a month's income
-  | "pay" // paid from abroad: pay the tax on a month's income
+  | "report" // not registered: submit the calculation for a month's income
+  | "pay" // not registered: pay the tax on a month's income
   | "advance" // self-employed: pay the monthly advance for a month
   | "annualReturn" // self-employed: file the annual tax balance for a year
   | "annualPayment"; // self-employed: pay any difference for a year
@@ -166,8 +200,8 @@ function followingMonth(month: string): string {
 }
 
 // Every deadline that one tax year leads to, soonest first. incomeMonths
-// ("YYYY-MM") only matters when paid from abroad: a month without income has
-// nothing to report.
+// ("YYYY-MM") only matters when not registered: a month without
+// self-reported income has nothing to report.
 export function getTaxDeadlinesForTaxYear(
   status: TaxStatus,
   taxYear: number,
@@ -238,7 +272,7 @@ export function getUpcomingTaxDeadlines(
 }
 
 export type TaxDeadlineGroup = {
-  // One month's income from abroad (report + pay), one month's advance, or
+  // One month's self-reported income (report + pay), one month's advance, or
   // one tax year's annual balance (return + payment).
   kind: "income" | "advance" | "annual";
   period: string;
@@ -309,19 +343,140 @@ export function getPaymentDate(invoice: PaidInvoiceDates): string {
   return invoice.date.slice(0, 10);
 }
 
-// The months ("YYYY-MM") in which a client outside North Macedonia paid an
-// invoice, oldest first. The monthly calculation is for income from abroad;
-// a Macedonian company that pays an individual withholds the tax itself, so
-// invoices to clients in MK don't add a month.
-export function getForeignIncomeMonths(
-  paidInvoices: readonly (PaidInvoiceDates & { clientCountry: string })[]
+// Whether the freelancer reports the income tax on what a client pays, rather
+// than the client withholding it (Personal Income Tax law, "ЗДЛД"):
+// - a client outside North Macedonia: income from abroad (Art. 87(1) point 3);
+// - a private person in North Macedonia: income from occasional services to
+//   natural persons (Art. 87(1) point 6), since only a payer that keeps
+//   business books withholds (Art. 80(1));
+// - a company in North Macedonia keeps business books and withholds the tax
+//   when it pays (Art. 80(1)), so its invoices are not self-reported.
+// Both self-reported kinds have the same deadlines: the calculation by the
+// 10th of the next month (Art. 88(1) points 4 and 7), the tax by the 15th
+// (Art. 93(1)).
+export function isSelfReportedIncome(client: {
+  clientCountry: string;
+  clientType: string;
+}): boolean {
+  return client.clientCountry !== "MK" || client.clientType === "person";
+}
+
+// The months ("YYYY-MM") in which self-reported income was received (a paid
+// invoice to a client abroad or to a private person in North Macedonia),
+// oldest first. A company in North Macedonia withholds the tax itself, so its
+// invoices don't add a month.
+export function getSelfReportedIncomeMonths(
+  paidInvoices: readonly (PaidInvoiceDates & {
+    clientCountry: string;
+    clientType: string;
+  })[]
 ): string[] {
   const months = new Set<string>();
   for (const invoice of paidInvoices) {
-    if (invoice.clientCountry === "MK") continue;
+    if (!isSelfReportedIncome(invoice)) continue;
     months.add(getPaymentDate(invoice).slice(0, 7));
   }
   return [...months].sort();
+}
+
+// ---------------------------------------------------------------------------
+// What's owed to UJP (not registered for an activity)
+//
+// For each month in which self-reported income was received, the tax is 10%
+// of it (ЗДЛД Art. 11(1), Art. 87(2)), with the calculation due by the 10th
+// of the following month (Art. 88(1) points 4 and 7) and the tax by the 15th
+// (Art. 93(1)). It's an approximation, and the UI says so:
+// - it converts at the rate stored on each invoice, while UJP uses the
+//   National Bank's (NBRSM) middle rate on the day the income was received
+//   (Art. 93(2));
+// - it taxes the gross amount, while income from author's rights is taxed
+//   after deemed costs of 20-50% (Art. 40), so it can overstate the tax;
+// - UJP's approved calculation is the real figure (Art. 88(4)).
+// A registered self-employed person pays a monthly advance instead: 1/12 of
+// the tax in last year's annual balance (Art. 94(1)), which the app can't
+// work out; they enter it in Settings.
+// ---------------------------------------------------------------------------
+
+export type SelfReportedPayment = PaidInvoiceDates & {
+  clientCountry: string;
+  clientType: string;
+  // The invoice's amount before VAT, in MKD at the rate stored on the
+  // invoice: subtotal x exchange rate.
+  amountMKD: number;
+};
+
+export type MonthlyTaxOwed = {
+  // "YYYY-MM": the month the income was received in (Skopje time).
+  month: string;
+  // Self-reported income received that month, in MKD.
+  incomeMKD: number;
+  // 10% of it, rounded to the deni.
+  taxMKD: number;
+  // "YYYY-MM-DD": submit the calculation (е-ППД) by this date...
+  reportBy: string;
+  // ...and pay the tax by this one.
+  payBy: string;
+};
+
+function roundToDeni(amount: number): number {
+  return Math.round(amount * 100) / 100;
+}
+
+// The tax on one month's self-reported income and its two deadlines.
+export function taxOwedForMonth(month: string, incomeMKD: number): MonthlyTaxOwed {
+  const next = followingMonth(month);
+  return {
+    month,
+    incomeMKD: roundToDeni(incomeMKD),
+    taxMKD: roundToDeni(incomeMKD * PERSONAL_INCOME_TAX_RATE),
+    reportBy: `${next}-${pad2(ABROAD_REPORT_DAY)}`,
+    payBy: `${next}-${pad2(ABROAD_PAYMENT_DAY)}`,
+  };
+}
+
+// One entry per month with self-reported income, oldest first. Invoices to
+// companies in North Macedonia are left out: those companies withhold the tax.
+export function getMonthlyTaxOwed(
+  payments: readonly SelfReportedPayment[]
+): MonthlyTaxOwed[] {
+  const byMonth = new Map<string, number>();
+  for (const payment of payments) {
+    if (!isSelfReportedIncome(payment)) continue;
+    const month = getPaymentDate(payment).slice(0, 7);
+    byMonth.set(month, (byMonth.get(month) ?? 0) + payment.amountMKD);
+  }
+  return [...byMonth.keys()]
+    .sort()
+    .map((month) => taxOwedForMonth(month, byMonth.get(month)!));
+}
+
+export type OwedToUjp = {
+  // Last month's tax while it isn't due yet (until the 15th), if there was
+  // any self-reported income last month; otherwise null.
+  due: MonthlyTaxOwed | null;
+  // This month's tax so far, due next month. Zero if nothing yet.
+  current: MonthlyTaxOwed;
+};
+
+// What the dashboard shows on `today` ("YYYY-MM-DD"): the payment coming up
+// for last month, and this month's running amount.
+export function getOwedToUjp(
+  payments: readonly SelfReportedPayment[],
+  today: string
+): OwedToUjp {
+  const monthly = getMonthlyTaxOwed(payments);
+  const currentMonth = today.slice(0, 7);
+  return {
+    due: monthly.find((m) => m.month < currentMonth && m.payBy >= today) ?? null,
+    current:
+      monthly.find((m) => m.month === currentMonth) ?? taxOwedForMonth(currentMonth, 0),
+  };
+}
+
+// "YYYY-MM-DD" plus a number of days, e.g. ("2026-12-20", 30) -> "2027-01-19".
+export function addDays(date: string, days: number): string {
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
 }
 
 // Whole days from one "YYYY-MM-DD" date to another; negative if `to` is
@@ -380,12 +535,17 @@ export function getRateToMKD(currency: string): number {
   return APPROXIMATE_RATES_TO_MKD[currency];
 }
 
+// "1.234.567,89 ден.": the Macedonian format, from the en-US one with the
+// separators swapped. Browsers whose Intl has no Macedonian data (Chrome's
+// doesn't) printed "1,234,567.89" for "mk-MK" in client components, which
+// also broke hydration against the server's output; en-US data is always
+// there, and rounds the same way.
 export function formatMKD(amount: number): string {
-  return new Intl.NumberFormat("mk-MK", {
-    style: "decimal",
+  const enUS = new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount) + " ден.";
+  }).format(amount);
+  return enUS.replace(/[,.]/g, (sep) => (sep === "," ? "." : ",")) + " ден.";
 }
 
 export function formatCurrency(amount: number, currency: string): string {

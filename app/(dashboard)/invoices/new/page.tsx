@@ -1,13 +1,14 @@
 import { getSession } from "@/lib/auth/session";
-import { getDb, clients } from "@/lib/db";
+import { getDb, clients, users } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { NewInvoiceForm } from "@/components/invoices/new-invoice-form";
+import { InvoiceForm } from "@/components/invoices/invoice-form";
 import { getTranslations } from "@/lib/i18n/server";
+import { addDays, toSkopjeDate } from "@/lib/tax/calculator";
 
 export default async function NewInvoicePage() {
   const session = await getSession();
@@ -19,6 +20,14 @@ export default async function NewInvoicePage() {
     .select({ id: clients.id, name: clients.name, currency: clients.currency })
     .from(clients)
     .where(eq(clients.userId, session.userId));
+
+  const today = toSkopjeDate(new Date());
+
+  const [user] = await getDb()
+    .select({ vatRegistered: users.vatRegistered })
+    .from(users)
+    .where(eq(users.id, session.userId))
+    .limit(1);
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
@@ -45,7 +54,12 @@ export default async function NewInvoicePage() {
               </Link>
             </div>
           ) : (
-            <NewInvoiceForm clients={clientList} />
+            <InvoiceForm
+              clients={clientList}
+              vatRegistered={user?.vatRegistered ?? false}
+              today={today}
+              dueDefault={addDays(today, 30)}
+            />
           )}
         </CardContent>
       </Card>

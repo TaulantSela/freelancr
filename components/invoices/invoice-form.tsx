@@ -7,13 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { createInvoice } from "@/lib/actions/invoices";
+import { createInvoice, updateInvoice } from "@/lib/actions/invoices";
 import {
   SUPPORTED_CURRENCIES,
+  DDV_RATE_REDUCED,
+  DDV_RATE_STANDARD,
   formatCurrency,
   formatMKD,
   getRateToMKD,
 } from "@/lib/tax/calculator";
+import Link from "next/link";
 import { Plus, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "@/lib/i18n/client";
@@ -25,29 +28,59 @@ type LineItem = {
   unitPrice: number;
 };
 
-export function NewInvoiceForm({
+// A draft being edited. Issued invoices never reach the form: they're locked.
+export type DraftInvoice = {
+  id: string;
+  clientId: string;
+  date: string;
+  supplyDate: string;
+  dueDate: string | null;
+  currency: string;
+  ddvRate: number;
+  notes: string | null;
+  items: LineItem[];
+};
+
+export function InvoiceForm({
   clients,
+  vatRegistered,
+  today,
+  dueDefault,
+  draft,
 }: {
   clients: { id: string; name: string; currency: string }[];
+  // Only a VAT-registered user gets the DDV rate choice; the action forces
+  // 0 for everyone else anyway.
+  vatRegistered: boolean;
+  // "YYYY-MM-DD" in North Macedonia, from the server: the default invoice
+  // date, and the default due date 30 days later.
+  today: string;
+  dueDefault: string;
+  // Set when editing a draft; otherwise the form creates one.
+  draft?: DraftInvoice;
 }) {
   const t = useTranslations();
   const f = t.invoices.form;
-  const [items, setItems] = useState<LineItem[]>([
-    { description: "", quantity: 1, unitPrice: 0 },
-  ]);
-  const [currency, setCurrency] = useState(clients[0]?.currency ?? "EUR");
-  const [ddvRate, setDdvRate] = useState(0);
+  const [items, setItems] = useState<LineItem[]>(
+    draft?.items.length ? draft.items : [{ description: "", quantity: 1, unitPrice: 0 }]
+  );
+  const [currency, setCurrency] = useState(draft?.currency ?? clients[0]?.currency ?? "EUR");
+  const [ddvRate, setDdvRate] = useState(vatRegistered ? (draft?.ddvRate ?? 0) : 0);
+  const [date, setDate] = useState(draft?.date ?? today);
+  // The date of supply follows the invoice date until it's changed by hand
+  // (a draft's counts as changed when it differs from its invoice date).
+  const [supplyDate, setSupplyDate] = useState(draft?.supplyDate ?? today);
+  const [supplyDateEdited, setSupplyDateEdited] = useState(
+    draft ? draft.supplyDate !== draft.date : false
+  );
   const [pending, startTransition] = useTransition();
   const router = useRouter();
 
   const ddvOptions = [
     { label: f.noDdv, value: 0 },
-    { label: f.reducedDdv, value: 0.05 },
-    { label: f.standardDdv, value: 0.18 },
+    { label: f.reducedDdv, value: DDV_RATE_REDUCED },
+    { label: f.standardDdv, value: DDV_RATE_STANDARD },
   ];
-
-  const today = new Date().toISOString().split("T")[0];
-  const dueDefault = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
 
   const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   const ddvAmount = subtotal * ddvRate;
@@ -80,12 +113,11 @@ export function NewInvoiceForm({
     const fd = new FormData(e.currentTarget);
     fd.set("items", JSON.stringify(items));
     fd.set("currency", currency);
-    fd.set("ddvRate", ddvRate.toString());
+    if (vatRegistered) fd.set("ddvRate", ddvRate.toString());
 
     startTransition(async () => {
-      const result = await createInvoice(fd);
+      const result = draft ? await updateInvoice(draft.id, fd) : await createInvoice(fd);
       if (result?.errorKey) toast.error(f[result.errorKey]);
-      else if (result?.error) toast.error(result.error);
     });
   }
 
@@ -100,6 +132,7 @@ export function NewInvoiceForm({
             name="clientId"
             id="clientId"
             required
+            defaultValue={draft?.clientId}
             onChange={(e) => {
               const selected = clients.find((c) => c.id === e.target.value);
               if (selected) setCurrency(selected.currency);
@@ -132,11 +165,43 @@ export function NewInvoiceForm({
           <Label htmlFor="date">
             {f.invoiceDate} <span className="text-destructive">*</span>
           </Label>
-          <Input id="date" name="date" type="date" defaultValue={today} required />
+          <Input
+            id="date"
+            name="date"
+            type="date"
+            value={date}
+            onChange={(e) => {
+              setDate(e.target.value);
+              if (!supplyDateEdited) setSupplyDate(e.target.value);
+            }}
+            required
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="supplyDate">
+            {f.supplyDate} <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="supplyDate"
+            name="supplyDate"
+            type="date"
+            value={supplyDate}
+            onChange={(e) => {
+              setSupplyDate(e.target.value);
+              setSupplyDateEdited(true);
+            }}
+            required
+          />
+          <p className="text-xs text-muted-foreground">{f.supplyDateHint}</p>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="dueDate">{f.dueDate}</Label>
-          <Input id="dueDate" name="dueDate" type="date" defaultValue={dueDefault} />
+          <Input
+            id="dueDate"
+            name="dueDate"
+            type="date"
+            defaultValue={draft ? (draft.dueDate ?? "") : dueDefault}
+          />
         </div>
       </div>
 
@@ -203,22 +268,31 @@ export function NewInvoiceForm({
       <Separator />
 
       <div className="grid sm:grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="ddvRate">{f.ddv}</Label>
-          <select
-            id="ddvRate"
-            value={ddvRate}
-            onChange={(e) => setDdvRate(parseFloat(e.target.value))}
-            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-          >
-            {ddvOptions.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-card">
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          <p className="text-xs text-muted-foreground">{f.ddvHint}</p>
-        </div>
+        {vatRegistered ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="ddvRate">{f.ddv}</Label>
+            <select
+              id="ddvRate"
+              value={ddvRate}
+              onChange={(e) => setDdvRate(parseFloat(e.target.value))}
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            >
+              {ddvOptions.map((opt) => (
+                <option key={opt.value} value={opt.value} className="bg-card">
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-muted-foreground">{f.ddvHint}</p>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            {f.noVatRegistration}{" "}
+            <Link href="/settings" className="underline underline-offset-2 hover:text-foreground">
+              {t.tax.changeInSettings}
+            </Link>
+          </p>
+        )}
 
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
@@ -251,13 +325,19 @@ export function NewInvoiceForm({
 
       <div className="space-y-1.5">
         <Label htmlFor="notes">{f.notes}</Label>
-        <Textarea id="notes" name="notes" placeholder={f.notesPlaceholder} rows={3} />
+        <Textarea
+          id="notes"
+          name="notes"
+          placeholder={f.notesPlaceholder}
+          rows={3}
+          defaultValue={draft?.notes ?? ""}
+        />
       </div>
 
       <div className="flex gap-3">
         <Button type="submit" disabled={pending} className="gap-2">
           {pending && <Loader2 className="h-4 w-4 animate-spin" />}
-          {f.submit}
+          {draft ? f.saveDraft : f.submit}
         </Button>
         <Button type="button" variant="outline" onClick={() => router.back()}>
           {t.common.cancel}

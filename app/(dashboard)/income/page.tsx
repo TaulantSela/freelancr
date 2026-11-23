@@ -3,17 +3,28 @@ import { getDb, invoices, clients } from "@/lib/db";
 import { eq, and, gte } from "drizzle-orm";
 import {
   getDDVStatus,
+  getLocalSupplies,
   getTaxCalendar,
   groupTaxDeadlines,
-  getForeignIncomeMonths,
+  getSelfReportedIncomeMonths,
+  getMonthlyTaxOwed,
+  getOwedToUjp,
   toSkopjeDate,
   daysBetween,
-  calculateIncomeTax,
   formatMKD,
   DDV_THRESHOLD_MKD,
 } from "@/lib/tax/calculator";
-import { getTaxStatus, getPaidInvoicesForDeadlines } from "@/lib/tax/queries";
-import { taxDeadlineAction, taxDeadlineGroupTitle } from "@/lib/tax/labels";
+import {
+  getTaxProfile,
+  getPaidInvoicesForDeadlines,
+  getInvoicesForThreshold,
+} from "@/lib/tax/queries";
+import {
+  formatTaxDate,
+  formatTaxPeriod,
+  taxDeadlineAction,
+  taxDeadlineGroupTitle,
+} from "@/lib/tax/labels";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,21 +66,33 @@ export default async function IncomePage() {
     .orderBy(invoices.date);
 
   const annualIncomeMKD = paidInvoices.reduce((s, i) => s + i.totalMKD, 0);
-  const ddvStatus = getDDVStatus(annualIncomeMKD);
-  const taxCalc = calculateIncomeTax(annualIncomeMKD);
 
   // UJP deadlines due from 1 January, for how the user is registered for tax.
-  // When paid from abroad, they follow the month each invoice was paid in,
-  // which can differ from the invoice date the breakdowns below use.
+  // When not registered, they follow the month each invoice was paid in,
+  // which can differ from the invoice date the breakdowns below use, and each
+  // month's group shows 10% of that month's self-reported income.
   const today = toSkopjeDate(new Date());
-  const taxStatus = await getTaxStatus(session.userId);
-  const incomeMonths =
-    taxStatus === "paid_from_abroad"
-      ? getForeignIncomeMonths(await getPaidInvoicesForDeadlines(session.userId, year))
-      : [];
+  const { taxStatus, monthlyAdvanceMKD, vatRegistered } = await getTaxProfile(session.userId);
+
+  // The DDV threshold: this year's supplies in North Macedonia only, hidden
+  // once registered for VAT or while there are none (see getLocalSupplies).
+  const localSupplies = vatRegistered
+    ? { totalMKD: 0, count: 0 }
+    : getLocalSupplies(await getInvoicesForThreshold(session.userId, year), year);
+  const showDdv = !vatRegistered && localSupplies.count > 0;
+  const ddvStatus = getDDVStatus(localSupplies.totalMKD);
+  const notRegistered = taxStatus === "paid_from_abroad";
+  const payments = notRegistered
+    ? await getPaidInvoicesForDeadlines(session.userId, year)
+    : [];
+  const incomeMonths = getSelfReportedIncomeMonths(payments);
+  const owedByMonth = new Map(getMonthlyTaxOwed(payments).map((m) => [m.month, m]));
+  const owed = getOwedToUjp(payments, today);
+  const owedNext = owed.due ?? owed.current;
   const taxCalendar = getTaxCalendar(taxStatus, year, incomeMonths);
   const deadlineGroups = groupTaxDeadlines(taxCalendar);
   const nextDueDate = taxCalendar.find((d) => d.dueDate >= today)?.dueDate;
+  const nextAdvance = taxCalendar.find((d) => d.kind === "advance" && d.dueDate >= today);
 
   const ddvBadgeLabels = {
     safe: t.dashboard.ddvSafe,
@@ -79,9 +102,9 @@ export default async function IncomePage() {
   };
 
   const alertItems = [
-    { label: t.income.alert70, threshold: DDV_THRESHOLD_MKD * 0.7, reached: annualIncomeMKD >= DDV_THRESHOLD_MKD * 0.7 },
-    { label: t.income.alert85, threshold: DDV_THRESHOLD_MKD * 0.85, reached: annualIncomeMKD >= DDV_THRESHOLD_MKD * 0.85 },
-    { label: t.income.alert100, threshold: DDV_THRESHOLD_MKD, reached: annualIncomeMKD >= DDV_THRESHOLD_MKD },
+    { label: t.income.alert70, threshold: DDV_THRESHOLD_MKD * 0.7, reached: localSupplies.totalMKD >= DDV_THRESHOLD_MKD * 0.7 },
+    { label: t.income.alert85, threshold: DDV_THRESHOLD_MKD * 0.85, reached: localSupplies.totalMKD >= DDV_THRESHOLD_MKD * 0.85 },
+    { label: t.income.alert100, threshold: DDV_THRESHOLD_MKD, reached: ddvStatus.mustRegister },
   ];
 
   // Income by currency
@@ -131,7 +154,38 @@ export default async function IncomePage() {
       </div>
 
       {/* Top stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className={cn("grid grid-cols-2 gap-4", showDdv && "md:grid-cols-3")}>
+        <Card>
+          <CardContent className="pt-5">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+              {t.tax.owed.title}
+            </div>
+            {notRegistered ? (
+              <>
+                <div className="text-lg font-mono font-semibold">{formatMKD(owedNext.taxMKD)}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  {formatMessage(t.tax.owed.tileDue, {
+                    month: formatTaxPeriod(owedNext.month, t),
+                    date: formatTaxDate(owedNext.payBy, t),
+                  })}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-lg font-mono font-semibold">
+                  {monthlyAdvanceMKD !== null ? formatMKD(monthlyAdvanceMKD) : "—"}
+                </div>
+                {nextAdvance && (
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    {formatMessage(t.tax.owed.advanceTile, {
+                      date: formatTaxDate(nextAdvance.dueDate, t),
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
         <Card>
           <CardContent className="pt-5">
             <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
@@ -143,47 +197,25 @@ export default async function IncomePage() {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-5">
-            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-              {t.income.estTax}
-            </div>
-            <div className="text-lg font-mono font-semibold text-red-400">
-              {formatMKD(taxCalc.totalTax)}
-            </div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              {(taxCalc.effectiveRate * 100).toFixed(1)}% {t.income.effectiveRate}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-5">
-            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-              {t.income.netIncome}
-            </div>
-            <div className="text-lg font-mono font-semibold text-emerald-400">
-              {formatMKD(annualIncomeMKD - taxCalc.totalTax)}
-            </div>
-            <div className="text-xs text-muted-foreground mt-0.5">{t.income.afterTax}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-5">
-            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-              {t.income.ddvThresholdPct}
-            </div>
-            <div className="text-lg font-mono font-semibold">
-              {ddvStatus.percentage.toFixed(1)}%
-            </div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              {formatMKD(ddvStatus.remaining)} {t.dashboard.remaining}
-            </div>
-          </CardContent>
-        </Card>
+        {showDdv && (
+          <Card>
+            <CardContent className="pt-5">
+              <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                {t.income.ddvThresholdPct}
+              </div>
+              <div className="text-lg font-mono font-semibold">
+                {ddvStatus.percentage.toFixed(1)}%
+              </div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                {formatMKD(ddvStatus.remaining)} {t.dashboard.remaining}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        {/* DDV Tracker */}
+      {/* DDV Tracker */}
+      {showDdv && (
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center justify-between">
@@ -200,7 +232,7 @@ export default async function IncomePage() {
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-muted-foreground">{t.income.currentAnnual}</span>
-                <span className="font-mono text-sm">{formatMKD(annualIncomeMKD)}</span>
+                <span className="font-mono text-sm">{formatMKD(localSupplies.totalMKD)}</span>
               </div>
               <div className="h-3 bg-muted rounded-full overflow-hidden">
                 <div
@@ -232,6 +264,8 @@ export default async function IncomePage() {
               ))}
             </div>
 
+            <p className="text-xs text-muted-foreground">{t.dashboard.ddvLocalOnly}</p>
+
             {ddvStatus.alertLevel !== "safe" && (
               <div className="flex items-start gap-2 text-xs bg-yellow-500/10 text-yellow-400 rounded px-3 py-2">
                 <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
@@ -246,58 +280,7 @@ export default async function IncomePage() {
             )}
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">
-              {formatMessage(t.income.taxBreakdown, { year })}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t.income.grossIncome}</span>
-                <span className="font-mono">{formatMKD(annualIncomeMKD)}</span>
-              </div>
-              <Separator />
-              {taxCalc.breakdown.length === 0 && (
-                <div className="text-xs text-muted-foreground py-1">{t.income.noIncome}</div>
-              )}
-              {taxCalc.breakdown.map((b, i) => (
-                <div key={i} className="flex justify-between items-center">
-                  <div>
-                    <span className="text-muted-foreground">
-                      {formatMessage(t.income.bracketOn, { bracket: b.bracket })}{" "}
-                    </span>
-                    <span className="font-mono text-xs">{formatMKD(b.amount)}</span>
-                  </div>
-                  <span className="font-mono text-red-400">{formatMKD(b.tax)}</span>
-                </div>
-              ))}
-              <Separator />
-              <div className="flex justify-between font-medium">
-                <span>{t.income.totalEstTax}</span>
-                <span className="font-mono text-red-400">{formatMKD(taxCalc.totalTax)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t.income.netIncome}</span>
-                <span className="font-mono text-emerald-400">
-                  {formatMKD(annualIncomeMKD - taxCalc.totalTax)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t.income.effectiveRate}</span>
-                <span className="font-mono">{(taxCalc.effectiveRate * 100).toFixed(2)}%</span>
-              </div>
-            </div>
-
-            <div className="bg-muted/50 rounded px-3 py-2 text-xs text-muted-foreground flex items-start gap-2">
-              <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-              <span>{t.income.taxNote}</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      )}
 
       <Card>
         <CardHeader className="pb-2">
@@ -337,6 +320,18 @@ export default async function IncomePage() {
                         <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
                       )}
                     </div>
+                    {group.kind === "income" && owedByMonth.has(group.period) && (
+                      <div className="text-sm font-mono mb-1">
+                        {formatMessage(t.tax.owed.groupAmount, {
+                          amount: formatMKD(owedByMonth.get(group.period)!.taxMKD),
+                        })}
+                      </div>
+                    )}
+                    {/* The amount entered in Settings; only for advances still
+                        to pay, since earlier ones may have been different. */}
+                    {group.kind === "advance" && !isPast && monthlyAdvanceMKD !== null && (
+                      <div className="text-sm font-mono mb-1">{formatMKD(monthlyAdvanceMKD)}</div>
+                    )}
                     {group.deadlines.map((d) => (
                       <div key={d.kind} className="text-xs text-muted-foreground mb-1">
                         {taxDeadlineAction(d, t)}
@@ -362,6 +357,20 @@ export default async function IncomePage() {
                 );
               })}
             </div>
+          )}
+          {notRegistered && owedByMonth.size > 0 && (
+            <div className="bg-muted/50 rounded px-3 py-2 text-xs text-muted-foreground flex items-start gap-2">
+              <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              <span>{t.tax.owed.note}</span>
+            </div>
+          )}
+          {!notRegistered && (
+            <p className="text-xs text-muted-foreground">
+              {monthlyAdvanceMKD !== null ? t.tax.owed.advanceSet : t.tax.owed.advanceHint}{" "}
+              <Link href="/settings" className="underline underline-offset-2 hover:text-foreground">
+                {monthlyAdvanceMKD !== null ? t.tax.changeInSettings : t.tax.owed.addInSettings}
+              </Link>
+            </p>
           )}
           <p className="text-xs text-muted-foreground">
             {formatMessage(t.tax.basedOn, { status: t.tax.statuses[taxStatus] })}{" "}

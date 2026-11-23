@@ -34,16 +34,3 @@ export function getInvoiceStatusColor(status: string): string {
       return "bg-zinc-500/10 text-zinc-500 border-zinc-200";
   }
 }
-
-export function generateInvoiceNumber(existingNumbers: string[]): string {
-  const year = new Date().getFullYear();
-  const prefix = `INV-${year}-`;
-  const existing = existingNumbers
-    .filter((n) => n.startsWith(prefix))
-    .map((n) => parseInt(n.replace(prefix, ""), 10))
-    .filter((n) => !isNaN(n))
-    .sort((a, b) => b - a);
-
-  const next = existing.length > 0 ? existing[0] + 1 : 1;
-  return `${prefix}${String(next).padStart(3, "0")}`;
-}
