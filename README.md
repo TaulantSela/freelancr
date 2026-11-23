@@ -26,8 +26,9 @@ is. Freelancr puts the invoices and the local tax picture in one place.
 | Clients | Create and edit, with tax ID, country, contact person and notes; a client with invoices can't be deleted, and the app says why |
 | Dashboard | Paid income this year, outstanding invoices, estimated tax, the DDV monitor, the next tax deadline and recent invoices |
 | DDV monitor | Progress toward 2,000,000 MKD of paid income this year, with warnings at 70%, 85% and 100% |
-| Income page | Monthly breakdown, income by client, an income tax estimate (flat 10%) and the deadlines the app tracks (Apr 30, Jul 31, Oct 31, Jan 31) |
-| Settings | Business profile (EDB, address, bank account) and an e-Faktura readiness checklist based on how complete it is |
+| Income page | Monthly breakdown, income by client, an income tax estimate (flat 10%) and the year's tax deadlines |
+| Tax deadlines | UJP's deadlines for how you're registered for tax. Paid from abroad and not registered (the default): for each month in which a client abroad paid you, submit the calculation by the 10th and pay the tax by the 15th of the next month. Registered self-employed: the monthly advance by the 15th for the previous month, the annual tax balance (ПДД-ДБ) by 15 March and any difference by 30 March |
+| Settings | Business profile (EDB, address, bank account), how you're registered for tax, and an e-Faktura readiness checklist based on how complete the profile is |
 | Languages | Macedonian (default), Albanian and English |
 
 ## Known limitations
@@ -45,9 +46,14 @@ is. Freelancr puts the invoices and the local tax picture in one place.
 - **Tax rules are constants.** The DDV threshold, the flat 10% income tax
   rate and the deadlines are hardcoded in `lib/tax/calculator.ts`. The estimate
   applies the rate to paid invoice totals, while the legal base is net income
-  after expenses. The deadlines are quarterly; UJP's guide for independent
-  activity has monthly advances by the 15th and the annual return by 15 March.
-  Treat the numbers as estimates, not tax advice.
+  after expenses. Treat the numbers as estimates, not tax advice.
+- **The deadlines cover two cases.** They follow the tax status you pick in
+  Settings, and nothing else is tracked: no social contributions, and no
+  31 March calculation for salaries from abroad. A deadline that falls on a
+  weekend or public holiday isn't moved. When you're paid from abroad, a
+  month counts once an invoice to a client outside North Macedonia is marked
+  paid in it; the app has no separate payment date, so mark invoices paid in
+  the month the money arrived.
 - **No e-Faktura integration.** The readiness checklist only checks your
   profile; nothing talks to UJP.
 - **No billing.** Every account is on the free plan; the paid plans on the
