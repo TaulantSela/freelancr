@@ -312,6 +312,10 @@ export const en: Dictionary = {
       ddvNotRegistered:
         "This draft shows DDV, but you aren't registered for VAT. Edit and save it (that removes the DDV) before issuing it.",
     },
+    duplicate: {
+      button: "Duplicate",
+      failed: "That invoice couldn't be duplicated.",
+    },
     cancel: {
       button: "Cancel invoice",
       title: "Cancel {number}?",

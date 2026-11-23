@@ -271,6 +271,10 @@ export type Dictionary = {
       notDraft: string;
       ddvNotRegistered: string;
     };
+    duplicate: {
+      button: string;
+      failed: string;
+    };
     cancel: {
       button: string;
       title: string;

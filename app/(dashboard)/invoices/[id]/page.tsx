@@ -13,6 +13,7 @@ import { DeleteInvoiceButton } from "@/components/invoices/delete-invoice-button
 import { DownloadPdfButton } from "@/components/invoices/download-pdf-button";
 import { IssueInvoiceButton } from "@/components/invoices/issue-invoice-button";
 import { CancelInvoiceButton } from "@/components/invoices/cancel-invoice-button";
+import { DuplicateInvoiceButton } from "@/components/invoices/duplicate-invoice-button";
 import { getTranslations } from "@/lib/i18n/server";
 import { LOCALE_LABELS } from "@/lib/i18n/config";
 import { resolveInvoiceLanguage } from "@/lib/clients/config";
@@ -75,6 +76,7 @@ export default async function InvoiceDetailPage({
           )}
           {isDraft && <IssueInvoiceButton id={invoice.id} year={invoice.date.slice(0, 4)} />}
           <DownloadPdfButton invoiceId={invoice.id} />
+          <DuplicateInvoiceButton id={invoice.id} />
           {/* Drafts can be deleted; issued invoices only cancelled, since
               they're kept for five years (VAT law Art. 56). */}
           {isDraft && <DeleteInvoiceButton id={invoice.id} number={invoice.number} />}

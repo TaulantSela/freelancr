@@ -14,6 +14,7 @@ import {
 import { getRateToMkd } from "@/lib/rates/queries";
 import { issueDraftInvoice } from "@/lib/invoices/numbering";
 import { updateDraftInvoice, type DraftLineItem, type DraftValues } from "@/lib/invoices/drafts";
+import { duplicateDueDate, insertDuplicateDraft } from "@/lib/invoices/duplicate";
 import { eq, and, inArray, sql } from "drizzle-orm";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -280,6 +281,72 @@ export async function cancelInvoice(id: string) {
   revalidatePath(`/invoices/${id}`);
   revalidatePath("/dashboard");
   return { ok: true as const };
+}
+
+// Duplicates one of the user's invoices, in any state, as a new draft: the
+// client, currency, line items and notes, with today's date (Skopje) as the
+// invoice and supply date, the same payment term, the rate for today (as for
+// any draft), and the DDV rate only if the user is registered for VAT now
+// (VAT law Art. 51(3)). Then on to editing it.
+export async function duplicateInvoice(id: string) {
+  const session = await getSession();
+  if (!session) redirect("/sign-in");
+
+  const [source] = await getDb()
+    .select({
+      currency: invoices.currency,
+      date: invoices.date,
+      dueDate: invoices.dueDate,
+      ddvRate: invoices.ddvRate,
+      vatRegistered: users.vatRegistered,
+    })
+    .from(invoices)
+    .innerJoin(users, eq(invoices.userId, users.id))
+    .where(and(eq(invoices.id, id), eq(invoices.userId, session.userId)))
+    .limit(1);
+  if (!source) return { errorKey: "notFound" as const };
+  const items = await getDb()
+    .select({
+      description: invoiceItems.description,
+      quantity: invoiceItems.quantity,
+      unitPrice: invoiceItems.unitPrice,
+    })
+    .from(invoiceItems)
+    .where(eq(invoiceItems.invoiceId, id));
+  if (items.length === 0) return { errorKey: "notFound" as const };
+
+  const today = toSkopjeDate(new Date());
+  const ddvRate = source.vatRegistered ? source.ddvRate : 0;
+  const subtotal = items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
+  const ddvAmount = subtotal * ddvRate;
+  const total = subtotal + ddvAmount;
+  const { rate, rateSource, rateDate } = await invoiceRate(source.currency, today);
+
+  const draftId = generateId();
+  const saved = await insertDuplicateDraft(getDb(), {
+    id: draftId,
+    userId: session.userId,
+    sourceId: id,
+    values: {
+      date: today,
+      supplyDate: today,
+      dueDate: duplicateDueDate(source, today),
+      currency: source.currency,
+      exchangeRateMKD: rate,
+      rateSource,
+      rateDate,
+      subtotal,
+      ddvRate,
+      ddvAmount,
+      total,
+      totalMKD: total * rate,
+    },
+    items: items.map((item) => ({ ...item, id: generateId() })),
+  });
+  if (!saved) return { errorKey: "notFound" as const };
+
+  revalidatePath("/invoices");
+  redirect(`/invoices/${draftId}/edit`);
 }
 
 // Deletes a draft. An issued invoice can only be cancelled (above).

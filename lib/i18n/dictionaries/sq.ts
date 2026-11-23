@@ -312,6 +312,10 @@ export const sq: Dictionary = {
       ddvNotRegistered:
         "Ky draft tregon TVSH, por nuk je i regjistruar për TVSH. Ndryshoje dhe ruaje (kështu hiqet TVSH-ja) para se ta lëshosh.",
     },
+    duplicate: {
+      button: "Dyfisho",
+      failed: "Fatura nuk mund të dyfishohej.",
+    },
     cancel: {
       button: "Anulo faturën",
       title: "Të anulohet {number}?",
