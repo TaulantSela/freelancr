@@ -92,7 +92,7 @@ export const sq: Dictionary = {
       },
       {
         title: "Ndjekës i të ardhurave vjetore",
-        desc: "Të ardhurat vjetore sipas klientit dhe monedhës, shkallët tatimore dhe detyrimi i vlerësuar.",
+        desc: "Të ardhurat vjetore sipas klientit dhe monedhës, me një vlerësim të tatimit mbi të ardhurat me normë të sheshtë 10%.",
       },
       {
         title: "Pajtim Wise & PayPal",
@@ -380,7 +380,7 @@ export const sq: Dictionary = {
     totalEstTax: "Tatimi total i vlerësuar",
     effectiveRate: "Shkalla efektive",
     taxNote:
-      "Tatim progresiv MK: 10% mbi 1.080.000 MKD të parë, 18% mbi. Kjo është vlerësim — konsulto kontabilistin.",
+      "Tatimi mbi të ardhurat personale në MK është me normë të sheshtë 10%. Ky vlerësim e llogarit mbi faturat e paguara, por baza tatimore për veprimtarinë e pavarur janë të ardhurat neto pas shpenzimeve — konsulto kontabilistin.",
     quarterlyDeadlines: "Afatet tatimore tremujore {year}",
     passed: "Kaluar",
     daysAway: "për {days} ditë",

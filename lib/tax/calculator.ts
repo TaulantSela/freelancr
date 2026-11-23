@@ -3,12 +3,18 @@
 // DDV (VAT) threshold in MKD per year
 export const DDV_THRESHOLD_MKD = 2_000_000;
 
-// MK personal income tax brackets (2026)
-// Progressive tax: 10% on first 1.08M MKD, 18% above
-export const TAX_BRACKETS = [
-  { upTo: 1_080_000, rate: 0.1, label: "10%" },
-  { upTo: Infinity, rate: 0.18, label: "18%" },
-];
+// MK personal income tax (2026): a flat 10%, with no brackets.
+// UJP's guide on income from independent activity gives the rate as 10%:
+// https://ujp.gov.mk/en/vodic/category/546
+// The 10%/18% progressive rates that applied in 2019 were suspended for
+// 2020-2022 and then abolished from 1 January 2023 (Official Gazette
+// 274/2022). PwC Worldwide Tax Summaries (reviewed 23 July 2026) lists the
+// same flat 10% for self-employment income:
+// https://taxsummaries.pwc.com/north-macedonia/individual/taxes-on-personal-income
+// The legal base for independent activity is net income (revenue minus
+// expenses); calculateIncomeTax() applies the rate to paid invoice totals,
+// so it overestimates for anyone with deductible expenses.
+export const PERSONAL_INCOME_TAX_RATE = 0.1;
 
 // Quarterly tax deadlines
 export const QUARTERLY_DEADLINES = [
@@ -27,33 +33,21 @@ export function calculateIncomeTax(annualIncomeMKD: number): {
   effectiveRate: number;
   breakdown: { bracket: string; amount: number; tax: number }[];
 } {
-  let remaining = annualIncomeMKD;
-  let totalTax = 0;
-  const breakdown: { bracket: string; amount: number; tax: number }[] = [];
-
-  for (let i = 0; i < TAX_BRACKETS.length; i++) {
-    const bracket = TAX_BRACKETS[i];
-    const prev = i === 0 ? 0 : TAX_BRACKETS[i - 1].upTo;
-    const taxable = Math.min(remaining, bracket.upTo - prev);
-
-    if (taxable <= 0) break;
-
-    const tax = taxable * bracket.rate;
-    totalTax += tax;
-    breakdown.push({
-      bracket: bracket.label,
-      amount: taxable,
-      tax,
-    });
-
-    remaining -= taxable;
-    if (remaining <= 0) break;
+  if (annualIncomeMKD <= 0) {
+    return { totalTax: 0, effectiveRate: 0, breakdown: [] };
   }
 
+  const totalTax = annualIncomeMKD * PERSONAL_INCOME_TAX_RATE;
   return {
     totalTax,
-    effectiveRate: annualIncomeMKD > 0 ? totalTax / annualIncomeMKD : 0,
-    breakdown,
+    effectiveRate: PERSONAL_INCOME_TAX_RATE,
+    breakdown: [
+      {
+        bracket: `${PERSONAL_INCOME_TAX_RATE * 100}%`,
+        amount: annualIncomeMKD,
+        tax: totalTax,
+      },
+    ],
   };
 }
 
