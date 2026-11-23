@@ -22,7 +22,6 @@ export type Dictionary = {
   nav: {
     features: string;
     pricing: string;
-    compliance: string;
     signIn: string;
     getStarted: string;
     dashboard: string;
@@ -59,8 +58,6 @@ export type Dictionary = {
     heroSubtitle: string;
     startFree: string;
     signInAccount: string;
-    eFakturaAlert: string;
-    eFakturaAlertDetail: string;
     featuresTitle: string;
     featuresSubtitle: string;
     features: { title: string; desc: string }[];
@@ -76,12 +73,6 @@ export type Dictionary = {
       cta: string;
       badge?: string;
     }[];
-    complianceTitle: string;
-    complianceSubtitle: string;
-    complianceBullets: string[];
-    checkStatus: string;
-    compliancePreview: string;
-    complianceRows: { label: string; value: string }[];
     ctaTitle: string;
     ctaSubtitle: string;
     ctaButton: string;
@@ -112,7 +103,6 @@ export type Dictionary = {
     ddvStatus: string;
     mustRegister: string;
     notRequired: string;
-    eFakturaDeadline: string;
     taxSummary: string;
     grossIncome: string;
     bracketTax: string;
@@ -125,8 +115,6 @@ export type Dictionary = {
     recentInvoices: string;
     noInvoices: string;
     createFirst: string;
-    eFakturaChecklist: string;
-    checklistItems: string[];
   };
   clients: {
     title: string;
@@ -281,7 +269,6 @@ export type Dictionary = {
     businessNamePlaceholder: string;
     businessType: string;
     taxNumber: string;
-    taxNumberBadge: string;
     address: string;
     bankAccount: string;
     bankName: string;
@@ -292,10 +279,6 @@ export type Dictionary = {
     plan: string;
     freePlan: string;
     memberSince: string;
-    eFakturaTitle: string;
-    eFakturaDesc: string;
-    requirementsMet: string;
-    checklist: string[];
     businessTypes: { value: string; label: string }[];
   };
   tax: {

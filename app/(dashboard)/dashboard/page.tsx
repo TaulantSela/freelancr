@@ -27,7 +27,6 @@ import {
   Users,
   Plus,
   Calendar,
-  CheckCircle2,
   Clock,
   CircleDollarSign,
 } from "lucide-react";
@@ -139,8 +138,6 @@ export default async function DashboardPage() {
     critical: { label: t.dashboard.ddvCritical, variant: "destructive" as const },
     exceeded: { label: t.dashboard.ddvExceeded, variant: "destructive" as const },
   };
-
-  const checklistDone = [true, true, false, false, false, false];
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
@@ -275,10 +272,6 @@ export default async function DashboardPage() {
                   {ddvStatus.isRegistered ? t.dashboard.mustRegister : t.dashboard.notRequired}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t.dashboard.eFakturaDeadline}</span>
-                <span className="text-xs text-yellow-400">{t.landing.eFakturaAlert}</span>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -408,34 +401,6 @@ export default async function DashboardPage() {
               })}
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-yellow-500" />
-            {t.dashboard.eFakturaChecklist}
-            <Badge variant="outline" className="text-xs text-yellow-500 border-yellow-500/30 ml-1">
-              {t.landing.eFakturaAlert}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-2">
-            {t.dashboard.checklistItems.map((text, i) => (
-              <div key={text} className="flex items-center gap-3 text-sm py-1">
-                {checklistDone[i] ? (
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                ) : (
-                  <div className="h-4 w-4 rounded-full border border-muted-foreground shrink-0" />
-                )}
-                <span className={checklistDone[i] ? "text-muted-foreground line-through" : ""}>
-                  {text}
-                </span>
-              </div>
-            ))}
-          </div>
         </CardContent>
       </Card>
     </div>

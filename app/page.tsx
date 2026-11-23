@@ -8,14 +8,12 @@ import {
   FileText,
   TrendingUp,
   Shield,
-  Globe,
   ArrowRight,
   Check,
-  AlertTriangle,
   Calendar,
 } from "lucide-react";
 
-const FEATURE_ICONS = [FileText, Shield, Calendar, TrendingUp, Globe];
+const FEATURE_ICONS = [FileText, Shield, Calendar, TrendingUp];
 
 export default async function LandingPage() {
   const { t } = await getTranslations();
@@ -36,9 +34,6 @@ export default async function LandingPage() {
             </Link>
             <Link href="#pricing" className="hover:text-foreground transition-colors">
               {t.nav.pricing}
-            </Link>
-            <Link href="#compliance" className="hover:text-foreground transition-colors">
-              {t.nav.compliance}
             </Link>
           </nav>
           <div className="flex items-center gap-3">
@@ -73,13 +68,6 @@ export default async function LandingPage() {
             <Button size="lg" variant="outline">{t.landing.signInAccount}</Button>
           </Link>
         </div>
-        <div className="mt-12 inline-flex items-center gap-3 bg-warning/10 border border-warning/30 text-warning-foreground rounded-lg px-5 py-3 text-sm">
-          <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0" />
-          <span>
-            <strong className="text-yellow-400">{t.landing.eFakturaAlert}</strong>{" "}
-            <span className="text-muted-foreground">{t.landing.eFakturaAlertDetail}</span>
-          </span>
-        </div>
       </section>
 
       <Separator className="max-w-6xl mx-auto" />
@@ -89,7 +77,7 @@ export default async function LandingPage() {
           <h2 className="text-2xl font-semibold mb-3">{t.landing.featuresTitle}</h2>
           <p className="text-muted-foreground max-w-xl mx-auto text-sm">{t.landing.featuresSubtitle}</p>
         </div>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {t.landing.features.map((f, i) => {
             const Icon = FEATURE_ICONS[i];
             return (
@@ -151,66 +139,6 @@ export default async function LandingPage() {
               </Link>
             </div>
           ))}
-        </div>
-      </section>
-
-      <Separator className="max-w-6xl mx-auto" />
-
-      <section id="compliance" className="max-w-6xl mx-auto px-6 py-20">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <Badge variant="outline" className="mb-4 text-xs text-yellow-500 border-yellow-500/30">
-              {t.landing.eFakturaAlert}
-            </Badge>
-            <h2 className="text-2xl font-semibold mb-4 leading-tight">{t.landing.complianceTitle}</h2>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              {t.landing.complianceSubtitle}
-            </p>
-            <ul className="space-y-3 mb-8">
-              {t.landing.complianceBullets.map((item) => (
-                <li key={item} className="flex gap-3 text-sm text-muted-foreground">
-                  <Check className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <Link href="/sign-up">
-              <Button className="gap-2">
-                {t.landing.checkStatus} <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-6 space-y-4">
-            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              {t.landing.compliancePreview}
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span>{t.dashboard.annualIncomeMkd}</span>
-                <span className="font-mono text-yellow-400">1,450,000 ден.</span>
-              </div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-yellow-500 rounded-full" style={{ width: "72.5%" }} />
-              </div>
-            </div>
-            <Separator />
-            <div className="space-y-2">
-              {t.landing.complianceRows.map((row, i) => (
-                <div key={row.label} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{row.label}</span>
-                  <span
-                    className={
-                      i >= 2
-                        ? "text-yellow-400 font-mono text-xs"
-                        : "text-emerald-400 font-mono text-xs"
-                    }
-                  >
-                    {row.value}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 

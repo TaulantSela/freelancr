@@ -23,7 +23,6 @@ export const en: Dictionary = {
   nav: {
     features: "Features",
     pricing: "Pricing",
-    compliance: "Compliance",
     signIn: "Sign in",
     getStarted: "Get started free",
     dashboard: "Dashboard",
@@ -62,12 +61,9 @@ export const en: Dictionary = {
     badge: "Built for North Macedonia · MKD + EUR + USD invoicing",
     heroTitle: "The invoicing platform that actually understands Macedonian freelancers",
     heroSubtitle:
-      "Stop invoicing in Word and tracking income in Excel. Freelancr puts multi-currency invoices, DDV threshold monitoring, your UJP tax deadlines and e-Faktura readiness in one place.",
+      "Stop invoicing in Word and tracking income in Excel. Freelancr puts multi-currency invoices, DDV threshold monitoring and your UJP tax deadlines in one place.",
     startFree: "Start for free",
     signInAccount: "Sign in to your account",
-    eFakturaAlert: "October 2026:",
-    eFakturaAlertDetail:
-      "e-Faktura mandate takes effect for businesses above 2,000,000 MKD/year. Are you ready?",
     featuresTitle: "Everything a Macedonian freelancer needs",
     featuresSubtitle:
       "Global tools don't know what DDV is. Your Excel doesn't know your tax deadlines. Freelancr knows both.",
@@ -87,10 +83,6 @@ export const en: Dictionary = {
       {
         title: "Annual income tracker",
         desc: "Yearly income by client and currency, with an estimate of the flat 10% income tax.",
-      },
-      {
-        title: "e-Faktura readiness",
-        desc: "Compliance checklist and readiness dashboard for the October 2026 mandate.",
       },
     ],
     pricingTitle: "Simple, honest pricing in MKD",
@@ -120,7 +112,6 @@ export const en: Dictionary = {
           "DDV threshold monitoring",
           "Tax deadline calendar",
           "MKD + EUR/USD invoicing",
-          "e-Faktura readiness checklist",
         ],
         cta: "Start free",
         badge: "Coming soon",
@@ -139,23 +130,6 @@ export const en: Dictionary = {
         cta: "Start free",
         badge: "Coming soon",
       },
-    ],
-    complianceTitle: "Get e-Faktura ready before the mandate hits",
-    complianceSubtitle:
-      "Starting October 2026, businesses above 2,000,000 MKD annual revenue must issue electronic invoices through the UJP system.",
-    complianceBullets: [
-      "Know exactly where you stand against the 2M MKD threshold",
-      "Get alerted automatically as you approach the limit",
-      "Follow our step-by-step e-Faktura readiness checklist",
-      "Understand whether you need to register for DDV this year",
-    ],
-    checkStatus: "Check my e-Faktura status",
-    compliancePreview: "Your compliance dashboard",
-    complianceRows: [
-      { label: "Next tax deadline", value: "10 December 2026" },
-      { label: "DDV status", value: "Not registered" },
-      { label: "e-Faktura readiness", value: "3 of 5 steps done" },
-      { label: "Outstanding invoices", value: "2 invoices" },
     ],
     ctaTitle: "Ready to replace Excel + Word?",
     ctaSubtitle:
@@ -190,7 +164,6 @@ export const en: Dictionary = {
     ddvStatus: "Current status",
     mustRegister: "Must register for DDV",
     notRequired: "Not required yet",
-    eFakturaDeadline: "e-Faktura deadline",
     taxSummary: "Tax Summary",
     grossIncome: "Gross income ({year})",
     bracketTax: "Income tax ({bracket})",
@@ -203,15 +176,6 @@ export const en: Dictionary = {
     recentInvoices: "Recent Invoices",
     noInvoices: "No invoices yet",
     createFirst: "Create first invoice",
-    eFakturaChecklist: "e-Faktura Readiness Checklist",
-    checklistItems: [
-      "Annual income tracked and current",
-      "DDV threshold monitoring active",
-      "Business registered (DOO or trade name)",
-      "Tax number (EDB) obtained from UJP",
-      "Accounting software registered with UJP system",
-      "Test invoice issued via e-Faktura system",
-    ],
   },
   clients: {
     title: "Clients",
@@ -387,7 +351,6 @@ export const en: Dictionary = {
     businessNamePlaceholder: "Your studio or company name",
     businessType: "Business structure",
     taxNumber: "Tax number (EDB)",
-    taxNumberBadge: "Required for e-Faktura",
     address: "Address",
     bankAccount: "Bank account (IBAN)",
     bankName: "Bank name",
@@ -398,17 +361,6 @@ export const en: Dictionary = {
     plan: "Plan",
     freePlan: "Free",
     memberSince: "Member since",
-    eFakturaTitle: "e-Faktura Compliance",
-    eFakturaDesc: "Requirements for businesses above 2,000,000 MKD/year.",
-    requirementsMet: "{done}/{total} requirements met",
-    checklist: [
-      "EDB (tax number) on file",
-      "Business name configured",
-      "Address on file",
-      "Bank account on file",
-      "Business structure set (not personal)",
-      "Income tracking active",
-    ],
     businessTypes: [
       { value: "personal", label: "Personal income" },
       { value: "doo", label: "DOO (limited liability company)" },

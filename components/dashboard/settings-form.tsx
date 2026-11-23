@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { updateProfile } from "@/lib/actions/settings";
 import { Loader2 } from "lucide-react";
 import type { User } from "@/lib/db/schema";
@@ -88,12 +87,7 @@ export function SettingsForm({ user }: { user: User }) {
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="taxNumber">
-            {t.settings.taxNumber}
-            <Badge variant="outline" className="ml-2 text-xs font-normal">
-              {t.settings.taxNumberBadge}
-            </Badge>
-          </Label>
+          <Label htmlFor="taxNumber">{t.settings.taxNumber}</Label>
           <Input
             id="taxNumber"
             name="taxNumber"

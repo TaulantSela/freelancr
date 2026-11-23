@@ -23,7 +23,6 @@ export const sq: Dictionary = {
   nav: {
     features: "Veçoritë",
     pricing: "Çmimet",
-    compliance: "Përputhshmëria",
     signIn: "Hyr",
     getStarted: "Fillo falas",
     dashboard: "Paneli",
@@ -62,12 +61,9 @@ export const sq: Dictionary = {
     badge: "Ndërtuar për Maqedoninë e Veriut · Fatura MKD + EUR + USD",
     heroTitle: "Platforma e faturimit që e kupton freelancerin maqedonas",
     heroSubtitle:
-      "Ndalo faturimin në Word dhe ndjekjen e të ardhurave në Excel. Freelancr i bashkon në një vend faturat shumëvalutore, monitorimin e pragut TVSH, afatet e tua tatimore në UJP dhe gatishmërinë për e-Faktura.",
+      "Ndalo faturimin në Word dhe ndjekjen e të ardhurave në Excel. Freelancr i bashkon në një vend faturat shumëvalutore, monitorimin e pragut TVSH dhe afatet e tua tatimore në UJP.",
     startFree: "Fillo falas",
     signInAccount: "Hyr në llogarinë tënde",
-    eFakturaAlert: "Tetor 2026:",
-    eFakturaAlertDetail:
-      "Mandati e-Faktura hyn në fuqi për bizneset mbi 2.000.000 MKD/vit. A je gati?",
     featuresTitle: "Gjithçka që i nevojitet freelancerit maqedonas",
     featuresSubtitle:
       "Mjetet globale nuk dinë çfarë është TVSH. Excel-i yt nuk i di afatet e tua tatimore. Freelancr i di të dyja.",
@@ -87,10 +83,6 @@ export const sq: Dictionary = {
       {
         title: "Ndjekës i të ardhurave vjetore",
         desc: "Të ardhurat vjetore sipas klientit dhe monedhës, me një vlerësim të tatimit mbi të ardhurat me normë të sheshtë 10%.",
-      },
-      {
-        title: "Gatishmëri për e-Faktura",
-        desc: "Lista kontrolluese dhe panel gatishmërie për mandatin e tetorit 2026.",
       },
     ],
     pricingTitle: "Çmime të thjeshta dhe të ndershme në MKD",
@@ -120,7 +112,6 @@ export const sq: Dictionary = {
           "Monitorim i pragut TVSH",
           "Kalendar i afateve tatimore",
           "Fatura MKD + EUR/USD",
-          "Lista kontrolluese e-Faktura",
         ],
         cta: "Fillo falas",
         badge: "Së shpejti",
@@ -139,23 +130,6 @@ export const sq: Dictionary = {
         cta: "Fillo falas",
         badge: "Së shpejti",
       },
-    ],
-    complianceTitle: "Përgatitu për e-Faktura para mandatit",
-    complianceSubtitle:
-      "Nga tetori 2026, bizneset mbi 2.000.000 MKD të ardhura vjetore duhet të lëshojnë fatura elektronike përmes sistemit UJP.",
-    complianceBullets: [
-      "Di saktësisht ku je kundrejt pragut 2M MKD",
-      "Merr alarme automatikisht kur i afrohesh limitit",
-      "Ndiq listën tonë hap pas hapi për e-Faktura",
-      "Kupto nëse duhet të regjistrohesh për TVSH këtë vit",
-    ],
-    checkStatus: "Kontrollo statusin tim e-Faktura",
-    compliancePreview: "Paneli yt i përputhshmërisë",
-    complianceRows: [
-      { label: "Afati i ardhshëm tatimor", value: "10 dhjetor 2026" },
-      { label: "Statusi TVSH", value: "Jo i regjistruar" },
-      { label: "Gatishmëria e-Faktura", value: "3 nga 5 hapa" },
-      { label: "Fatura të papaguara", value: "2 fatura" },
     ],
     ctaTitle: "Gati të zëvendësosh Excel + Word?",
     ctaSubtitle:
@@ -190,7 +164,6 @@ export const sq: Dictionary = {
     ddvStatus: "Statusi aktual",
     mustRegister: "Duhet regjistrim TVSH",
     notRequired: "Ende nuk kërkohet",
-    eFakturaDeadline: "Afati e-Faktura",
     taxSummary: "Përmbledhje tatimore",
     grossIncome: "Të ardhurat bruto ({year})",
     bracketTax: "Tatimi {bracket}",
@@ -203,15 +176,6 @@ export const sq: Dictionary = {
     recentInvoices: "Faturat e fundit",
     noInvoices: "Ende nuk ka fatura",
     createFirst: "Krijo faturën e parë",
-    eFakturaChecklist: "Lista kontrolluese e-Faktura",
-    checklistItems: [
-      "Të ardhurat vjetore të ndjekura dhe aktuale",
-      "Monitorimi i pragut TVSH aktiv",
-      "Biznesi i regjistruar (DOO ose emër tregtar)",
-      "Numri tatimor (EDB) nga UJP",
-      "Softueri kontabël i regjistruar në UJP",
-      "Faturë test e lëshuar përmes e-Faktura",
-    ],
   },
   clients: {
     title: "Klientët",
@@ -387,7 +351,6 @@ export const sq: Dictionary = {
     businessNamePlaceholder: "Emri i studios ose kompanisë tënde",
     businessType: "Struktura e biznesit",
     taxNumber: "Numri tatimor (EDB)",
-    taxNumberBadge: "Kërkohet për e-Faktura",
     address: "Adresa",
     bankAccount: "Llogaria bankare (IBAN)",
     bankName: "Emri i bankës",
@@ -398,17 +361,6 @@ export const sq: Dictionary = {
     plan: "Plani",
     freePlan: "Falas",
     memberSince: "Anëtar që",
-    eFakturaTitle: "Përputhshmëria e-Faktura",
-    eFakturaDesc: "Kërkesat për bizneset mbi 2.000.000 MKD/vit.",
-    requirementsMet: "{done}/{total} kërkesa të plotësuara",
-    checklist: [
-      "EDB (numri tatimor) i regjistruar",
-      "Emri i biznesit i konfiguruar",
-      "Adresa e regjistruar",
-      "Llogaria bankare e regjistruar",
-      "Struktura e biznesit (jo të ardhura personale)",
-      "Ndjekja e të ardhurave aktive",
-    ],
     businessTypes: [
       { value: "personal", label: "Të ardhura personale" },
       { value: "doo", label: "DOO (shoqëri me përgjegjësi të kufizuar)" },
