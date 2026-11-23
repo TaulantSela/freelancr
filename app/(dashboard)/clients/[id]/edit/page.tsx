@@ -8,6 +8,7 @@ import { getSession } from "@/lib/auth/session";
 import { getDb, clients } from "@/lib/db";
 import { eq, and } from "drizzle-orm";
 import { getTranslations } from "@/lib/i18n/server";
+import { getCountryOptions } from "@/lib/clients/countries";
 
 export default async function EditClientPage({
   params,
@@ -18,7 +19,7 @@ export default async function EditClientPage({
   if (!session) redirect("/sign-in");
 
   const { id } = await params;
-  const { t } = await getTranslations();
+  const { t, locale } = await getTranslations();
 
   const [client] = await getDb()
     .select()
@@ -45,7 +46,7 @@ export default async function EditClientPage({
           <CardTitle className="text-base">{t.clients.editTitle}</CardTitle>
         </CardHeader>
         <CardContent>
-          <ClientForm client={client} />
+          <ClientForm client={client} countries={getCountryOptions(locale)} />
         </CardContent>
       </Card>
     </div>

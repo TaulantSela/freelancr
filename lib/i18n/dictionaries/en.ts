@@ -153,6 +153,8 @@ export const en: Dictionary = {
       clientTypeHint:
         "Used for your tax deadlines: when you aren't registered for an activity, companies in North Macedonia withhold the income tax for you, but private persons and clients abroad don't, so you report that income yourself.",
       personName: "Full name",
+      chooseCountry: "Choose a country",
+      countryRequired: "Choose the client's country",
     },
     types: {
       company: "Company",
@@ -164,21 +166,6 @@ export const en: Dictionary = {
     deleteBlockedTitle: "Can't delete {name}",
     deleteBlockedDesc:
       "{name} has {count} invoice(s). Clients with invoices can't be deleted, because the invoices are part of your income and tax records.",
-    countries: {
-      MK: "North Macedonia",
-      US: "United States",
-      DE: "Germany",
-      NL: "Netherlands",
-      GB: "United Kingdom",
-      FR: "France",
-      CH: "Switzerland",
-      AU: "Australia",
-      CA: "Canada",
-      XK: "Kosovo",
-      RS: "Serbia",
-      HR: "Croatia",
-      OTHER: "Other",
-    },
   },
   invoices: {
     title: "Invoices",

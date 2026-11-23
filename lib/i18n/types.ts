@@ -128,13 +128,14 @@ export type Dictionary = {
       clientType: string;
       clientTypeHint: string;
       personName: string;
+      chooseCountry: string;
+      countryRequired: string;
     };
     types: { company: string; person: string };
     deleteTitle: string;
     deleteDesc: string;
     deleteBlockedTitle: string;
     deleteBlockedDesc: string;
-    countries: Record<string, string>;
   };
   invoices: {
     title: string;

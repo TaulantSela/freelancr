@@ -4,9 +4,10 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { NewClientForm } from "@/components/clients/new-client-form";
 import { getTranslations } from "@/lib/i18n/server";
+import { getCountryOptions } from "@/lib/clients/countries";
 
 export default async function NewClientPage() {
-  const { t } = await getTranslations();
+  const { t, locale } = await getTranslations();
 
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-6">
@@ -25,7 +26,7 @@ export default async function NewClientPage() {
           <CardTitle className="text-base">{t.clients.newTitle}</CardTitle>
         </CardHeader>
         <CardContent>
-          <NewClientForm />
+          <NewClientForm countries={getCountryOptions(locale)} />
         </CardContent>
       </Card>
     </div>

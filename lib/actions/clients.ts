@@ -7,6 +7,7 @@ import { getSession } from "@/lib/auth/session";
 import { generateId } from "@/lib/utils";
 import { isSupportedCurrency } from "@/lib/tax/calculator";
 import { DEFAULT_CLIENT_TYPE, isClientType } from "@/lib/clients/config";
+import { isCountryCode } from "@/lib/clients/countries";
 import { eq, and, count } from "drizzle-orm";
 
 // A private person has no tax ID or contact person on file: the form hides
@@ -36,6 +37,7 @@ export async function createClient(formData: FormData) {
   const notes = formData.get("notes") as string;
 
   if (!name) return { errorKey: "nameRequired" as const };
+  if (!isCountryCode(country)) return { errorKey: "countryRequired" as const };
   if (!isSupportedCurrency(currency)) {
     return { errorKey: "currencyUnsupported" as const };
   }
@@ -46,7 +48,7 @@ export async function createClient(formData: FormData) {
     name,
     ...readClientType(formData),
     email: email || null,
-    country: country || "MK",
+    country,
     currency,
     address: address || null,
     notes: notes || null,
@@ -61,8 +63,10 @@ export async function updateClient(id: string, formData: FormData) {
   if (!session) redirect("/sign-in");
 
   const name = formData.get("name") as string;
+  const country = formData.get("country");
   const currency = (formData.get("currency") as string) || "EUR";
   if (!name) return { errorKey: "nameRequired" as const };
+  if (!isCountryCode(country)) return { errorKey: "countryRequired" as const };
   if (!isSupportedCurrency(currency)) {
     return { errorKey: "currencyUnsupported" as const };
   }
@@ -73,7 +77,7 @@ export async function updateClient(id: string, formData: FormData) {
       name,
       ...readClientType(formData),
       email: (formData.get("email") as string) || null,
-      country: (formData.get("country") as string) || "MK",
+      country,
       currency,
       address: (formData.get("address") as string) || null,
       notes: (formData.get("notes") as string) || null,

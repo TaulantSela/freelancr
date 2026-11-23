@@ -153,6 +153,8 @@ export const sq: Dictionary = {
       clientTypeHint:
         "Përdoret për afatet tatimore: kur nuk ke veprimtari të regjistruar, kompanitë në Maqedoninë e Veriut e mbajnë tatimin mbi të ardhurat për ty, por personat fizikë dhe klientët nga jashtë jo, ndaj ato të ardhura i deklaron vetë.",
       personName: "Emri dhe mbiemri",
+      chooseCountry: "Zgjidh shtetin",
+      countryRequired: "Zgjidh shtetin e klientit",
     },
     types: {
       company: "Kompani",
@@ -164,21 +166,6 @@ export const sq: Dictionary = {
     deleteBlockedTitle: "{name} nuk mund të fshihet",
     deleteBlockedDesc:
       "{name} ka {count} faturë(a). Klientët me fatura nuk mund të fshihen, sepse faturat janë pjesë e evidencës së të ardhurave dhe tatimeve të tua.",
-    countries: {
-      MK: "Maqedonia e Veriut",
-      US: "Shtetet e Bashkuara",
-      DE: "Gjermania",
-      NL: "Holanda",
-      GB: "Mbretëria e Bashkuar",
-      FR: "Franca",
-      CH: "Zvicra",
-      AU: "Australia",
-      CA: "Kanada",
-      XK: "Kosova",
-      RS: "Serbia",
-      HR: "Kroacia",
-      OTHER: "Tjetër",
-    },
   },
   invoices: {
     title: "Faturat",

@@ -13,9 +13,9 @@ import { SUPPORTED_CURRENCIES } from "@/lib/tax/calculator";
 import { CLIENT_TYPES, DEFAULT_CLIENT_TYPE, type ClientType } from "@/lib/clients/config";
 import type { Client } from "@/lib/db/schema";
 
-const COUNTRY_CODES = ["MK", "US", "DE", "NL", "GB", "FR", "CH", "AU", "CA", "XK", "RS", "HR", "OTHER"] as const;
-
-type State = { errorKey?: "nameRequired" | "currencyUnsupported" } | null;
+type State = {
+  errorKey?: "nameRequired" | "currencyUnsupported" | "countryRequired";
+} | null;
 
 async function createClientAction(_prev: State, formData: FormData): Promise<State> {
   const result = await createClient(formData);
@@ -31,7 +31,14 @@ async function updateClientAction(
   return result ?? null;
 }
 
-export function ClientForm({ client }: { client?: Client }) {
+export function ClientForm({
+  client,
+  countries,
+}: {
+  client?: Client;
+  // From getCountryOptions(), in the UI language.
+  countries: { code: string; name: string }[];
+}) {
   const t = useTranslations();
   const isEdit = Boolean(client);
 
@@ -45,6 +52,11 @@ export function ClientForm({ client }: { client?: Client }) {
     client?.clientType ?? DEFAULT_CLIENT_TYPE
   );
   const isPerson = clientType === "person";
+  // A new client, or one saved with a code that's no longer offered (the old
+  // "OTHER"), starts on an empty choice so the country is picked on purpose.
+  const initialCountry = countries.some((c) => c.code === client?.country)
+    ? client!.country
+    : "";
 
   return (
     <form action={action} className="space-y-5">
@@ -128,12 +140,16 @@ export function ClientForm({ client }: { client?: Client }) {
           <select
             name="country"
             id="country"
-            defaultValue={client?.country ?? "US"}
+            required
+            defaultValue={initialCountry}
             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
-            {COUNTRY_CODES.map((code) => (
+            <option value="" disabled className="bg-card">
+              {t.clients.form.chooseCountry}
+            </option>
+            {countries.map(({ code, name }) => (
               <option key={code} value={code} className="bg-card">
-                {t.clients.countries[code]}
+                {name}
               </option>
             ))}
           </select>
