@@ -319,6 +319,31 @@ export type Dictionary = {
       hasCreditNotes: string;
       note: string;
     };
+    email: {
+      button: string;
+      title: string;
+      attachmentNote: string;
+      to: string;
+      subject: string;
+      message: string;
+      copy: string;
+      send: string;
+      sent: string;
+      notConfigured: string;
+      emailedTo: string;
+      defaultSubject: string;
+      defaultMessage: string;
+      defaultMessageNoDue: string;
+      errors: {
+        toInvalid: string;
+        subjectRequired: string;
+        notIssued: string;
+        dailyLimit: string;
+        notConfigured: string;
+        demo: string;
+        sendFailed: string;
+      };
+    };
   };
   creditNotes: {
     title: string;

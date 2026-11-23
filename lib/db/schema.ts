@@ -226,6 +226,26 @@ export const payments = pgTable("payments", {
   ),
 ]);
 
+// Every attempt to email an invoice to a client: a row is written before
+// the send (so at most 20 a user a day, counted in the same statement) and
+// completed with Resend's id, or the error.
+export const invoiceEmails = pgTable("invoice_emails", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  invoiceId: text("invoice_id")
+    .notNull()
+    .references(() => invoices.id),
+  toAddress: text("to_address").notNull(),
+  sentAt: timestamp("sent_at", { mode: "string" }).notNull().defaultNow(),
+  providerId: text("provider_id"),
+  error: text("error"),
+}, (table) => [
+  index("invoice_emails_user_id_sent_at_idx").on(table.userId, table.sentAt),
+  index("invoice_emails_invoice_id_idx").on(table.invoiceId),
+]);
+
 // Password reset links: a token goes out by email, only its sha256 is kept.
 // It lasts 60 minutes and works once; a successful reset marks all of the
 // user's tokens used (lib/auth/reset.ts). At most 3 a user an hour.

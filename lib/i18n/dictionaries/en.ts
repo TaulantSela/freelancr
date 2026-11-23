@@ -363,6 +363,33 @@ export const en: Dictionary = {
       note:
         "Cancelled. It stays in your records for the five years invoices have to be kept (VAT law Art. 56).",
     },
+    email: {
+      button: "Email to client",
+      title: "Email {number} to the client",
+      attachmentNote: "The PDF goes as an attachment. Replies come to {email}.",
+      to: "To",
+      subject: "Subject",
+      message: "Message",
+      copy: "Send me a copy",
+      send: "Send",
+      sent: "Sent to {to}",
+      notConfigured: "Email isn't set up on this server yet.",
+      emailedTo: "Emailed to {to} on {date}",
+      defaultSubject: "Invoice {number} from {name}",
+      defaultMessage:
+        "Hello,\n\nPlease find attached invoice {number} for {total}, due on {due}.\n\nKind regards,\n{name}",
+      defaultMessageNoDue:
+        "Hello,\n\nPlease find attached invoice {number} for {total}.\n\nKind regards,\n{name}",
+      errors: {
+        toInvalid: "Enter one valid email address.",
+        subjectRequired: "Add a subject.",
+        notIssued: "Only issued invoices that aren't cancelled can be emailed.",
+        dailyLimit: "You've emailed 20 invoices in the last 24 hours. Try again later.",
+        notConfigured: "Email isn't set up on this server yet.",
+        demo: "Not available in the demo account.",
+        sendFailed: "The email didn't go out. Try again in a moment.",
+      },
+    },
   },
   creditNotes: {
     title: "Credit notes",

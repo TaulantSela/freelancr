@@ -366,6 +366,33 @@ export const sq: Dictionary = {
       note:
         "E anuluar. Mbetet në evidencën tënde për pesë vitet që faturat duhet të ruhen (Ligji për TVSH, neni 56).",
     },
+    email: {
+      button: "Dërgoja klientit",
+      title: "Dërgoja {number} klientit",
+      attachmentNote: "PDF-ja shkon si bashkëngjitje. Përgjigjet vijnë te {email}.",
+      to: "Për",
+      subject: "Subjekti",
+      message: "Mesazhi",
+      copy: "Më dërgo një kopje",
+      send: "Dërgo",
+      sent: "U dërgua te {to}",
+      notConfigured: "Email-i ende nuk është konfiguruar në këtë server.",
+      emailedTo: "U dërgua te {to} më {date}",
+      defaultSubject: "Fatura {number} nga {name}",
+      defaultMessage:
+        "Të nderuar,\n\nNë bashkëngjitje është fatura {number} në shumë prej {total}, me afat pagese {due}.\n\nMe respekt,\n{name}",
+      defaultMessageNoDue:
+        "Të nderuar,\n\nNë bashkëngjitje është fatura {number} në shumë prej {total}.\n\nMe respekt,\n{name}",
+      errors: {
+        toInvalid: "Shkruaj një adresë email të vlefshme.",
+        subjectRequired: "Shto një subjekt.",
+        notIssued: "Mund të dërgohen vetëm fatura të lëshuara që nuk janë anuluar.",
+        dailyLimit: "Ke dërguar 20 fatura me email në 24 orët e fundit. Provo më vonë.",
+        notConfigured: "Email-i ende nuk është konfiguruar në këtë server.",
+        demo: "Nuk është në dispozicion në llogarinë demo.",
+        sendFailed: "Email-i nuk u dërgua. Provo përsëri pas pak.",
+      },
+    },
   },
   creditNotes: {
     title: "Notat e kreditit",

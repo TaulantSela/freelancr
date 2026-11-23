@@ -120,6 +120,13 @@
       "when": 1795473215797,
       "tag": "0016_password_resets",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1795473361367,
+      "tag": "0017_invoice_emails",
+      "breakpoints": true
     }
   ]
 }
