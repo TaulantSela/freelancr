@@ -5,7 +5,7 @@
 Invoicing and tax tracking for freelancers in North Macedonia who aren't
 registered for VAT (DDV) yet. You invoice foreign and local clients in their
 currency, and Freelancr keeps a running MKD total against the 2,000,000 MKD DDV
-threshold, estimates your income tax, and shows the next quarterly deadline.
+threshold, estimates your income tax, and shows the next tax deadline.
 It's an early MVP, in Macedonian, Albanian and English.
 
 **▶ [Try it live →](https://freelancr-mk.vercel.app)** — sign up with an email
@@ -20,37 +20,39 @@ is. Freelancr puts the invoices and the local tax picture in one place.
 | Area | What's there |
 |------|--------------|
 | Invoices | Line items, optional DDV (0%, 5% or 18%), numbering per year (`INV-2026-001`), and an MKD equivalent at an approximate rate |
-| Currencies | EUR, USD, GBP, CHF, AUD and MKD; each client has a default currency |
+| Currencies | EUR, USD, GBP, CHF, AUD, CAD and MKD, from one shared list; each client has a default currency |
 | Status | Draft, sent, paid, overdue or cancelled, set from the invoice list or detail page |
 | PDF | Download any invoice as a PDF in the language you're using |
-| Clients | Create and edit, with tax ID, country, contact person and notes; delete clients that have no invoices |
+| Clients | Create and edit, with tax ID, country, contact person and notes; a client with invoices can't be deleted, and the app says why |
 | Dashboard | Paid income this year, outstanding invoices, estimated tax, the DDV monitor, the next tax deadline and recent invoices |
 | DDV monitor | Progress toward 2,000,000 MKD of paid income this year, with warnings at 70%, 85% and 100% |
-| Income page | Monthly breakdown, income by client and by currency, an income tax estimate and the quarterly deadlines (Apr 30, Jul 31, Oct 31, Jan 31) |
+| Income page | Monthly breakdown, income by client, an income tax estimate (flat 10%) and the deadlines the app tracks (Apr 30, Jul 31, Oct 31, Jan 31) |
 | Settings | Business profile (EDB, address, bank account) and an e-Faktura readiness checklist based on how complete it is |
 | Languages | Macedonian (default), Albanian and English |
 
 ## Known limitations
 
-- **Exchange rates are hardcoded.** Invoices use fixed rates from
-  `lib/tax/calculator.ts` (EUR 61.5, USD 56.8, GBP 72.1), labelled as
-  approximate. Currencies without a rate (CHF, AUD, and CAD, which a client can
-  default to) count 1:1 toward the MKD totals. `/api/exchange-rate` can fetch a
-  live rate, but nothing calls it yet, and the `exchange_rate_cache` table is
-  unused.
+- **Exchange rates are fixed.** Invoices use NBRM middle rates from
+  20 Nov 2026, kept in `lib/tax/calculator.ts` and labelled as approximate;
+  each invoice stores the rate it was created with. `/api/exchange-rate` can
+  fetch a live rate, but nothing calls it yet, and the `exchange_rate_cache`
+  table is unused.
 - **Nothing is emailed.** There's no email sending at all. "Sent" and
   "overdue" are labels you set by hand (overdue isn't detected), and tax
   deadlines show up in the app only.
 - **Invoices can't be edited** after you create them; you can change the
   status or delete the invoice.
-- **Tax rules are constants.** The DDV threshold, income tax brackets and
-  deadlines are hardcoded in `lib/tax/calculator.ts`. Treat the numbers as
-  estimates, not tax advice.
+- **Tax rules are constants.** The DDV threshold, the flat 10% income tax
+  rate and the deadlines are hardcoded in `lib/tax/calculator.ts`. The estimate
+  applies the rate to paid invoice totals, while the legal base is net income
+  after expenses. The deadlines are quarterly; UJP's guide for independent
+  activity has monthly advances by the 15th and the annual return by 15 March.
+  Treat the numbers as estimates, not tax advice.
 - **No e-Faktura integration.** The readiness checklist only checks your
   profile; nothing talks to UJP.
-- **No billing.** Every account is on the free plan. The landing page lists
-  paid plans and features that aren't built yet (Wise and PayPal CSV import,
-  contract templates, accountant sharing).
+- **No billing.** Every account is on the free plan; the paid plans on the
+  landing page are marked "Coming soon", and the free plan's limits aren't
+  enforced.
 - **No password reset.**
 
 ## How it works
