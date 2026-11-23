@@ -161,6 +161,9 @@ export const en: Dictionary = {
       invoiceLanguageHint: "The language of this client's invoice PDFs, whatever language you use the app in.",
       looksLikeEmbg:
         "That looks like a personal ID number (ЕМБГ). Enter the company's tax number, or leave it empty.",
+      deemedCosts: "Deemed costs (author's rights only)",
+      deemedCostsHint:
+        "Only income from author's and related rights is taxed after deemed costs (Personal Income Tax law Art. 40): 50% for sculpture, tapestry, ceramics and stained glass; 40% for art photography, painting, graphic works, industrial design, costume and fashion design, stage design, music and film works, and restoration; 30% for scientific, professional and journalistic works and for performing serious music, ballet, opera or acting; 20% for translations, lectures and other author's works. Most freelance work (software, consulting, most services) is income from work (Art. 14), with no deemed costs: leave it at 0%. New payments from this client start with this rate.",
     },
     types: {
       company: "Company",
@@ -171,7 +174,7 @@ export const en: Dictionary = {
       "This will permanently delete this client. This action cannot be undone.",
     deleteBlockedTitle: "Can't delete {name}",
     deleteBlockedDesc:
-      "{name} has {count} invoice(s). Clients with invoices can't be deleted, because the invoices are part of your income and tax records.",
+      "{name} has {count} invoice(s) or payment(s). Clients with invoices or payments can't be deleted, because they're part of your income and tax records.",
   },
   invoices: {
     title: "Invoices",

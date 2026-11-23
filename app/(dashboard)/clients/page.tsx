@@ -1,5 +1,5 @@
 import { getSession } from "@/lib/auth/session";
-import { getDb, clients, invoices } from "@/lib/db";
+import { getDb, clients, invoices, payments } from "@/lib/db";
 import { eq, count } from "drizzle-orm";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -30,18 +30,29 @@ export default async function ClientsPage() {
     .from(clients)
     .where(eq(clients.userId, session.userId));
 
-  const invoiceCounts = await Promise.all(
-    clientList.map((c) =>
-      getDb()
-        .select({ cnt: count() })
-        .from(invoices)
-        .where(eq(invoices.clientId, c.id))
-        .then((rows) => rows[0])
-    )
-  );
+  const [invoiceCounts, paymentCounts] = await Promise.all([
+    Promise.all(
+      clientList.map((c) =>
+        getDb()
+          .select({ cnt: count() })
+          .from(invoices)
+          .where(eq(invoices.clientId, c.id))
+          .then((rows) => rows[0])
+      )
+    ),
+    Promise.all(
+      clientList.map((c) =>
+        getDb()
+          .select({ cnt: count() })
+          .from(payments)
+          .where(eq(payments.clientId, c.id))
+          .then((rows) => rows[0])
+      )
+    ),
+  ]);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold">{t.clients.title}</h1>
@@ -118,7 +129,7 @@ export default async function ClientsPage() {
                     <DeleteClientButton
                       id={client.id}
                       name={client.name}
-                      invoiceCount={invoiceCounts[i]?.cnt ?? 0}
+                      recordCount={(invoiceCounts[i]?.cnt ?? 0) + (paymentCounts[i]?.cnt ?? 0)}
                     />
                   </div>
                 </div>

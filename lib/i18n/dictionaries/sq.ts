@@ -161,6 +161,9 @@ export const sq: Dictionary = {
       invoiceLanguageHint: "Gjuha e faturave PDF për këtë klient, pavarësisht gjuhës që përdor në aplikacion.",
       looksLikeEmbg:
         "Kjo duket si numër personal (EMBG). Shkruaj numrin tatimor të kompanisë ose lëre bosh.",
+      deemedCosts: "Shpenzimet e normuara (vetëm të drejtat e autorit)",
+      deemedCostsHint:
+        "Vetëm të ardhurat nga të drejtat e autorit dhe të drejtat e përafërta tatohen pas zbritjes së shpenzimeve të normuara (Ligji për tatimin mbi të ardhurat personale, neni 40): 50% për vepra skulpturore, tapiceri, qeramikë dhe vitrazh; 40% për fotografi artistike, pikturë, vepra grafike, dizajn industrial, kostumografi dhe kreacion mode, skenografi, vepra muzikore dhe kinematografike dhe restaurim; 30% për vepra shkencore, profesionale dhe publicistike dhe për interpretimin e muzikës serioze, baletit, operës ose aktrimit; 20% për përkthime, ligjërata dhe vepra të tjera autoriale. Shumica e punëve freelance (softuer, konsulencë, shumica e shërbimeve) janë të ardhura nga puna (neni 14), pa shpenzime të normuara: lëre 0%. Pagesat e reja nga ky klient fillojnë me këtë normë.",
     },
     types: {
       company: "Kompani",
@@ -171,7 +174,7 @@ export const sq: Dictionary = {
       "Kjo do ta fshijë përgjithmonë klientin. Ky veprim nuk mund të kthehet.",
     deleteBlockedTitle: "{name} nuk mund të fshihet",
     deleteBlockedDesc:
-      "{name} ka {count} faturë(a). Klientët me fatura nuk mund të fshihen, sepse faturat janë pjesë e evidencës së të ardhurave dhe tatimeve të tua.",
+      "{name} ka {count} faturë(a) ose pagesë(a). Klientët me fatura ose pagesa nuk mund të fshihen, sepse janë pjesë e evidencës së të ardhurave dhe tatimeve të tua.",
   },
   invoices: {
     title: "Faturat",

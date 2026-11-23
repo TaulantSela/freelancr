@@ -134,6 +134,8 @@ export type Dictionary = {
       invoiceLanguage: string;
       invoiceLanguageHint: string;
       looksLikeEmbg: string;
+      deemedCosts: string;
+      deemedCostsHint: string;
     };
     types: { company: string; person: string };
     deleteTitle: string;
