@@ -3,16 +3,23 @@ import { getDb, invoices, clients } from "@/lib/db";
 import { eq, and, gte } from "drizzle-orm";
 import {
   getDDVStatus,
-  getNextQuarterlyDeadline,
+  getTaxCalendar,
+  groupTaxDeadlines,
+  getForeignIncomeMonths,
+  toSkopjeDate,
+  daysBetween,
   calculateIncomeTax,
   formatMKD,
   DDV_THRESHOLD_MKD,
 } from "@/lib/tax/calculator";
+import { getTaxStatus, getPaidInvoicesForDeadlines } from "@/lib/tax/queries";
+import { taxDeadlineAction, taxDeadlineGroupTitle } from "@/lib/tax/labels";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, Calendar, CheckCircle2, Info } from "lucide-react";
+import { AlertTriangle, Calendar, Info } from "lucide-react";
 import { getTranslations } from "@/lib/i18n/server";
 import { formatMessage } from "@/lib/i18n/format";
 
@@ -49,8 +56,20 @@ export default async function IncomePage() {
 
   const annualIncomeMKD = paidInvoices.reduce((s, i) => s + i.totalMKD, 0);
   const ddvStatus = getDDVStatus(annualIncomeMKD);
-  const deadline = getNextQuarterlyDeadline();
   const taxCalc = calculateIncomeTax(annualIncomeMKD);
+
+  // UJP deadlines due from 1 January, for how the user is registered for tax.
+  // When paid from abroad, they follow the month each invoice was paid in,
+  // which can differ from the invoice date the breakdowns below use.
+  const today = toSkopjeDate(new Date());
+  const taxStatus = await getTaxStatus(session.userId);
+  const incomeMonths =
+    taxStatus === "paid_from_abroad"
+      ? getForeignIncomeMonths(await getPaidInvoicesForDeadlines(session.userId, year))
+      : [];
+  const taxCalendar = getTaxCalendar(taxStatus, year, incomeMonths);
+  const deadlineGroups = groupTaxDeadlines(taxCalendar);
+  const nextDueDate = taxCalendar.find((d) => d.dueDate >= today)?.dueDate;
 
   const ddvBadgeLabels = {
     safe: t.dashboard.ddvSafe,
@@ -284,61 +303,72 @@ export default async function IncomePage() {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
             <Calendar className="h-4 w-4 text-muted-foreground" />
-            {formatMessage(t.income.quarterlyDeadlines, { year })}
+            {formatMessage(t.income.taxDeadlines, { year })}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid sm:grid-cols-4 gap-3">
-            {[
-              { quarter: "Q1", deadline: `30 Apr ${year}`, date: new Date(`${year}-04-30`) },
-              { quarter: "Q2", deadline: `31 Jul ${year}`, date: new Date(`${year}-07-31`) },
-              { quarter: "Q3", deadline: `31 Oct ${year}`, date: new Date(`${year}-10-31`) },
-              { quarter: "Q4", deadline: `31 Jan ${year + 1}`, date: new Date(`${year + 1}-01-31`) },
-            ].map((q) => {
-              const now = new Date();
-              const isPast = q.date < now;
-              const daysUntil = Math.ceil((q.date.getTime() - now.getTime()) / 86400000);
-              const isNext = !isPast && q.quarter === deadline.quarter;
-              return (
-                <div
-                  key={q.quarter}
-                  className={cn(
-                    "rounded-lg border px-4 py-3 text-sm",
-                    isPast
-                      ? "border-border bg-muted/20"
-                      : isNext
-                      ? "border-yellow-500/40 bg-yellow-500/5"
-                      : "border-border bg-card"
-                  )}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">{q.quarter}</span>
-                    {isPast ? (
-                      <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    ) : isNext ? (
-                      <AlertTriangle className="h-4 w-4 text-yellow-500" />
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground">{t.tax.rules[taxStatus]}</p>
+          {deadlineGroups.length === 0 ? (
+            <div className="text-xs text-muted-foreground py-1">{t.tax.noneInYear}</div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {deadlineGroups.map((group) => {
+                const upcoming = group.deadlines.find((d) => d.dueDate >= today);
+                const isPast = !upcoming;
+                const isNext = group.deadlines.some((d) => d.dueDate === nextDueDate);
+                const daysUntil = upcoming ? daysBetween(today, upcoming.dueDate) : null;
+                return (
+                  <div
+                    key={`${group.kind}-${group.period}`}
+                    className={cn(
+                      "rounded-lg border px-4 py-3 text-sm",
+                      isPast
+                        ? "border-border bg-muted/20"
+                        : isNext
+                        ? "border-yellow-500/40 bg-yellow-500/5"
+                        : "border-border bg-card"
+                    )}
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="font-medium">{taxDeadlineGroupTitle(group, t)}</span>
+                      {isNext ? (
+                        <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0" />
+                      ) : (
+                        <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+                      )}
+                    </div>
+                    {group.deadlines.map((d) => (
+                      <div key={d.kind} className="text-xs text-muted-foreground mb-1">
+                        {taxDeadlineAction(d, t)}
+                      </div>
+                    ))}
+                    {daysUntil === null ? (
+                      <div className="text-xs text-muted-foreground">{t.income.passed}</div>
                     ) : (
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <div
+                        className={cn(
+                          "text-xs font-medium",
+                          daysUntil <= 7 ? "text-yellow-400" : "text-muted-foreground"
+                        )}
+                      >
+                        {daysUntil === 0
+                          ? t.income.dueToday
+                          : daysUntil === 1
+                          ? t.income.dueTomorrow
+                          : formatMessage(t.income.daysAway, { days: daysUntil })}
+                      </div>
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground mb-1">{q.deadline}</div>
-                  {!isPast && (
-                    <div
-                      className={cn(
-                        "text-xs font-medium",
-                        daysUntil <= 14 ? "text-yellow-400" : "text-muted-foreground"
-                      )}
-                    >
-                      {formatMessage(t.income.daysAway, { days: daysUntil })}
-                    </div>
-                  )}
-                  {isPast && (
-                    <div className="text-xs text-muted-foreground">{t.income.passed}</div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            {formatMessage(t.tax.basedOn, { status: t.tax.statuses[taxStatus] })}{" "}
+            <Link href="/settings" className="underline underline-offset-2 hover:text-foreground">
+              {t.tax.changeInSettings}
+            </Link>
+          </p>
         </CardContent>
       </Card>
 

@@ -120,6 +120,8 @@ export type Dictionary = {
     netIncome: string;
     nextDeadline: string;
     daysAway: string;
+    dueToday: string;
+    dueTomorrow: string;
     recentInvoices: string;
     noInvoices: string;
     createFirst: string;
@@ -259,9 +261,11 @@ export type Dictionary = {
     totalEstTax: string;
     effectiveRate: string;
     taxNote: string;
-    quarterlyDeadlines: string;
+    taxDeadlines: string;
     passed: string;
     daysAway: string;
+    dueToday: string;
+    dueTomorrow: string;
     monthlyBreakdown: string;
     annualTotal: string;
     byClient: string;
@@ -299,5 +303,27 @@ export type Dictionary = {
     statusHint: string;
     statuses: { paid_from_abroad: string; self_employed: string };
     statusDescriptions: { paid_from_abroad: string; self_employed: string };
+    months: string[];
+    rules: { paid_from_abroad: string; self_employed: string };
+    deadlines: {
+      report: string;
+      pay: string;
+      advance: string;
+      annualReturn: string;
+      annualPayment: string;
+    };
+    actions: {
+      report: string;
+      pay: string;
+      advance: string;
+      annualReturn: string;
+      annualPayment: string;
+    };
+    groups: { income: string; advance: string; annual: string };
+    basedOn: string;
+    changeInSettings: string;
+    noUpcoming: string;
+    noneInYear: string;
+    then: string;
   };
 };

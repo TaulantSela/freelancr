@@ -196,8 +196,10 @@ export const en: Dictionary = {
     bracketTax: "Income tax ({bracket})",
     totalEstTax: "Estimated total tax",
     netIncome: "Net income (after tax)",
-    nextDeadline: "Next deadline: {quarter}",
+    nextDeadline: "Next tax deadline",
     daysAway: "{date} — {days} days away",
+    dueToday: "{date} — today",
+    dueTomorrow: "{date} — tomorrow",
     recentInvoices: "Recent Invoices",
     noInvoices: "No invoices yet",
     createFirst: "Create first invoice",
@@ -365,9 +367,11 @@ export const en: Dictionary = {
     effectiveRate: "Effective rate",
     taxNote:
       "MK personal income tax is a flat 10%. This estimate applies it to your paid invoices, but the tax base for independent activity is net income after expenses — consult your accountant.",
-    quarterlyDeadlines: "Quarterly Tax Deadlines {year}",
+    taxDeadlines: "Tax deadlines {year}",
     passed: "Passed",
     daysAway: "{days} days away",
+    dueToday: "Due today",
+    dueTomorrow: "Due tomorrow",
     monthlyBreakdown: "Monthly income breakdown ({year})",
     annualTotal: "Annual total",
     byClient: "Income by client",
@@ -425,5 +429,51 @@ export const en: Dictionary = {
       self_employed:
         "Registered with UJP as a self-employed person (самостоен вршител на дејност).",
     },
+    months: [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ],
+    rules: {
+      paid_from_abroad:
+        "For each month in which a client abroad paid you, submit the tax calculation to UJP by the 10th of the next month and pay the tax by the 15th.",
+      self_employed:
+        "Pay an income tax advance by the 15th of each month for the previous month. File the annual tax balance (ПДД-ДБ) and the statement of income and expenses by 15 March of the next year, and pay any difference by 30 March.",
+    },
+    deadlines: {
+      report: "Submit the tax calculation for {period} income",
+      pay: "Pay the tax on {period} income",
+      advance: "Pay the income tax advance for {period}",
+      annualReturn: "File the annual tax balance (ПДД-ДБ) for {period}",
+      annualPayment: "Pay any difference from the {period} tax balance",
+    },
+    actions: {
+      report: "Submit the calculation by {date}",
+      pay: "Pay the tax by {date}",
+      advance: "Pay by {date}",
+      annualReturn: "File ПДД-ДБ by {date}",
+      annualPayment: "Pay any difference by {date}",
+    },
+    groups: {
+      income: "{period} income",
+      advance: "Advance for {period}",
+      annual: "Annual tax balance {period}",
+    },
+    basedOn: "Deadlines for: {status}.",
+    changeInSettings: "Change in Settings",
+    noUpcoming:
+      "No tax deadline coming up. Once a client abroad pays an invoice and you mark it paid, that month's deadlines show up here.",
+    noneInYear:
+      "None yet. Deadlines show up for each month in which a client abroad paid you.",
+    then: "Then: {label}, {date}",
   },
 };

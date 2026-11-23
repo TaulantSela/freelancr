@@ -33,14 +33,6 @@ export function isTaxStatus(value: unknown): value is TaxStatus {
   );
 }
 
-// Quarterly tax deadlines
-export const QUARTERLY_DEADLINES = [
-  { quarter: "Q1", deadline: "April 30", months: [1, 2, 3] },
-  { quarter: "Q2", deadline: "July 31", months: [4, 5, 6] },
-  { quarter: "Q3", deadline: "October 31", months: [7, 8, 9] },
-  { quarter: "Q4", deadline: "January 31 (next year)", months: [10, 11, 12] },
-];
-
 // Standard DDV rate in Macedonia
 export const DDV_RATE_STANDARD = 0.18; // 18%
 export const DDV_RATE_REDUCED = 0.05; // 5%
@@ -90,51 +82,256 @@ export function getDDVStatus(annualIncomeMKD: number): {
   };
 }
 
-export function getNextQuarterlyDeadline(): {
-  quarter: string;
-  deadline: string;
-  daysUntil: number;
-} {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1;
+// ---------------------------------------------------------------------------
+// Tax deadlines (UJP)
+//
+// Which deadlines apply depends on the user's TaxStatus (above).
+//
+// "paid_from_abroad": for each month in which income was received, submit
+// the electronic calculation (е-ППД) by the 10th of the following month and
+// pay the tax by the 15th of the following month.
+// https://biznisinfo.mk/kako-i-koga-da-prijavite-dohod-od-stranstvo-upatstvo-od-ujp-co-pravila-i-rokovi-za-prijavuvanje/
+// https://republika.mk/vesti/ekonomija/ujp-se-priblizhuva-rokot-za-podnesuvane-presmetki-za-dohod-ostvaren-od-rabota-vo-stranstvo-vo-2025-godina/
+// (The republika.mk piece is UJP's reminder about the 31 March calculation
+// for salaries from work abroad, which isn't modelled here.)
+//
+// "self_employed": an income tax advance by the 15th of each month for the
+// previous month (1/12 of the tax in last year's annual balance); the annual
+// tax balance (ПДД-ДБ) and the statement of income and expenses by 15 March
+// of the following year, filed through etax.ujp.gov.mk; any difference paid
+// within 15 days after that, i.e. by 30 March.
+// https://ujp.gov.mk/en/vodic/category/546
+// https://taxsummaries.pwc.com/north-macedonia/individual/tax-administration
+//
+// Nothing else is modelled: no social contributions, and a deadline that
+// falls on a weekend or public holiday is shown on that date.
+//
+// Every date here is a calendar date in North Macedonia, as "YYYY-MM-DD".
+// The functions are pure: callers pass in today's date and the months that
+// had income, so they can be tested without a clock or a database.
+// ---------------------------------------------------------------------------
 
-  const deadlines = [
-    { quarter: "Q1", date: new Date(`${year}-04-30`) },
-    { quarter: "Q2", date: new Date(`${year}-07-31`) },
-    { quarter: "Q3", date: new Date(`${year}-10-31`) },
-    { quarter: "Q4", date: new Date(`${year + 1}-01-31`) },
-  ];
+// Paid from abroad: day of the following month to submit the calculation by,
+// and to pay the tax by.
+const ABROAD_REPORT_DAY = 10;
+const ABROAD_PAYMENT_DAY = 15;
+// Self-employed: day of the following month the monthly advance is due.
+const ADVANCE_DAY = 15;
+// Self-employed: month and day in the following year for the annual tax
+// balance (ПДД-ДБ), and for paying any difference (15 days after it).
+const ANNUAL_RETURN_DATE = "03-15";
+const ANNUAL_PAYMENT_DATE = "03-30";
 
-  for (const d of deadlines) {
-    if (d.date > now) {
-      const daysUntil = Math.ceil(
-        (d.date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+export type TaxDeadlineKind =
+  | "report" // paid from abroad: submit the calculation for a month's income
+  | "pay" // paid from abroad: pay the tax on a month's income
+  | "advance" // self-employed: pay the monthly advance for a month
+  | "annualReturn" // self-employed: file the annual tax balance for a year
+  | "annualPayment"; // self-employed: pay any difference for a year
+
+export type TaxDeadline = {
+  kind: TaxDeadlineKind;
+  // What the deadline is for: a month ("YYYY-MM") for report, pay and
+  // advance; a tax year ("YYYY") for annualReturn and annualPayment.
+  period: string;
+  // "YYYY-MM-DD"
+  dueDate: string;
+};
+
+const KIND_ORDER: Record<TaxDeadlineKind, number> = {
+  report: 0,
+  pay: 1,
+  advance: 2,
+  annualReturn: 3,
+  annualPayment: 4,
+};
+
+function compareDeadlines(a: TaxDeadline, b: TaxDeadline): number {
+  if (a.dueDate !== b.dueDate) return a.dueDate < b.dueDate ? -1 : 1;
+  if (a.kind !== b.kind) return KIND_ORDER[a.kind] - KIND_ORDER[b.kind];
+  return a.period < b.period ? -1 : a.period > b.period ? 1 : 0;
+}
+
+const MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+function pad2(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+// "2026-12" -> "2027-01"
+function followingMonth(month: string): string {
+  const [year, m] = month.split("-").map(Number);
+  return m === 12 ? `${year + 1}-01` : `${year}-${pad2(m + 1)}`;
+}
+
+// Every deadline that one tax year leads to, soonest first. incomeMonths
+// ("YYYY-MM") only matters when paid from abroad: a month without income has
+// nothing to report.
+export function getTaxDeadlinesForTaxYear(
+  status: TaxStatus,
+  taxYear: number,
+  incomeMonths: readonly string[]
+): TaxDeadline[] {
+  const deadlines: TaxDeadline[] = [];
+
+  if (status === "paid_from_abroad") {
+    for (const month of new Set(incomeMonths)) {
+      if (!MONTH_PATTERN.test(month) || !month.startsWith(`${taxYear}-`)) {
+        continue;
+      }
+      const next = followingMonth(month);
+      deadlines.push(
+        { kind: "report", period: month, dueDate: `${next}-${pad2(ABROAD_REPORT_DAY)}` },
+        { kind: "pay", period: month, dueDate: `${next}-${pad2(ABROAD_PAYMENT_DAY)}` }
       );
-      return {
-        quarter: d.quarter,
-        deadline: d.date.toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        }),
-        daysUntil,
-      };
     }
+  } else {
+    for (let m = 1; m <= 12; m++) {
+      const month = `${taxYear}-${pad2(m)}`;
+      deadlines.push({
+        kind: "advance",
+        period: month,
+        dueDate: `${followingMonth(month)}-${pad2(ADVANCE_DAY)}`,
+      });
+    }
+    deadlines.push(
+      { kind: "annualReturn", period: String(taxYear), dueDate: `${taxYear + 1}-${ANNUAL_RETURN_DATE}` },
+      { kind: "annualPayment", period: String(taxYear), dueDate: `${taxYear + 1}-${ANNUAL_PAYMENT_DATE}` }
+    );
   }
 
-  const nextQ4 = new Date(`${year + 1}-01-31`);
-  return {
-    quarter: "Q4",
-    deadline: nextQ4.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }),
-    daysUntil: Math.ceil(
-      (nextQ4.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-    ),
+  return deadlines.sort(compareDeadlines);
+}
+
+// The Income & Tax page's list for `year`: every deadline due from 1 January
+// of `year`, which covers the last of the previous tax year (December's
+// report or advance, the annual balance) and all of `year`'s own, including
+// the ones that fall early the next year.
+export function getTaxCalendar(
+  status: TaxStatus,
+  year: number,
+  incomeMonths: readonly string[]
+): TaxDeadline[] {
+  return [
+    ...getTaxDeadlinesForTaxYear(status, year - 1, incomeMonths),
+    ...getTaxDeadlinesForTaxYear(status, year, incomeMonths),
+  ]
+    .filter((d) => d.dueDate >= `${year}-01-01`)
+    .sort(compareDeadlines);
+}
+
+// Deadlines due today or later, soonest first. Tax years before the previous
+// one have none left (the last deadline a tax year leads to is 30 March of
+// the year after), and next year's start in February, which matters in
+// December when the dashboard shows the deadline after the next one.
+export function getUpcomingTaxDeadlines(
+  status: TaxStatus,
+  today: string,
+  incomeMonths: readonly string[]
+): TaxDeadline[] {
+  const year = Number(today.slice(0, 4));
+  return [year - 1, year, year + 1]
+    .flatMap((taxYear) => getTaxDeadlinesForTaxYear(status, taxYear, incomeMonths))
+    .filter((d) => d.dueDate >= today)
+    .sort(compareDeadlines);
+}
+
+export type TaxDeadlineGroup = {
+  // One month's income from abroad (report + pay), one month's advance, or
+  // one tax year's annual balance (return + payment).
+  kind: "income" | "advance" | "annual";
+  period: string;
+  deadlines: TaxDeadline[];
+};
+
+const GROUP_KIND: Record<TaxDeadlineKind, TaxDeadlineGroup["kind"]> = {
+  report: "income",
+  pay: "income",
+  advance: "advance",
+  annualReturn: "annual",
+  annualPayment: "annual",
+};
+
+// Groups deadlines that belong together, ordered by each group's first
+// deadline.
+export function groupTaxDeadlines(
+  deadlines: readonly TaxDeadline[]
+): TaxDeadlineGroup[] {
+  const groups = new Map<string, TaxDeadlineGroup>();
+  for (const deadline of [...deadlines].sort(compareDeadlines)) {
+    const kind = GROUP_KIND[deadline.kind];
+    const key = `${kind}:${deadline.period}`;
+    const group = groups.get(key);
+    if (group) group.deadlines.push(deadline);
+    else groups.set(key, { kind, period: deadline.period, deadlines: [deadline] });
+  }
+  return [...groups.values()];
+}
+
+let skopjeDateFormat: Intl.DateTimeFormat | undefined;
+
+// The calendar date ("YYYY-MM-DD") in North Macedonia at a given moment.
+// Servers run in UTC, which is one or two hours behind.
+export function toSkopjeDate(moment: Date): string {
+  skopjeDateFormat ??= new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Skopje",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const parts: Record<string, string> = {};
+  for (const part of skopjeDateFormat.formatToParts(moment)) {
+    parts[part.type] = part.value;
+  }
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
+export type PaidInvoiceDates = {
+  // When the invoice was marked paid: an ISO timestamp in UTC (the demo data
+  // stores a plain date). The app sets it whenever the status becomes paid,
+  // so null would mean the row was marked paid some other way.
+  paidAt: string | null;
+  // The invoice date, "YYYY-MM-DD".
+  date: string;
+};
+
+// The date an invoice's income was received. The app records payment only by
+// the moment the invoice is marked paid (paidAt), so that's the best date it
+// has; an invoice without one falls back to its invoice date.
+export function getPaymentDate(invoice: PaidInvoiceDates): string {
+  const { paidAt } = invoice;
+  if (paidAt) {
+    if (DATE_PATTERN.test(paidAt)) return paidAt;
+    const moment = new Date(paidAt);
+    if (!Number.isNaN(moment.getTime())) return toSkopjeDate(moment);
+  }
+  return invoice.date.slice(0, 10);
+}
+
+// The months ("YYYY-MM") in which a client outside North Macedonia paid an
+// invoice, oldest first. The monthly calculation is for income from abroad;
+// a Macedonian company that pays an individual withholds the tax itself, so
+// invoices to clients in MK don't add a month.
+export function getForeignIncomeMonths(
+  paidInvoices: readonly (PaidInvoiceDates & { clientCountry: string })[]
+): string[] {
+  const months = new Set<string>();
+  for (const invoice of paidInvoices) {
+    if (invoice.clientCountry === "MK") continue;
+    months.add(getPaymentDate(invoice).slice(0, 7));
+  }
+  return [...months].sort();
+}
+
+// Whole days from one "YYYY-MM-DD" date to another; negative if `to` is
+// earlier.
+export function daysBetween(from: string, to: string): number {
+  const toUtc = (date: string) => {
+    const [year, month, day] = date.split("-").map(Number);
+    return Date.UTC(year, month - 1, day);
   };
+  return Math.round((toUtc(to) - toUtc(from)) / 86_400_000);
 }
 
 // Every currency a client can default to or an invoice can be issued in.
