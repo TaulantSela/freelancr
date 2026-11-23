@@ -20,7 +20,26 @@ async function updateProfileAction(_prev: State, formData: FormData): Promise<St
   return { success: true };
 }
 
-export function SettingsForm({ user }: { user: User }) {
+// Only what the form shows; never the password hash.
+export type SettingsUser = Pick<
+  User,
+  | "name"
+  | "businessName"
+  | "taxStatus"
+  | "monthlyAdvanceMKD"
+  | "vatRegistered"
+  | "vatNumber"
+  | "taxNumber"
+  | "address"
+  | "placeOfIssue"
+  | "signatoryName"
+  | "bankName"
+  | "bankAccount"
+  | "iban"
+  | "bic"
+>;
+
+export function SettingsForm({ user }: { user: SettingsUser }) {
   const t = useTranslations();
   const [state, action, pending] = useActionState(updateProfileAction, null);
   const [taxStatus, setTaxStatus] = useState<TaxStatus>(user.taxStatus);

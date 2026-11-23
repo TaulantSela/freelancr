@@ -12,8 +12,27 @@ export default async function SettingsPage() {
 
   const { t } = await getTranslations();
 
+  // The profile goes to a client component, so select what it shows rather
+  // than the whole row (which includes the password hash).
   const [user] = await getDb()
-    .select()
+    .select({
+      email: users.email,
+      createdAt: users.createdAt,
+      name: users.name,
+      businessName: users.businessName,
+      taxStatus: users.taxStatus,
+      monthlyAdvanceMKD: users.monthlyAdvanceMKD,
+      vatRegistered: users.vatRegistered,
+      vatNumber: users.vatNumber,
+      taxNumber: users.taxNumber,
+      address: users.address,
+      placeOfIssue: users.placeOfIssue,
+      signatoryName: users.signatoryName,
+      bankName: users.bankName,
+      bankAccount: users.bankAccount,
+      iban: users.iban,
+      bic: users.bic,
+    })
     .from(users)
     .where(eq(users.id, session.userId))
     .limit(1);
