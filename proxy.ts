@@ -9,10 +9,7 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isPublic =
-    pathname === "/" ||
-    pathname === "/sign-in" ||
-    pathname === "/sign-up" ||
-    pathname.startsWith("/api/exchange-rate");
+    pathname === "/" || pathname === "/sign-in" || pathname === "/sign-up";
 
   const token = request.cookies.get(SESSION_COOKIE)?.value;
 

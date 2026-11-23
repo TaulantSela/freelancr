@@ -78,6 +78,8 @@ export const invoiceItems = pgTable("invoice_items", {
   total: doublePrecision("total").notNull(),
 });
 
+// Not read or written yet: invoices use the fixed rates in
+// lib/tax/calculator.ts. Kept for caching the National Bank's daily rates.
 export const exchangeRateCache = pgTable("exchange_rate_cache", {
   id: text("id").primaryKey(),
   date: text("date").notNull(),
