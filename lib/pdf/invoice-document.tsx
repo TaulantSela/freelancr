@@ -348,7 +348,10 @@ export function InvoicePdfDocument({
               </View>
               <View style={styles.totalRow}>
                 <Text style={[styles.totalLabel, { fontSize: 8 }]}>
-                  {labels.exchangeRate
+                  {(invoice.rateSource === "nbrsm" && invoice.rateDate
+                    ? labels.exchangeRateNbrsm.replace("{date}", formatDate(invoice.rateDate, lang))
+                    : labels.exchangeRate
+                  )
                     .replace("{currency}", invoice.currency)
                     .replace("{rate}", String(invoice.exchangeRateMKD))}
                 </Text>

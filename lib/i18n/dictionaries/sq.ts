@@ -64,7 +64,7 @@ export const sq: Dictionary = {
     features: [
       {
         title: "Faturim shumëvalutor",
-        desc: "Krijo fatura në MKD, EUR ose USD. Ekuivalenti MKD llogaritet automatikisht sipas një kursi të përafërt të integruar.",
+        desc: "Krijo fatura në MKD, EUR ose USD. Ekuivalenti MKD llogaritet automatikisht sipas kursit mesatar të Bankës Popullore.",
       },
       {
         title: "Monitorim i pragut TVSH",
@@ -175,7 +175,7 @@ export const sq: Dictionary = {
     drafts: "Drafte",
     emptyTitle: "Ende nuk ka fatura",
     emptyDesc:
-      "Krijo faturën e parë. Mbështet MKD, EUR dhe USD me konvertim automatik në MKD sipas një kursi të përafërt të integruar.",
+      "Krijo faturën e parë. Mbështet MKD, EUR dhe USD me konvertim automatik në MKD sipas kursit mesatar të Bankës Popullore.",
     createFirst: "Krijo faturën e parë",
     colNumber: "Numri",
     colClient: "Klienti",
@@ -213,6 +213,7 @@ export const sq: Dictionary = {
       grandTotal: "Totali",
       mkdEquivalent: "Ekuivalenti MKD",
       exchangeRate: "1 {currency} = {rate} MKD (kurs i përafërt)",
+      exchangeRateNbrsm: "1 {currency} = {rate} MKD (kursi mesatar i BPRMV-së, {date})",
       notes: "Shënime",
       footer: "Gjeneruar nga Freelancr",
       draft: "Draft, e palëshuar",
@@ -240,6 +241,10 @@ export const sq: Dictionary = {
       dueDate: "Afati i pagesës",
       lineItems: "Artikujt",
       approximateRate: "1 {currency} = {rate} MKD (kurs i përafërt)",
+      nbrsmRate: "1 {currency} = {rate} MKD (kursi mesatar i Bankës Popullore, {date})",
+      rateLoading: "Po merret kursi i Bankës Popullore…",
+      rateUnavailable:
+        "kursi i Bankës Popullore nuk u mor, ndaj fatura e përdor këtë kurs të përafërt",
       description: "Përshkrimi",
       qty: "Sas.",
       unitPrice: "Çmimi njësi ({currency})",

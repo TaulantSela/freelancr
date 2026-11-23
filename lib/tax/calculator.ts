@@ -504,11 +504,12 @@ export const SUPPORTED_CURRENCIES = [
 
 export type Currency = (typeof SUPPORTED_CURRENCIES)[number];
 
-// Approximate MKD rates. These are the only rates the app uses: nothing calls
-// a live rate service, and each invoice stores the rate it was created with.
-// Values are NBRM middle rates (среден курс) from the exchange rate list
-// formed on 20 November 2026 (valid from 21 November 2026), rounded to one
-// decimal, retrieved from
+// Approximate MKD rates, the fallback only: invoices and payments convert at
+// the NBRSM middle rate for their date (lib/rates), and an invoice uses one of
+// these, flagged as approximate, only when the National Bank can't be
+// reached. Values are NBRM middle rates (среден курс) from the exchange rate
+// list formed on 20 November 2026 (valid from 21 November 2026), rounded to
+// one decimal, retrieved from
 // https://www.nbrm.mk/KLServiceNOV/GetExchangeRates?StartDate=21.11.2026&EndDate=21.11.2026&format=json
 export const APPROXIMATE_RATES_TO_MKD: Record<Currency, number> = {
   EUR: 61.6, // NBRM middle 61.5942

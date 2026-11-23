@@ -180,6 +180,7 @@ export type Dictionary = {
       grandTotal: string;
       mkdEquivalent: string;
       exchangeRate: string;
+      exchangeRateNbrsm: string;
       notes: string;
       footer: string;
       draft: string;
@@ -207,6 +208,9 @@ export type Dictionary = {
       dueDate: string;
       lineItems: string;
       approximateRate: string;
+      nbrsmRate: string;
+      rateLoading: string;
+      rateUnavailable: string;
       description: string;
       qty: string;
       unitPrice: string;

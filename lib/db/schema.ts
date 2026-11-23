@@ -104,7 +104,16 @@ export const invoices = pgTable("invoices", {
   supplyDate: text("supply_date"),
   dueDate: text("due_date"),
   currency: text("currency").notNull().default("EUR"),
+  // MKD for one unit of the currency: the NBRSM middle rate on the date of
+  // supply, when the VAT liability arises (VAT law Art. 20, Art. 31(1)), or
+  // today's for a supply date still ahead.
   exchangeRateMKD: doublePrecision("exchange_rate_mkd").notNull().default(1),
+  // "nbrsm", or "approximate" when the National Bank couldn't be reached and
+  // the fixed fallback rate was used. Null on invoices saved before rates
+  // were looked up, which all used the fixed rates.
+  rateSource: text("rate_source", { enum: ["nbrsm", "approximate"] }),
+  // "YYYY-MM-DD": the day of the NBRSM list the rate comes from.
+  rateDate: text("rate_date"),
   subtotal: doublePrecision("subtotal").notNull().default(0),
   ddvRate: doublePrecision("ddv_rate").notNull().default(0),
   ddvAmount: doublePrecision("ddv_amount").notNull().default(0),

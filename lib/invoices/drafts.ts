@@ -13,6 +13,8 @@ export type DraftValues = Pick<
   | "dueDate"
   | "currency"
   | "exchangeRateMKD"
+  | "rateSource"
+  | "rateDate"
   | "subtotal"
   | "ddvRate"
   | "ddvAmount"
@@ -51,6 +53,8 @@ export async function updateDraftInvoice(
         due_date = ${values.dueDate ?? null},
         currency = ${values.currency},
         exchange_rate_mkd = ${values.exchangeRateMKD}::double precision,
+        rate_source = ${values.rateSource ?? null},
+        rate_date = ${values.rateDate ?? null},
         subtotal = ${values.subtotal}::double precision,
         ddv_rate = ${values.ddvRate}::double precision,
         ddv_amount = ${values.ddvAmount}::double precision,

@@ -25,16 +25,23 @@ function isUniqueViolation(error: unknown): boolean {
 // index on (user_id, number) rejects the second, which then tries again with
 // the next number. Returns the number, or null when the invoice isn't one
 // of the user's drafts (already issued, or not theirs).
+// `rate`, when given, replaces the draft's rate (and its MKD total) in the
+// same statement.
 export async function issueDraftInvoice(
   db: Db,
   invoiceId: string,
-  userId: string
+  userId: string,
+  rate: { rate: number; rateSource: "nbrsm"; rateDate: string | null } | null = null
 ): Promise<string | null> {
   for (let attempt = 0; ; attempt++) {
     try {
       const result = await db.execute<{ number: string }>(sql`
         update invoices as target
         set status = 'sent',
+            exchange_rate_mkd = coalesce(${rate?.rate ?? null}::double precision, target.exchange_rate_mkd),
+            total_mkd = target.total * coalesce(${rate?.rate ?? null}::double precision, target.exchange_rate_mkd),
+            rate_source = coalesce(${rate?.rateSource ?? null}, target.rate_source),
+            rate_date = coalesce(${rate?.rateDate ?? null}, target.rate_date),
             number = coalesce(target.number, (
               select 'INV-' || substr(target.date, 1, 4) || '-'
                 || lpad(next.n::text, greatest(3, length(next.n::text)), '0')

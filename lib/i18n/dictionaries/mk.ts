@@ -64,7 +64,7 @@ export const mk: Dictionary = {
     features: [
       {
         title: "Повеќевалутно фактурирање",
-        desc: "Креирајте фактури во MKD, EUR или USD. MKD еквивалентот се пресметува автоматски според вграден приближен курс.",
+        desc: "Креирајте фактури во MKD, EUR или USD. MKD еквивалентот се пресметува автоматски по средниот курс на Народната банка.",
       },
       {
         title: "Следење на ДДВ праг",
@@ -175,7 +175,7 @@ export const mk: Dictionary = {
     drafts: "Нацрти",
     emptyTitle: "Сè уште нема фактури",
     emptyDesc:
-      "Креирајте ја вашата прва фактура. Поддржува MKD, EUR и USD со автоматска конверзија во MKD по вграден приближен курс.",
+      "Креирајте ја вашата прва фактура. Поддржува MKD, EUR и USD со автоматска конверзија во MKD по средниот курс на Народната банка.",
     createFirst: "Креирај прва фактура",
     colNumber: "Број",
     colClient: "Клиент",
@@ -213,6 +213,7 @@ export const mk: Dictionary = {
       grandTotal: "Вкупно",
       mkdEquivalent: "MKD еквивалент",
       exchangeRate: "1 {currency} = {rate} MKD (приближен курс)",
+      exchangeRateNbrsm: "1 {currency} = {rate} MKD (среден курс на НБРСМ, {date})",
       notes: "Белешки",
       footer: "Генерирано од Freelancr",
       draft: "Нацрт, не е издадена",
@@ -241,6 +242,10 @@ export const mk: Dictionary = {
       dueDate: "Рок на плаќање",
       lineItems: "Ставки",
       approximateRate: "1 {currency} = {rate} MKD (приближен курс)",
+      nbrsmRate: "1 {currency} = {rate} MKD (среден курс на НБРСМ, {date})",
+      rateLoading: "Се вчитува курсот на НБРСМ…",
+      rateUnavailable:
+        "курсот на НБРСМ не можеше да се вчита, па фактурата го користи овој приближен курс",
       description: "Опис",
       qty: "Кол.",
       unitPrice: "Единечна цена ({currency})",

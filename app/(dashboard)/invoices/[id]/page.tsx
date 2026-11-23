@@ -17,6 +17,7 @@ import { getTranslations } from "@/lib/i18n/server";
 import { LOCALE_LABELS } from "@/lib/i18n/config";
 import { resolveInvoiceLanguage } from "@/lib/clients/config";
 import { formatMessage } from "@/lib/i18n/format";
+import { formatTaxDate } from "@/lib/tax/labels";
 
 export default async function InvoiceDetailPage({
   params,
@@ -178,10 +179,16 @@ export default async function InvoiceDetailPage({
               <div>
                 <p className="text-xs text-muted-foreground">{t.invoices.detail.exchangeRate}</p>
                 <p className="font-medium font-mono text-xs">
-                  {formatMessage(t.invoices.form.approximateRate, {
-                    currency: invoice.currency,
-                    rate: String(invoice.exchangeRateMKD),
-                  })}
+                  {invoice.rateSource === "nbrsm" && invoice.rateDate
+                    ? formatMessage(t.invoices.form.nbrsmRate, {
+                        currency: invoice.currency,
+                        rate: String(invoice.exchangeRateMKD),
+                        date: formatTaxDate(invoice.rateDate, t),
+                      })
+                    : formatMessage(t.invoices.form.approximateRate, {
+                        currency: invoice.currency,
+                        rate: String(invoice.exchangeRateMKD),
+                      })}
                 </p>
               </div>
             )}

@@ -5,7 +5,13 @@ import { revalidatePath } from "next/cache";
 import { getDb, clients, invoices, invoiceItems, users } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId } from "@/lib/utils";
-import { getRateToMKD, isDdvRate, isSupportedCurrency } from "@/lib/tax/calculator";
+import {
+  getRateToMKD,
+  isDdvRate,
+  isSupportedCurrency,
+  toSkopjeDate,
+} from "@/lib/tax/calculator";
+import { getRateToMkd } from "@/lib/rates/queries";
 import { issueDraftInvoice } from "@/lib/invoices/numbering";
 import { updateDraftInvoice, type DraftLineItem, type DraftValues } from "@/lib/invoices/drafts";
 import { eq, and, inArray, sql } from "drizzle-orm";
@@ -32,6 +38,20 @@ function parseItems(json: FormDataEntryValue | null): DraftLineItem[] | null {
     items.push({ description, quantity, unitPrice });
   }
   return items;
+}
+
+// The rate an invoice converts at: the NBRSM middle rate on the date of
+// supply, the day the VAT liability arises (VAT law Art. 20, Art. 31(1)), or
+// today's while the supply date is still ahead. If the National Bank can't
+// be reached, the fixed approximate rate, flagged as such.
+async function invoiceRate(currency: string, supplyDate: string) {
+  const today = toSkopjeDate(new Date());
+  const rateDate = supplyDate < today ? supplyDate : today;
+  const nbrsm = await getRateToMkd(currency, rateDate, today);
+  if (nbrsm) {
+    return { rate: nbrsm.rate, rateSource: "nbrsm" as const, rateDate: nbrsm.date };
+  }
+  return { rate: getRateToMKD(currency), rateSource: "approximate" as const, rateDate: null };
 }
 
 type InvoiceFormErrorKey =
@@ -97,7 +117,7 @@ async function readInvoiceForm(
   const subtotal = items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
   const ddvAmount = subtotal * ddvRate;
   const total = subtotal + ddvAmount;
-  const rate = getRateToMKD(currency);
+  const { rate, rateSource, rateDate } = await invoiceRate(currency, supplyDate);
 
   return {
     values: {
@@ -107,6 +127,8 @@ async function readInvoiceForm(
       dueDate: dueDate || null,
       currency,
       exchangeRateMKD: rate,
+      rateSource,
+      rateDate,
       subtotal,
       ddvRate,
       ddvAmount,
@@ -184,7 +206,13 @@ export async function issueInvoice(id: string) {
   // like that (VAT law Art. 51(3), Art. 55); anyone else saves the draft
   // again first, which sets the DDV to 0.
   const [draft] = await getDb()
-    .select({ ddvRate: invoices.ddvRate, vatRegistered: users.vatRegistered })
+    .select({
+      ddvRate: invoices.ddvRate,
+      vatRegistered: users.vatRegistered,
+      currency: invoices.currency,
+      supplyDate: invoices.supplyDate,
+      date: invoices.date,
+    })
     .from(invoices)
     .innerJoin(users, eq(invoices.userId, users.id))
     .where(and(eq(invoices.id, id), eq(invoices.userId, session.userId)))
@@ -193,7 +221,18 @@ export async function issueInvoice(id: string) {
     return { errorKey: "ddvNotRegistered" as const };
   }
 
-  const number = await issueDraftInvoice(getDb(), id, session.userId);
+  // The rate is looked up again on issue: the supply date may have passed
+  // since the draft was saved with today's rate. If the National Bank can't
+  // be reached now, the draft keeps the rate it was saved with.
+  const issueRate = draft
+    ? await invoiceRate(draft.currency, draft.supplyDate ?? draft.date)
+    : null;
+  const number = await issueDraftInvoice(
+    getDb(),
+    id,
+    session.userId,
+    issueRate?.rateSource === "nbrsm" ? issueRate : null
+  );
   if (!number) return { errorKey: "notDraft" as const };
 
   revalidatePath("/invoices");
