@@ -12,6 +12,7 @@ import { InvoiceStatusButton } from "@/components/invoices/invoice-status-button
 import { DeleteInvoiceButton } from "@/components/invoices/delete-invoice-button";
 import { DownloadPdfButton } from "@/components/invoices/download-pdf-button";
 import { IssueInvoiceButton } from "@/components/invoices/issue-invoice-button";
+import { CancelInvoiceButton } from "@/components/invoices/cancel-invoice-button";
 import { getTranslations } from "@/lib/i18n/server";
 import { formatMessage } from "@/lib/i18n/format";
 
@@ -58,7 +59,12 @@ export default async function InvoiceDetailPage({
           )}
           {isDraft && <IssueInvoiceButton id={invoice.id} year={invoice.date.slice(0, 4)} />}
           <DownloadPdfButton invoiceId={invoice.id} />
-          <DeleteInvoiceButton id={invoice.id} number={invoice.number} />
+          {/* Drafts can be deleted; issued invoices only cancelled, since
+              they're kept for five years (VAT law Art. 56). */}
+          {isDraft && <DeleteInvoiceButton id={invoice.id} number={invoice.number} />}
+          {!isDraft && invoice.status !== "cancelled" && invoice.number && (
+            <CancelInvoiceButton id={invoice.id} number={invoice.number} />
+          )}
         </div>
       </div>
 
@@ -224,6 +230,10 @@ export default async function InvoiceDetailPage({
             <p className="text-xs text-muted-foreground">
               {t.invoices.detail.paidOn}: {formatDate(invoice.paidAt.split("T")[0])}
             </p>
+          )}
+
+          {invoice.status === "cancelled" && (
+            <p className="text-xs text-muted-foreground">{t.invoices.cancel.note}</p>
           )}
         </CardContent>
       </Card>

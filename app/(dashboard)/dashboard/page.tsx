@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/auth/session";
 import { getDb, invoices, clients } from "@/lib/db";
-import { eq, sum, count, and, gte } from "drizzle-orm";
+import { eq, sum, count, and, gte, inArray } from "drizzle-orm";
 import {
   getDDVStatus,
   getLocalSupplies,
@@ -61,10 +61,16 @@ export default async function DashboardPage() {
 
   const annualIncomeMKD = Number(annualStats?.totalMKD ?? 0);
 
+  // Issued and not paid yet, overdue or not.
   const [outstandingStats] = await getDb()
     .select({ cnt: count() })
     .from(invoices)
-    .where(and(eq(invoices.userId, session.userId), eq(invoices.status, "sent")));
+    .where(
+      and(
+        eq(invoices.userId, session.userId),
+        inArray(invoices.status, ["sent", "overdue"])
+      )
+    );
 
   const recentInvoices = await getDb()
     .select({

@@ -187,9 +187,9 @@ export const en: Dictionary = {
     addFirstClient: "Add your first client",
     downloadPdf: "Download PDF",
     deleteTitle: "Delete {number}?",
-    deleteDesc:
-      "This will permanently delete this invoice and all its line items. This action cannot be undone.",
+    deleteDesc: "This permanently deletes the draft and its line items.",
     deleteDraftTitle: "Delete this draft?",
+    deleteNotDraft: "Only drafts can be deleted. Cancel an issued invoice instead.",
     detail: {
       from: "From",
       billTo: "Bill to",
@@ -265,6 +265,18 @@ export const en: Dictionary = {
       confirm: "Issue",
       issued: "Issued as {number}",
       notDraft: "This invoice has already been issued.",
+    },
+    cancel: {
+      button: "Cancel invoice",
+      title: "Cancel {number}?",
+      desc:
+        "A cancelled invoice stays in your records, since invoices have to be kept for five years (VAT law Art. 56). It stops counting as income and toward the DDV threshold, and this can't be undone. There are no credit notes yet.",
+      confirm: "Cancel invoice",
+      keep: "Keep it",
+      cancelled: "Invoice cancelled",
+      notIssued: "Only issued invoices can be cancelled.",
+      note:
+        "Cancelled. It stays in your records for the five years invoices have to be kept (VAT law Art. 56).",
     },
   },
   income: {

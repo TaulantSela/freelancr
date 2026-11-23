@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTranslations } from "@/lib/i18n/client";
 
-// The statuses an issued invoice can be moved between. A draft has no menu:
-// it leaves "draft" only by being issued, which gives it a number.
-const ISSUED_STATUS_KEYS = ["sent", "paid", "overdue", "cancelled"] as const;
-type InvoiceStatus = "draft" | (typeof ISSUED_STATUS_KEYS)[number];
+// The statuses an issued invoice can be moved between. A draft has no menu
+// (it leaves "draft" only by being issued, which gives it a number), and
+// neither has a cancelled invoice (cancelling is final; see
+// CancelInvoiceButton).
+const OPEN_STATUS_KEYS = ["sent", "paid", "overdue"] as const;
+type InvoiceStatus = "draft" | "cancelled" | (typeof OPEN_STATUS_KEYS)[number];
 
 const statusColors: Record<InvoiceStatus, string> = {
   paid: "text-emerald-400 border-emerald-400/30",
@@ -37,12 +39,12 @@ export function InvoiceStatusButton({
   const status = currentStatus as InvoiceStatus;
   const label = t.invoices.status[status] ?? currentStatus;
 
-  if (status === "draft") {
+  if (status === "draft" || status === "cancelled") {
     return (
       <span
         className={cn(
           "inline-flex items-center px-2 py-0.5 rounded border text-xs",
-          statusColors.draft
+          statusColors[status]
         )}
       >
         {label}
@@ -68,7 +70,7 @@ export function InvoiceStatusButton({
         }
       />
       <DropdownMenuContent align="end" className="w-36">
-        {ISSUED_STATUS_KEYS.map((opt) => (
+        {OPEN_STATUS_KEYS.map((opt) => (
           <DropdownMenuItem
             key={opt}
             className={cn("text-xs cursor-pointer", opt === status && "font-medium")}

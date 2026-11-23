@@ -157,6 +157,7 @@ export type Dictionary = {
     deleteTitle: string;
     deleteDesc: string;
     deleteDraftTitle: string;
+    deleteNotDraft: string;
     detail: {
       from: string;
       billTo: string;
@@ -228,6 +229,16 @@ export type Dictionary = {
       confirm: string;
       issued: string;
       notDraft: string;
+    };
+    cancel: {
+      button: string;
+      title: string;
+      desc: string;
+      confirm: string;
+      keep: string;
+      cancelled: string;
+      notIssued: string;
+      note: string;
     };
   };
   income: {

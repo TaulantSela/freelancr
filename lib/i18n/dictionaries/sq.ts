@@ -187,9 +187,9 @@ export const sq: Dictionary = {
     addFirstClient: "Shto klientin e parë",
     downloadPdf: "Shkarko PDF",
     deleteTitle: "Fshi {number}?",
-    deleteDesc:
-      "Kjo do ta fshijë përgjithmonë faturën dhe të gjithë artikujt e saj. Ky veprim nuk mund të kthehet.",
+    deleteDesc: "Kjo e fshin përgjithmonë draftin dhe artikujt e tij.",
     deleteDraftTitle: "Të fshihet ky draft?",
+    deleteNotDraft: "Mund të fshihen vetëm draftet. Faturën e lëshuar anuloje.",
     detail: {
       from: "Nga",
       billTo: "Për",
@@ -264,6 +264,18 @@ export const sq: Dictionary = {
       confirm: "Lësho",
       issued: "U lëshua me numrin {number}",
       notDraft: "Kjo faturë është lëshuar tashmë.",
+    },
+    cancel: {
+      button: "Anulo faturën",
+      title: "Të anulohet {number}?",
+      desc:
+        "Fatura e anuluar mbetet në evidencën tënde, sepse faturat ruhen pesë vjet (Ligji për TVSH, neni 56). Nuk numërohet më si e ardhur dhe në pragun e TVSH-së, dhe kjo nuk mund të kthehet. Ende nuk ka nota krediti.",
+      confirm: "Anulo faturën",
+      keep: "Mbaje",
+      cancelled: "Fatura u anulua",
+      notIssued: "Mund të anulohen vetëm faturat e lëshuara.",
+      note:
+        "E anuluar. Mbetet në evidencën tënde për pesë vitet që faturat duhet të ruhen (Ligji për TVSH, neni 56).",
     },
   },
   income: {

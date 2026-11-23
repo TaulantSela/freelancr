@@ -35,7 +35,10 @@ export default async function InvoicesPage() {
     .orderBy(invoices.createdAt);
 
   const paidTotal = invoiceList.filter((i) => i.status === "paid").reduce((s, i) => s + i.totalMKD, 0);
-  const sentTotal = invoiceList.filter((i) => i.status === "sent").reduce((s, i) => s + i.totalMKD, 0);
+  // Issued and not paid yet, overdue or not.
+  const sentTotal = invoiceList
+    .filter((i) => i.status === "sent" || i.status === "overdue")
+    .reduce((s, i) => s + i.totalMKD, 0);
   const draftCount = invoiceList.filter((i) => i.status === "draft").length;
 
   return (

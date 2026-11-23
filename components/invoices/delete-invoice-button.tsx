@@ -15,6 +15,7 @@ import {
 import { deleteInvoice } from "@/lib/actions/invoices";
 import { Trash2 } from "lucide-react";
 import { useTransition } from "react";
+import { toast } from "sonner";
 import { useTranslations } from "@/lib/i18n/client";
 import { formatMessage } from "@/lib/i18n/format";
 
@@ -54,7 +55,12 @@ export function DeleteInvoiceButton({
         <AlertDialogFooter>
           <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
           <AlertDialogAction
-            onClick={() => startTransition(() => deleteInvoice(id))}
+            onClick={() =>
+              startTransition(async () => {
+                const result = await deleteInvoice(id);
+                if (result?.errorKey) toast.error(t.invoices.deleteNotDraft);
+              })
+            }
             disabled={pending}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >

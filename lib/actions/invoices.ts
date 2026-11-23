@@ -188,16 +188,16 @@ export async function issueInvoice(id: string) {
   return { number };
 }
 
-const ISSUED_STATUSES = ["sent", "paid", "overdue", "cancelled"] as const;
-type IssuedStatus = (typeof ISSUED_STATUSES)[number];
+// An issued invoice that's still open moves between these from the status
+// menu. A draft only leaves "draft" through issueInvoice(), so it gets a
+// number; cancelling is cancelInvoice(), and is final.
+const OPEN_STATUSES = ["sent", "paid", "overdue"] as const;
+type OpenStatus = (typeof OPEN_STATUSES)[number];
 
-// Moves an issued invoice between issued statuses. A draft only leaves
-// "draft" through issueInvoice(), so it gets a number; nothing goes back to
-// draft.
-export async function updateInvoiceStatus(id: string, status: IssuedStatus) {
+export async function updateInvoiceStatus(id: string, status: OpenStatus) {
   const session = await getSession();
   if (!session) redirect("/sign-in");
-  if (!(ISSUED_STATUSES as readonly string[]).includes(status)) return;
+  if (!(OPEN_STATUSES as readonly string[]).includes(status)) return;
 
   await getDb()
     .update(invoices)
@@ -214,7 +214,7 @@ export async function updateInvoiceStatus(id: string, status: IssuedStatus) {
       and(
         eq(invoices.id, id),
         eq(invoices.userId, session.userId),
-        inArray(invoices.status, ISSUED_STATUSES)
+        inArray(invoices.status, OPEN_STATUSES)
       )
     );
 
@@ -222,13 +222,49 @@ export async function updateInvoiceStatus(id: string, status: IssuedStatus) {
   revalidatePath(`/invoices/${id}`);
 }
 
+// Cancels an issued invoice. It isn't deleted: invoices have to be kept for
+// five years after the end of their year (VAT law Art. 56(1)), so it stays,
+// marked cancelled, and stops counting as income or toward the DDV
+// threshold. There's no way back and no credit note yet.
+export async function cancelInvoice(id: string) {
+  const session = await getSession();
+  if (!session) redirect("/sign-in");
+
+  const cancelled = await getDb()
+    .update(invoices)
+    .set({ status: "cancelled" })
+    .where(
+      and(
+        eq(invoices.id, id),
+        eq(invoices.userId, session.userId),
+        inArray(invoices.status, OPEN_STATUSES)
+      )
+    )
+    .returning({ id: invoices.id });
+  if (cancelled.length === 0) return { errorKey: "notIssued" as const };
+
+  revalidatePath("/invoices");
+  revalidatePath(`/invoices/${id}`);
+  revalidatePath("/dashboard");
+  return { ok: true as const };
+}
+
+// Deletes a draft. An issued invoice can only be cancelled (above).
 export async function deleteInvoice(id: string) {
   const session = await getSession();
   if (!session) redirect("/sign-in");
 
-  await getDb()
+  const deleted = await getDb()
     .delete(invoices)
-    .where(and(eq(invoices.id, id), eq(invoices.userId, session.userId)));
+    .where(
+      and(
+        eq(invoices.id, id),
+        eq(invoices.userId, session.userId),
+        eq(invoices.status, "draft")
+      )
+    )
+    .returning({ id: invoices.id });
+  if (deleted.length === 0) return { errorKey: "deleteNotDraft" as const };
 
   revalidatePath("/invoices");
   redirect("/invoices");
