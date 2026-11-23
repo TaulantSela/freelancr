@@ -126,6 +126,7 @@ export type Dictionary = {
       countryRequired: string;
       invoiceLanguage: string;
       invoiceLanguageHint: string;
+      looksLikeEmbg: string;
     };
     types: { company: string; person: string };
     deleteTitle: string;
@@ -273,11 +274,19 @@ export type Dictionary = {
     businessName: string;
     businessNamePlaceholder: string;
     taxNumber: string;
+    taxNumberHint: string;
     vatRegistered: string;
     vatRegisteredHint: string;
     vatNumber: string;
     address: string;
+    placeOfIssue: string;
+    placeOfIssuePlaceholder: string;
+    signatoryName: string;
+    signatoryNameHint: string;
     bankAccount: string;
+    bankAccountHint: string;
+    iban: string;
+    bic: string;
     bankName: string;
     saveChanges: string;
     saved: string;
@@ -286,7 +295,13 @@ export type Dictionary = {
     memberSince: string;
     monthlyAdvance: string;
     monthlyAdvanceHint: string;
-    errors: { nameRequired: string; advanceInvalid: string; vatNumberRequired: string };
+    errors: {
+      nameRequired: string;
+      advanceInvalid: string;
+      vatNumberRequired: string;
+      looksLikeEmbg: string;
+      ibanInvalid: string;
+    };
   };
   tax: {
     statusLabel: string;

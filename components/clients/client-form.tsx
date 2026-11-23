@@ -23,7 +23,7 @@ import { LOCALE_LABELS } from "@/lib/i18n/config";
 import type { Client } from "@/lib/db/schema";
 
 type State = {
-  errorKey?: "nameRequired" | "currencyUnsupported" | "countryRequired";
+  errorKey?: "nameRequired" | "currencyUnsupported" | "countryRequired" | "looksLikeEmbg";
 } | null;
 
 async function createClientAction(_prev: State, formData: FormData): Promise<State> {

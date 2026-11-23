@@ -6,8 +6,19 @@ import { getDb, users } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { eq } from "drizzle-orm";
 import { isTaxStatus } from "@/lib/tax/calculator";
+import { formatIban, isValidIban, looksLikeEmbg } from "@/lib/profile";
 
-export type SettingsErrorKey = "nameRequired" | "advanceInvalid" | "vatNumberRequired";
+export type SettingsErrorKey =
+  | "nameRequired"
+  | "advanceInvalid"
+  | "vatNumberRequired"
+  | "looksLikeEmbg"
+  | "ibanInvalid";
+
+function text(formData: FormData, name: string): string | null {
+  const value = formData.get(name);
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
 
 // "" -> null (not entered); otherwise a non-negative amount in MKD.
 function parseMonthlyAdvance(value: FormDataEntryValue | null): number | null | undefined {
@@ -45,15 +56,31 @@ export async function updateProfile(
     .toUpperCase();
   if (vatRegistered && !vatNumber) return { errorKey: "vatNumberRequired" };
 
+  // The personal ID number (ЕМБГ) never goes on an invoice, so it isn't
+  // accepted as a tax or VAT number.
+  const taxNumber = text(formData, "taxNumber");
+  if (looksLikeEmbg(taxNumber) || looksLikeEmbg(vatNumber)) {
+    return { errorKey: "looksLikeEmbg" };
+  }
+
+  const iban = text(formData, "iban");
+  if (iban && !isValidIban(iban)) return { errorKey: "ibanInvalid" };
+
   await getDb()
     .update(users)
     .set({
       name,
-      businessName: (formData.get("businessName") as string) || null,
-      taxNumber: (formData.get("taxNumber") as string) || null,
-      address: (formData.get("address") as string) || null,
-      bankAccount: (formData.get("bankAccount") as string) || null,
-      bankName: (formData.get("bankName") as string) || null,
+      businessName: text(formData, "businessName"),
+      taxNumber,
+      address: text(formData, "address"),
+      placeOfIssue: text(formData, "placeOfIssue"),
+      signatoryName: text(formData, "signatoryName"),
+      bankName: text(formData, "bankName"),
+      iban: iban ? formatIban(iban) : null,
+      bic: text(formData, "bic")?.replace(/\s+/g, "").toUpperCase() ?? null,
+      // Only the local account number now; an IBAN that used to be saved
+      // here was shown in the IBAN field and is saved there.
+      bankAccount: text(formData, "bankAccount"),
       ...(isTaxStatus(taxStatus) ? { taxStatus } : {}),
       ...(formData.has("monthlyAdvanceMKD") ? { monthlyAdvanceMKD } : {}),
       vatRegistered,

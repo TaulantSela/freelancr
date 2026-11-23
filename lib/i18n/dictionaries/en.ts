@@ -152,6 +152,8 @@ export const en: Dictionary = {
       countryRequired: "Choose the client's country",
       invoiceLanguage: "Invoice language",
       invoiceLanguageHint: "The language of this client's invoice PDFs, whatever language you use the app in.",
+      looksLikeEmbg:
+        "That looks like a personal ID number (ЕМБГ). Enter the company's tax number, or leave it empty.",
     },
     types: {
       company: "Company",
@@ -312,12 +314,23 @@ export const en: Dictionary = {
     businessName: "Business / company name",
     businessNamePlaceholder: "Your studio or company name",
     taxNumber: "Tax number (EDB)",
+    taxNumberHint:
+      "Your ЕДБ, if you have one (for example as registered self-employed). Never enter your personal ID number (ЕМБГ): invoices go to your clients.",
     vatRegistered: "Registered for VAT (DDV)",
     vatRegisteredHint:
       "Only taxpayers registered for VAT may show VAT on an invoice (VAT law Art. 51(3)); anyone who shows it without being registered owes the amount shown (Art. 55). Tick this only if UJP has registered you.",
     vatNumber: "VAT number",
     address: "Address",
-    bankAccount: "Bank account (IBAN)",
+    placeOfIssue: "Place of issue",
+    placeOfIssuePlaceholder: "Skopje",
+    signatoryName: "Signatory",
+    signatoryNameHint:
+      "The person who signs your invoices, usually you. Left empty, invoices show your full name.",
+    bankAccount: "Local account number",
+    bankAccountHint:
+      "Optional: the 15-digit account clients in North Macedonia pay into. Clients abroad pay to the IBAN.",
+    iban: "IBAN",
+    bic: "BIC / SWIFT",
     bankName: "Bank name",
     saveChanges: "Save changes",
     saved: "Profile updated successfully.",
@@ -331,6 +344,10 @@ export const en: Dictionary = {
       nameRequired: "Name is required",
       advanceInvalid: "Enter the monthly advance as an amount in MKD, or leave it empty.",
       vatNumberRequired: "Enter your VAT number, or untick VAT registration.",
+      looksLikeEmbg:
+        "That looks like a personal ID number (ЕМБГ). Enter a tax number (ЕДБ) instead, or leave it empty: the app never prints an ЕМБГ.",
+      ibanInvalid:
+        "That IBAN doesn't check out. Copy it from your bank's documents, e.g. MK07 2501 2000 0058 984.",
     },
   },
   tax: {

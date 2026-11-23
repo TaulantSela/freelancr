@@ -152,6 +152,8 @@ export const sq: Dictionary = {
       countryRequired: "Zgjidh shtetin e klientit",
       invoiceLanguage: "Gjuha e faturave",
       invoiceLanguageHint: "Gjuha e faturave PDF për këtë klient, pavarësisht gjuhës që përdor në aplikacion.",
+      looksLikeEmbg:
+        "Kjo duket si numër personal (EMBG). Shkruaj numrin tatimor të kompanisë ose lëre bosh.",
     },
     types: {
       company: "Kompani",
@@ -311,12 +313,23 @@ export const sq: Dictionary = {
     businessName: "Emri i biznesit / kompanisë",
     businessNamePlaceholder: "Emri i studios ose kompanisë tënde",
     taxNumber: "Numri tatimor (EDB)",
+    taxNumberHint:
+      "EDB-ja jote, nëse ke (për shembull si i vetëpunësuar i regjistruar). Mos e shkruaj kurrë numrin personal (EMBG): faturat shkojnë te klientët e tu.",
     vatRegistered: "I regjistruar për TVSH",
     vatRegisteredHint:
       "TVSH-në në faturë mund ta tregojnë vetëm tatimpaguesit e regjistruar për TVSH (Ligji për TVSH, neni 51 paragrafi 3); kush e tregon pa qenë i regjistruar, e detyrohet shumën e treguar (neni 55). Shënoje këtë vetëm nëse të ka regjistruar UJP.",
     vatNumber: "Numri i TVSH-së",
     address: "Adresa",
-    bankAccount: "Llogaria bankare (IBAN)",
+    placeOfIssue: "Vendi i lëshimit",
+    placeOfIssuePlaceholder: "Shkup",
+    signatoryName: "Personi i autorizuar për nënshkrim",
+    signatoryNameHint:
+      "Personi që i nënshkruan faturat, zakonisht ti. Nëse mbetet bosh, në fatura del emri yt i plotë.",
+    bankAccount: "Llogaria transaksionale",
+    bankAccountHint:
+      "Opsionale: llogaria me 15 shifra ku paguajnë klientët në Maqedoninë e Veriut. Klientët nga jashtë paguajnë në IBAN.",
+    iban: "IBAN",
+    bic: "BIC / SWIFT",
     bankName: "Emri i bankës",
     saveChanges: "Ruaj ndryshimet",
     saved: "Profili u përditësua me sukses.",
@@ -330,6 +343,10 @@ export const sq: Dictionary = {
       nameRequired: "Emri është i detyrueshëm",
       advanceInvalid: "Shkruaj akontimin mujor si shumë në MKD, ose lëre bosh.",
       vatNumberRequired: "Shkruaj numrin e TVSH-së ose hiq shenjën e regjistrimit për TVSH.",
+      looksLikeEmbg:
+        "Kjo duket si numër personal (EMBG). Shkruaj numrin tatimor (EDB) ose lëre bosh: aplikacioni nuk e shtyp kurrë EMBG-në.",
+      ibanInvalid:
+        "Ky IBAN nuk është i saktë. Kopjoje nga dokumentet e bankës, p.sh. MK07 2501 2000 0058 984.",
     },
   },
   tax: {

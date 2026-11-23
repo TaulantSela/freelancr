@@ -9,6 +9,7 @@ import { updateProfile, type SettingsErrorKey } from "@/lib/actions/settings";
 import { Loader2 } from "lucide-react";
 import type { User } from "@/lib/db/schema";
 import { TAX_STATUSES, type TaxStatus } from "@/lib/tax/calculator";
+import { resolveBankDetails } from "@/lib/profile";
 import { useTranslations } from "@/lib/i18n/client";
 
 type State = { success?: boolean; errorKey?: SettingsErrorKey } | null;
@@ -24,6 +25,8 @@ export function SettingsForm({ user }: { user: User }) {
   const [state, action, pending] = useActionState(updateProfileAction, null);
   const [taxStatus, setTaxStatus] = useState<TaxStatus>(user.taxStatus);
   const [vatRegistered, setVatRegistered] = useState(user.vatRegistered);
+  // An IBAN saved in the old "Bank account (IBAN)" field shows up as the IBAN.
+  const bank = resolveBankDetails(user);
 
   return (
     <form action={action} className="space-y-5">
@@ -126,10 +129,30 @@ export function SettingsForm({ user }: { user: User }) {
             placeholder="4012345678901"
             className="font-mono"
           />
+          <p className="text-xs text-muted-foreground">{t.settings.taxNumberHint}</p>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="address">{t.settings.address}</Label>
           <Input id="address" name="address" defaultValue={user.address ?? ""} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="placeOfIssue">{t.settings.placeOfIssue}</Label>
+          <Input
+            id="placeOfIssue"
+            name="placeOfIssue"
+            defaultValue={user.placeOfIssue ?? ""}
+            placeholder={t.settings.placeOfIssuePlaceholder}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="signatoryName">{t.settings.signatoryName}</Label>
+          <Input
+            id="signatoryName"
+            name="signatoryName"
+            defaultValue={user.signatoryName ?? ""}
+            placeholder={user.name}
+          />
+          <p className="text-xs text-muted-foreground">{t.settings.signatoryNameHint}</p>
         </div>
       </div>
 
@@ -137,17 +160,39 @@ export function SettingsForm({ user }: { user: User }) {
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="bankAccount">{t.settings.bankAccount}</Label>
+          <Label htmlFor="bankName">{t.settings.bankName}</Label>
+          <Input id="bankName" name="bankName" defaultValue={bank.bankName ?? ""} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="iban">{t.settings.iban}</Label>
           <Input
-            id="bankAccount"
-            name="bankAccount"
-            defaultValue={user.bankAccount ?? ""}
+            id="iban"
+            name="iban"
+            defaultValue={bank.iban ?? ""}
+            placeholder="MK07 2501 2000 0058 984"
             className="font-mono"
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="bankName">{t.settings.bankName}</Label>
-          <Input id="bankName" name="bankName" defaultValue={user.bankName ?? ""} />
+          <Label htmlFor="bic">{t.settings.bic}</Label>
+          <Input
+            id="bic"
+            name="bic"
+            defaultValue={bank.bic ?? ""}
+            placeholder="KOBSMK2X"
+            className="font-mono"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="bankAccount">{t.settings.bankAccount}</Label>
+          <Input
+            id="bankAccount"
+            name="bankAccount"
+            defaultValue={bank.accountNumber ?? ""}
+            placeholder="300000000123456"
+            className="font-mono"
+          />
+          <p className="text-xs text-muted-foreground">{t.settings.bankAccountHint}</p>
         </div>
       </div>
 

@@ -13,6 +13,7 @@ import {
   isInvoiceLanguage,
 } from "@/lib/clients/config";
 import { isCountryCode } from "@/lib/clients/countries";
+import { looksLikeEmbg } from "@/lib/profile";
 import { eq, and, count } from "drizzle-orm";
 
 // A private person has no tax ID or contact person on file: the form hides
@@ -51,12 +52,14 @@ export async function createClient(formData: FormData) {
   if (!isSupportedCurrency(currency)) {
     return { errorKey: "currencyUnsupported" as const };
   }
+  const typeFields = readClientType(formData);
+  if (looksLikeEmbg(typeFields.taxId)) return { errorKey: "looksLikeEmbg" as const };
 
   await getDb().insert(clients).values({
     id: generateId(),
     userId: session.userId,
     name,
-    ...readClientType(formData),
+    ...typeFields,
     email: email || null,
     country,
     currency,
@@ -81,12 +84,14 @@ export async function updateClient(id: string, formData: FormData) {
   if (!isSupportedCurrency(currency)) {
     return { errorKey: "currencyUnsupported" as const };
   }
+  const typeFields = readClientType(formData);
+  if (looksLikeEmbg(typeFields.taxId)) return { errorKey: "looksLikeEmbg" as const };
 
   await getDb()
     .update(clients)
     .set({
       name,
-      ...readClientType(formData),
+      ...typeFields,
       email: (formData.get("email") as string) || null,
       country,
       currency,

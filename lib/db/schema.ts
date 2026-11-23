@@ -25,8 +25,20 @@ export const users = pgTable("users", {
   businessType: text("business_type").default("personal"),
   taxNumber: text("tax_number"),
   address: text("address"),
+  // The local account number (трансакциска сметка) clients in North
+  // Macedonia pay into. Before iban existed this field was labelled "IBAN",
+  // so an IBAN-looking value here is read as the IBAN (lib/profile.ts).
   bankAccount: text("bank_account"),
   bankName: text("bank_name"),
+  iban: text("iban"),
+  // BIC / SWIFT code of the bank.
+  bic: text("bic"),
+  // Place of issue printed on invoices (VAT law Art. 53(10) point 1).
+  placeOfIssue: text("place_of_issue"),
+  // The person authorised to sign invoices (Art. 53(10) point 10); invoices
+  // fall back to the user's name. The personal ID number (ЕМБГ) is never
+  // asked for or printed.
+  signatoryName: text("signatory_name"),
   // How the user is registered for tax, which decides their UJP deadlines
   // (see lib/tax/calculator.ts). Existing rows get the default.
   taxStatus: text("tax_status", { enum: TAX_STATUSES })
