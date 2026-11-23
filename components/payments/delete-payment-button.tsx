@@ -17,8 +17,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deletePayment } from "@/lib/actions/payments";
 import { useTranslations } from "@/lib/i18n/client";
+import { formatMessage } from "@/lib/i18n/format";
 
-export function DeletePaymentButton({ id }: { id: string }) {
+export function DeletePaymentButton({
+  id,
+  attachmentCount,
+}: {
+  id: string;
+  // Its files are deleted with it (ON DELETE CASCADE).
+  attachmentCount: number;
+}) {
   const t = useTranslations();
   const f = t.payments.form;
   const [pending, startTransition] = useTransition();
@@ -36,7 +44,10 @@ export function DeletePaymentButton({ id }: { id: string }) {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{f.deleteTitle}</AlertDialogTitle>
-          <AlertDialogDescription>{f.deleteDesc}</AlertDialogDescription>
+          <AlertDialogDescription>
+            {f.deleteDesc}
+            {attachmentCount > 0 && ` ${formatMessage(t.attachments.deleteWithPayment, { count: attachmentCount })}`}
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>

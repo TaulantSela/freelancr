@@ -551,6 +551,26 @@ export type Dictionary = {
       amount_mkd: string;
     };
   };
+  attachments: {
+    proofTitle: string;
+    contractsTitle: string;
+    none: string;
+    upload: string;
+    limits: string;
+    uploaded: string;
+    delete: string;
+    deleteTitle: string;
+    deleteDesc: string;
+    deleteWithPayment: string;
+    deleteWithClient: string;
+    errors: {
+      tooLarge: string;
+      type: string;
+      quota: string;
+      notFound: string;
+      invalid: string;
+    };
+  };
   settings: {
     title: string;
     subtitle: string;

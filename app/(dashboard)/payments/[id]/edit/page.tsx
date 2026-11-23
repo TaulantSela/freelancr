@@ -10,6 +10,8 @@ import { getTaxProfile } from "@/lib/tax/queries";
 import { getPayment } from "@/lib/payments/queries";
 import { PaymentForm } from "@/components/payments/payment-form";
 import { DeletePaymentButton } from "@/components/payments/delete-payment-button";
+import { AttachmentList } from "@/components/attachments/attachment-list";
+import { getPaymentAttachments } from "@/lib/attachments/queries";
 
 export default async function EditPaymentPage({
   params,
@@ -21,9 +23,10 @@ export default async function EditPaymentPage({
 
   const { id } = await params;
   const { t } = await getTranslations();
-  const [payment, { taxStatus }] = await Promise.all([
+  const [payment, { taxStatus }, files] = await Promise.all([
     getPayment(id, session.userId),
     getTaxProfile(session.userId),
+    getPaymentAttachments(id, session.userId),
   ]);
   if (!payment) notFound();
   const back = payment.invoiceId
@@ -38,7 +41,7 @@ export default async function EditPaymentPage({
             <ArrowLeft className="h-4 w-4" /> {back.label}
           </Button>
         </Link>
-        <DeletePaymentButton id={payment.id} />
+        <DeletePaymentButton id={payment.id} attachmentCount={files.length} />
       </div>
       <Card>
         <CardHeader>
@@ -52,6 +55,14 @@ export default async function EditPaymentPage({
             clients={[]}
             existing={{ ...payment, taxTreatment: payment.taxTreatment }}
           />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t.attachments.proofTitle}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AttachmentList owner={{ paymentId: payment.id }} items={files} />
         </CardContent>
       </Card>
     </div>

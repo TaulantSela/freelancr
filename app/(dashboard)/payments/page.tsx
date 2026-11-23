@@ -22,6 +22,8 @@ import {
 } from "@/lib/tax/payments";
 import { MonthUjpActions, UseNbrsmRatesButton } from "@/components/payments/month-actions";
 import { TaxCalendar } from "@/components/payments/tax-calendar";
+import { AttachmentCount } from "@/components/attachments/attachment-list";
+import { getPaymentAttachmentCounts } from "@/lib/attachments/queries";
 import type { Dictionary } from "@/lib/i18n/types";
 
 const STATUS_COLORS: Record<UjpMonthStatus, string> = {
@@ -72,6 +74,10 @@ export default async function PaymentsPage({
     getPaymentsReceived(session.userId, `${year - 1}-12-01`, `${year}-12-31`),
   ]);
   const rows = fetched.filter((r) => r.receivedOn >= `${year}-01-01`);
+  const fileCounts = await getPaymentAttachmentCounts(
+    session.userId,
+    rows.map((r) => r.id)
+  );
   const yearOptions = [...new Set([currentYear, year, ...years])].sort((a, b) => b - a);
   const notRegistered = taxStatus === "paid_from_abroad";
   const months = summarizeMonths(rows, today);
@@ -200,6 +206,7 @@ export default async function PaymentsPage({
             key={month.month}
             month={month}
             rows={rows.filter((r) => r.receivedOn.startsWith(`${month.month}-`))}
+            fileCounts={fileCounts}
             notRegistered={notRegistered}
             today={today}
             t={t}
@@ -223,12 +230,15 @@ export default async function PaymentsPage({
 function MonthCard({
   month,
   rows,
+  fileCounts,
   notRegistered,
   today,
   t,
 }: {
   month: MonthSummary;
   rows: PaymentRow[];
+  // payment id -> its proof files
+  fileCounts: ReadonlyMap<string, number>;
   notRegistered: boolean;
   today: string;
   t: Dictionary;
@@ -274,6 +284,7 @@ function MonthCard({
                   )}
                 </span>
                 <span className="flex items-center gap-2">
+                  <AttachmentCount count={fileCounts.get(r.id) ?? 0} />
                   <span className="font-mono">
                     {r.currency !== "MKD" && `× ${r.rateToMKD} `}
                     {r.rateSource !== "nbrsm" && (

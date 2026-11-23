@@ -2,11 +2,13 @@ import {
   pgTable,
   text,
   doublePrecision,
+  integer,
   timestamp,
   boolean,
   uniqueIndex,
   index,
   check,
+  customType,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { DEFAULT_TAX_STATUS, TAX_STATUSES } from "../tax/calculator";
@@ -246,6 +248,41 @@ export const creditNotes = pgTable("credit_notes", {
   check("credit_notes_amount_positive", sql`${table.amount} > 0`),
   check("credit_notes_ddv_amount_not_negative", sql`${table.ddvAmount} >= 0`),
   check("credit_notes_rate_positive", sql`${table.rateToMKD} > 0`),
+]);
+
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+});
+
+// Files kept as proof: a payment's (the bank statement, the contract or
+// confirmation е-ПДД needs) or a client's (contracts). Exactly one of the
+// two is set, and the file goes when its payment or client does. The bytes
+// are only ever selected by the download route (lib/attachments/queries.ts).
+export const attachments = pgTable("attachments", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  paymentId: text("payment_id").references(() => payments.id, { onDelete: "cascade" }),
+  clientId: text("client_id").references(() => clients.id, { onDelete: "cascade" }),
+  filename: text("filename").notNull(),
+  // From the file's first bytes, never from what the browser sent.
+  contentType: text("content_type").notNull(),
+  sizeBytes: integer("size_bytes").notNull(),
+  data: bytea("data").notNull(),
+  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+}, (table) => [
+  index("attachments_user_id_idx").on(table.userId),
+  index("attachments_payment_id_idx").on(table.paymentId),
+  index("attachments_client_id_idx").on(table.clientId),
+  check("attachments_one_owner", sql`num_nonnulls(${table.paymentId}, ${table.clientId}) = 1`),
+  check("attachments_size", sql`${table.sizeBytes} > 0 and ${table.sizeBytes} <= 4194304`),
+  check(
+    "attachments_content_type",
+    sql`${table.contentType} in ('application/pdf', 'image/png', 'image/jpeg')`
+  ),
 ]);
 
 // The National Bank's middle rates, cached per day and currency
