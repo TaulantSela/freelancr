@@ -26,7 +26,7 @@ export type Dictionary = {
     dashboard: string;
     clients: string;
     invoices: string;
-    incomeTax: string;
+    payments: string;
     settings: string;
   };
   auth: {
@@ -427,29 +427,6 @@ export type Dictionary = {
         notFound: string;
       };
     };
-  };
-  income: {
-    title: string;
-    subtitle: string;
-    grossIncome: string;
-    invoicesPaid: string;
-    ddvThresholdPct: string;
-    ddvMonitor: string;
-    currentAnnual: string;
-    alert70: string;
-    alert85: string;
-    alert100: string;
-    ddvExceededMsg: string;
-    ddvWarningMsg: string;
-    taxDeadlines: string;
-    passed: string;
-    daysAway: string;
-    dueToday: string;
-    dueTomorrow: string;
-    monthlyBreakdown: string;
-    annualTotal: string;
-    byClient: string;
-    invShort: string;
   };
   settings: {
     title: string;

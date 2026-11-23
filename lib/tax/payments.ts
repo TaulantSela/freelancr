@@ -134,6 +134,9 @@ export type MonthSummary = {
   reportBy: string;
   payBy: string;
   status: UjpMonthStatus;
+  // Every self-reported payment is filed (or approved, or paid): what's
+  // left, if anything, is paying. False when there's none.
+  filed: boolean;
   // Some payment converts at a rate that isn't the National Bank's for its
   // day: copied from the invoice (backfilled) or typed in by hand.
   hasOtherRates: boolean;
@@ -190,6 +193,7 @@ export function summarizeMonths(
       reportBy,
       payBy,
       status: ujpMonthStatus(selfStatuses, reportBy, payBy, today),
+      filed: selfStatuses.length > 0 && selfStatuses.every((s) => s !== null && s !== "to_file"),
       hasOtherRates: list.some((p) => p.rateSource !== "nbrsm"),
     });
   }
@@ -261,6 +265,19 @@ export function owedToUjp(months: readonly MonthSummary[], today: string): OwedT
     current: months.find((m) => m.month === currentMonth) ?? null,
     totalUnpaidMKD: roundDeni(open.reduce((s, m) => s + m.unpaidOwedMKD, 0)),
   };
+}
+
+// Whether a month's deadline is already met: its calculation filed (report)
+// or its tax paid (pay). The other deadlines (advances, annual ones) aren't
+// tracked, so they never are.
+export function deadlineMet(
+  deadline: { kind: string; period: string },
+  months: ReadonlyMap<string, MonthSummary>
+): boolean {
+  const month = months.get(deadline.period);
+  if (deadline.kind === "report") return Boolean(month?.filed);
+  if (deadline.kind === "pay") return month?.status === "paid";
+  return false;
 }
 
 // The months with self-reported income, for the deadline calendar.

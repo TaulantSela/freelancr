@@ -9,7 +9,7 @@ import {
   FileText,
   Settings,
   LogOut,
-  TrendingUp,
+  Wallet,
 } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, key: "dashboard" as const },
   { href: "/clients", icon: Users, key: "clients" as const },
   { href: "/invoices", icon: FileText, key: "invoices" as const },
-  { href: "/income", icon: TrendingUp, key: "incomeTax" as const },
+  { href: "/payments", icon: Wallet, key: "payments" as const },
   { href: "/settings", icon: Settings, key: "settings" as const },
 ];
 

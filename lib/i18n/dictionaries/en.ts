@@ -27,7 +27,7 @@ export const en: Dictionary = {
     dashboard: "Dashboard",
     clients: "Clients",
     invoices: "Invoices",
-    incomeTax: "Income & Tax",
+    payments: "Payments",
     settings: "Settings",
   },
   auth: {
@@ -487,30 +487,6 @@ export const en: Dictionary = {
       },
     },
   },
-  income: {
-    title: "Income & Tax",
-    subtitle: "Annual overview for {year} — paid invoices only",
-    grossIncome: "Gross income",
-    invoicesPaid: "{count} invoices paid",
-    ddvThresholdPct: "DDV threshold",
-    ddvMonitor: "DDV Threshold Monitor",
-    currentAnnual: "Supplies in North Macedonia this year",
-    alert70: "70% alert",
-    alert85: "85% alert (critical)",
-    alert100: "100% — DDV registration required",
-    ddvExceededMsg:
-      "You're over the DDV threshold. Apply for DDV registration by the 15th of the month after the one you passed it in (VAT law Art. 51(11)); talk to your accountant.",
-    ddvWarningMsg: "At this rate, you may reach the threshold before year end. {remaining} remaining.",
-    taxDeadlines: "Tax deadlines {year}",
-    passed: "Passed",
-    daysAway: "{days} days away",
-    dueToday: "Due today",
-    dueTomorrow: "Due tomorrow",
-    monthlyBreakdown: "Monthly income breakdown ({year})",
-    annualTotal: "Annual total",
-    byClient: "Income by client",
-    invShort: "inv.",
-  },
   settings: {
     title: "Settings",
     subtitle: "Your profile and business details appear on invoices.",
@@ -559,7 +535,7 @@ export const en: Dictionary = {
   tax: {
     statusLabel: "How are you registered for tax?",
     statusHint:
-      "This decides which tax deadlines the dashboard and the Income & Tax page show.",
+      "This decides which tax deadlines the dashboard and the Payments page show, and how the tax on new payments is worked out.",
     statuses: {
       paid_from_abroad: "Not registered for an activity",
       self_employed: "Registered self-employed",
@@ -586,7 +562,7 @@ export const en: Dictionary = {
     ],
     rules: {
       paid_from_abroad:
-        "For each month in which a client abroad or a private person in North Macedonia paid you, submit the tax calculation (е-ПДД) to UJP by the 10th of the next month and pay the tax by the 15th. Companies in North Macedonia withhold the tax when they pay you, so their invoices don't add a month.",
+        "For each month in which a client abroad or a private person in North Macedonia paid you, submit the tax calculation (е-ПДД) to UJP by the 10th of the next month and pay the tax by the 15th. Companies in North Macedonia withhold the tax when they pay you, so their payments don't add a month.",
       self_employed:
         "Pay an income tax advance by the 15th of each month for the previous month. File the annual tax balance (ПДД-ДБ) and the statement of income and expenses by 15 March of the next year, and pay any difference by 30 March.",
     },
@@ -632,7 +608,7 @@ export const en: Dictionary = {
         "Nothing to pay yet. When a client abroad or a private person in North Macedonia pays an invoice and you mark it paid, the tax on it (10%) shows up here.",
       note:
         "Approximate: 10% of what these clients paid, at the exchange rate stored on each invoice. UJP converts at the National Bank's (NBRSM) middle rate on the day the money arrived, which the app doesn't use yet, and income from author's rights is taxed after deemed costs (Personal Income Tax law, Art. 40), so this can be more than you owe. The calculation UJP approves is the real figure.",
-      groupAmount: "Tax ≈ {amount}",
+      groupAmount: "Tax: {amount}",
       advanceTile: "Advance due by {date}",
       advanceHint:
         "Enter your monthly advance to see it here. It's 1/12 of the tax in last year's annual tax balance, which the app can't work out: take it from your balance or ask your accountant.",

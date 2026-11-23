@@ -27,7 +27,7 @@ export const sq: Dictionary = {
     dashboard: "Paneli",
     clients: "Klientët",
     invoices: "Faturat",
-    incomeTax: "Të ardhurat & Tatimi",
+    payments: "Pagesat",
     settings: "Cilësimet",
   },
   auth: {
@@ -489,30 +489,6 @@ export const sq: Dictionary = {
       },
     },
   },
-  income: {
-    title: "Të ardhurat & Tatimi",
-    subtitle: "Përmbledhje vjetore për {year} — vetëm fatura të paguara",
-    grossIncome: "Të ardhurat bruto",
-    invoicesPaid: "{count} fatura të paguara",
-    ddvThresholdPct: "Pragu TVSH",
-    ddvMonitor: "Monitor i pragut TVSH",
-    currentAnnual: "Furnizimet në Maqedoninë e Veriut këtë vit",
-    alert70: "Alarm 70%",
-    alert85: "Alarm 85% (kritik)",
-    alert100: "100% — kërkohet regjistrim TVSH",
-    ddvExceededMsg:
-      "E ke kaluar pragun e TVSH-së. Dorëzo kërkesën për regjistrim për TVSH deri më 15 të muajit pas atij në të cilin e kalove (Ligji për TVSH, neni 51 paragrafi 11); fol me kontabilistin.",
-    ddvWarningMsg: "Me këtë ritëm mund ta arrish pragun para fundvitit. {remaining} mbeten.",
-    taxDeadlines: "Afatet tatimore {year}",
-    passed: "Kaluar",
-    daysAway: "për {days} ditë",
-    dueToday: "Afati është sot",
-    dueTomorrow: "Afati është nesër",
-    monthlyBreakdown: "Ndarja mujore e të ardhurave ({year})",
-    annualTotal: "Totali vjetor",
-    byClient: "Të ardhurat sipas klientit",
-    invShort: "faturë",
-  },
   settings: {
     title: "Cilësimet",
     subtitle: "Profili dhe detajet e biznesit shfaqen në fatura.",
@@ -561,7 +537,7 @@ export const sq: Dictionary = {
   tax: {
     statusLabel: "Si je regjistruar për tatime?",
     statusHint:
-      "Nga kjo varet se cilat afate tatimore shfaqen në panel dhe në faqen „Të ardhurat & Tatimi”.",
+      "Nga kjo varet se cilat afate tatimore shfaqen në panel dhe në faqen „Pagesat”, dhe si llogaritet tatimi për pagesat e reja.",
     statuses: {
       paid_from_abroad: "Pa veprimtari të regjistruar",
       self_employed: "Vetëpunësim i regjistruar",
@@ -588,7 +564,7 @@ export const sq: Dictionary = {
     ],
     rules: {
       paid_from_abroad:
-        "Për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut, dorëzo llogaritjen tatimore (е-ПДД) në UJP deri më 10 dhe paguaj tatimin deri më 15 të muajit pasues. Kompanitë në Maqedoninë e Veriut e mbajnë tatimin kur të paguajnë, ndaj faturat e tyre nuk shtojnë muaj.",
+        "Për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut, dorëzo llogaritjen tatimore (е-ПДД) në UJP deri më 10 dhe paguaj tatimin deri më 15 të muajit pasues. Kompanitë në Maqedoninë e Veriut e mbajnë tatimin kur të paguajnë, ndaj pagesat e tyre nuk shtojnë muaj.",
       self_employed:
         "Akontimi i tatimit paguhet deri më 15 të çdo muaji për muajin e kaluar. Bilanci tatimor vjetor (ПДД-ДБ) dhe pasqyra e të ardhurave dhe shpenzimeve dorëzohen deri më 15 mars të vitit pasues, dhe diferenca paguhet deri më 30 mars.",
     },
@@ -635,7 +611,7 @@ export const sq: Dictionary = {
         "Ende s'ka asgjë për të paguar. Kur një klient nga jashtë ose një person fizik në Maqedoninë e Veriut paguan një faturë dhe e shënon si të paguar, tatimi mbi të (10%) shfaqet këtu.",
       note:
         "Përafërsisht: 10% e asaj që kanë paguar këta klientë, me kursin e ruajtur në çdo faturë. UJP konverton me kursin mesatar të Bankës Popullore (NBRSM) në ditën kur arritën paratë, të cilin aplikacioni ende nuk e përdor, dhe të ardhurat nga të drejtat e autorit tatohen pas shpenzimeve të normuara (Ligji për tatimin mbi të ardhurat personale, neni 40), ndaj shuma mund të jetë më e madhe se sa detyrohesh. Shuma e vërtetë është ajo në llogaritjen që e miraton UJP.",
-      groupAmount: "Tatimi ≈ {amount}",
+      groupAmount: "Tatimi: {amount}",
       advanceTile: "Akontimi deri më {date}",
       advanceHint:
         "Shkruaj akontimin mujor që ta shohësh këtu. Ai është 1/12 e tatimit në bilancin tatimor vjetor të vitit të kaluar, që aplikacioni nuk mund ta llogarisë: merre nga bilanci ose pyet kontabilistin.",
