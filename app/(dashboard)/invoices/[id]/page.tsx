@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { getInvoiceDetail } from "@/lib/invoices/queries";
 import { formatDate } from "@/lib/utils";
@@ -48,6 +48,14 @@ export default async function InvoiceDetailPage({
           <span className="text-sm font-mono font-medium">{title}</span>
         </div>
         <div className="flex items-center gap-2">
+          {isDraft && (
+            <Link href={`/invoices/${invoice.id}/edit`}>
+              <Button size="sm" variant="outline" className="gap-1.5">
+                <Pencil className="h-3.5 w-3.5" />
+                {t.common.edit}
+              </Button>
+            </Link>
+          )}
           {isDraft && <IssueInvoiceButton id={invoice.id} year={invoice.date.slice(0, 4)} />}
           <DownloadPdfButton invoiceId={invoice.id} />
           <DeleteInvoiceButton id={invoice.id} number={invoice.number} />

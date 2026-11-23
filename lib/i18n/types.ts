@@ -150,6 +150,7 @@ export type Dictionary = {
     colStatus: string;
     newTitle: string;
     newBreadcrumb: string;
+    editTitle: string;
     needClient: string;
     addFirstClient: string;
     downloadPdf: string;
@@ -207,6 +208,8 @@ export type Dictionary = {
       notes: string;
       notesPlaceholder: string;
       submit: string;
+      saveDraft: string;
+      notDraft: string;
       fillItems: string;
       currencyUnsupported: string;
       requiredFields: string;

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { NewInvoiceForm } from "@/components/invoices/new-invoice-form";
+import { InvoiceForm } from "@/components/invoices/invoice-form";
 import { getTranslations } from "@/lib/i18n/server";
 import { addDays, toSkopjeDate } from "@/lib/tax/calculator";
 
@@ -54,7 +54,7 @@ export default async function NewInvoicePage() {
               </Link>
             </div>
           ) : (
-            <NewInvoiceForm
+            <InvoiceForm
               clients={clientList}
               vatRegistered={user?.vatRegistered ?? false}
               today={today}
