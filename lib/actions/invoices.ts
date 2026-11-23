@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getDb, invoices, invoiceItems } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId, generateInvoiceNumber } from "@/lib/utils";
-import { getRateToMKD } from "@/lib/tax/calculator";
+import { getRateToMKD, isSupportedCurrency } from "@/lib/tax/calculator";
 import { eq, and } from "drizzle-orm";
 
 export async function createInvoice(formData: FormData) {
@@ -25,6 +25,10 @@ export async function createInvoice(formData: FormData) {
 
   if (!clientId || !date || items.length === 0) {
     return { error: "Client, date, and at least one item are required" };
+  }
+
+  if (!isSupportedCurrency(currency)) {
+    return { errorKey: "currencyUnsupported" as const };
   }
 
   const existingInvoices = await getDb()

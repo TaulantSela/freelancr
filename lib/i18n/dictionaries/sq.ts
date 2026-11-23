@@ -251,6 +251,7 @@ export const sq: Dictionary = {
       notes: "Shënime",
       submit: "Shto klient",
       nameRequired: "Emri i klientit është i detyrueshëm",
+      currencyUnsupported: "Zgjidh një nga monedhat e listuara",
     },
     deleteTitle: "Fshi {name}?",
     deleteDesc:
@@ -342,6 +343,7 @@ export const sq: Dictionary = {
       notesPlaceholder: "Llogaria bankare, kushtet, falenderim…",
       submit: "Krijo faturë",
       fillItems: "Plotëso të gjithë artikujt me përshkrim dhe çmim",
+      currencyUnsupported: "Kjo monedhë nuk mbështetet. Zgjidh një nga monedhat e listuara.",
     },
     status: {
       draft: "Draft",

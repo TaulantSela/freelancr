@@ -14,7 +14,7 @@ import type { Client } from "@/lib/db/schema";
 
 const COUNTRY_CODES = ["MK", "US", "DE", "NL", "GB", "FR", "CH", "AU", "CA", "XK", "RS", "HR", "OTHER"] as const;
 
-type State = { errorKey?: "nameRequired" } | null;
+type State = { errorKey?: "nameRequired" | "currencyUnsupported" } | null;
 
 async function createClientAction(_prev: State, formData: FormData): Promise<State> {
   const result = await createClient(formData);

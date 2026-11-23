@@ -251,6 +251,7 @@ export const en: Dictionary = {
       notes: "Notes",
       submit: "Add client",
       nameRequired: "Client name is required",
+      currencyUnsupported: "Choose one of the listed currencies",
     },
     deleteTitle: "Delete {name}?",
     deleteDesc:
@@ -342,6 +343,7 @@ export const en: Dictionary = {
       notesPlaceholder: "Bank account details, payment terms, thank you note…",
       submit: "Create invoice",
       fillItems: "Fill in all line items with a description and price",
+      currencyUnsupported: "This currency isn't supported. Choose one of the listed currencies.",
     },
     status: {
       draft: "Draft",

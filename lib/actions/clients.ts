@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getDb, clients } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { generateId } from "@/lib/utils";
+import { isSupportedCurrency } from "@/lib/tax/calculator";
 import { eq, and } from "drizzle-orm";
 
 export async function createClient(formData: FormData) {
@@ -15,12 +16,15 @@ export async function createClient(formData: FormData) {
   const email = formData.get("email") as string;
   const taxId = formData.get("taxId") as string;
   const country = formData.get("country") as string;
-  const currency = formData.get("currency") as string;
+  const currency = (formData.get("currency") as string) || "EUR";
   const address = formData.get("address") as string;
   const contactPerson = formData.get("contactPerson") as string;
   const notes = formData.get("notes") as string;
 
   if (!name) return { errorKey: "nameRequired" as const };
+  if (!isSupportedCurrency(currency)) {
+    return { errorKey: "currencyUnsupported" as const };
+  }
 
   await getDb().insert(clients).values({
     id: generateId(),
@@ -29,7 +33,7 @@ export async function createClient(formData: FormData) {
     email: email || null,
     taxId: taxId || null,
     country: country || "MK",
-    currency: currency || "EUR",
+    currency,
     address: address || null,
     contactPerson: contactPerson || null,
     notes: notes || null,
@@ -44,7 +48,11 @@ export async function updateClient(id: string, formData: FormData) {
   if (!session) redirect("/sign-in");
 
   const name = formData.get("name") as string;
+  const currency = (formData.get("currency") as string) || "EUR";
   if (!name) return { errorKey: "nameRequired" as const };
+  if (!isSupportedCurrency(currency)) {
+    return { errorKey: "currencyUnsupported" as const };
+  }
 
   await getDb()
     .update(clients)
@@ -53,7 +61,7 @@ export async function updateClient(id: string, formData: FormData) {
       email: (formData.get("email") as string) || null,
       taxId: (formData.get("taxId") as string) || null,
       country: (formData.get("country") as string) || "MK",
-      currency: (formData.get("currency") as string) || "EUR",
+      currency,
       address: (formData.get("address") as string) || null,
       contactPerson: (formData.get("contactPerson") as string) || null,
       notes: (formData.get("notes") as string) || null,

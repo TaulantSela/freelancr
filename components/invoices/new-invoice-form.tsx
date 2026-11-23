@@ -84,7 +84,8 @@ export function NewInvoiceForm({
 
     startTransition(async () => {
       const result = await createInvoice(fd);
-      if (result?.error) toast.error(result.error);
+      if (result?.errorKey) toast.error(f[result.errorKey]);
+      else if (result?.error) toast.error(result.error);
     });
   }
 

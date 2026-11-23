@@ -150,6 +150,7 @@ export type Dictionary = {
       notes: string;
       submit: string;
       nameRequired: string;
+      currencyUnsupported: string;
     };
     deleteTitle: string;
     deleteDesc: string;
@@ -224,6 +225,7 @@ export type Dictionary = {
       notesPlaceholder: string;
       submit: string;
       fillItems: string;
+      currencyUnsupported: string;
     };
     status: {
       draft: string;

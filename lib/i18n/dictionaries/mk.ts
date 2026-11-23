@@ -251,6 +251,7 @@ export const mk: Dictionary = {
       notes: "Белешки",
       submit: "Додај клиент",
       nameRequired: "Името на клиентот е задолжително",
+      currencyUnsupported: "Изберете една од понудените валути",
     },
     deleteTitle: "Избриши {name}?",
     deleteDesc:
@@ -342,6 +343,7 @@ export const mk: Dictionary = {
       notesPlaceholder: "Банкарска сметка, услови, благодарност…",
       submit: "Креирај фактура",
       fillItems: "Пополнете ги сите ставки со опис и цена",
+      currencyUnsupported: "Оваа валута не е поддржана. Изберете една од понудените валути.",
     },
     status: {
       draft: "Нацрт",
