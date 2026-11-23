@@ -109,7 +109,7 @@ export const sq: Dictionary = {
     mustRegister: "Duhet regjistrim TVSH",
     notRequired: "Ende nuk kërkohet",
     ddvLocalOnly:
-      "Numërohen faturat për klientët në Maqedoninë e Veriut sipas datës së furnizimit, të paguara ose jo. Shërbimet për klientët jashtë vendit kryhen jashtë (Ligji për TVSH, neni 14-а), ndaj nuk numërohen në prag.",
+      "Numërohen faturat për klientët në Maqedoninë e Veriut sipas datës së furnizimit, të paguara ose jo, dhe pagesat e tyre pa faturë sipas ditës së pranimit. Shërbimet për klientët jashtë vendit kryhen jashtë (Ligji për TVSH, neni 14-а), ndaj nuk numërohen në prag.",
     nextDeadline: "Afati i ardhshëm tatimor",
     daysAway: "{date} — për {days} ditë",
     dueToday: "{date} — sot",

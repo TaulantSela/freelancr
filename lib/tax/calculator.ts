@@ -64,18 +64,31 @@ export type ThresholdInvoice = {
   totalMKD: number;
 };
 
+// A payment without an invoice (a platform's payout, a one-off job).
+export type ThresholdPayout = {
+  clientCountry: string;
+  // The day it was received, "YYYY-MM-DD".
+  receivedOn: string;
+  // What the client paid for it, in MKD: credited + fees + tax withheld,
+  // at the payment's rate.
+  valueMKD: number;
+};
+
 // What counts toward the DDV threshold in `year`. "Total turnover" is the
 // turnover taxable under Art. 2(1), i.e. supplies made in North Macedonia
 // (Art. 51(2)). A service to a taxable person abroad is supplied where that
 // person is established (Art. 14-а(2)), and so are most services a freelancer
 // sells to private persons abroad (Art. 14-а(6): consulting, engineering,
 // data processing, electronic services, copyright and the like), so they
-// don't count. The app takes "supplied in North Macedonia" to mean "invoiced
-// to a client in North Macedonia": every issued, not cancelled invoice to a
-// client there, paid or not, by its date of supply in the year.
+// don't count. The app takes "supplied in North Macedonia" to mean "done for
+// a client in North Macedonia": every issued, not cancelled invoice to a
+// client there, paid or not, by its date of supply in the year, and every
+// payment without an invoice from a client there, by the day it was received
+// (there's no date of supply without an invoice).
 export function getLocalSupplies(
   invoices: readonly ThresholdInvoice[],
-  year: number
+  year: number,
+  payouts: readonly ThresholdPayout[] = []
 ): { totalMKD: number; count: number } {
   let totalMKD = 0;
   let count = 0;
@@ -85,6 +98,12 @@ export function getLocalSupplies(
     const supplied = invoice.supplyDate ?? invoice.date;
     if (!supplied.startsWith(`${year}-`)) continue;
     totalMKD += invoice.totalMKD;
+    count++;
+  }
+  for (const payout of payouts) {
+    if (payout.clientCountry !== "MK") continue;
+    if (!payout.receivedOn.startsWith(`${year}-`)) continue;
+    totalMKD += payout.valueMKD;
     count++;
   }
   return { totalMKD, count };

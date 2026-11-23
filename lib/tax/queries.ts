@@ -1,11 +1,12 @@
-import { and, eq, sql } from "drizzle-orm";
-import { getDb, invoices, clients, users } from "@/lib/db";
+import { and, eq, gte, isNull, lte, sql } from "drizzle-orm";
+import { getDb, invoices, clients, users, payments } from "@/lib/db";
 import {
   DEFAULT_TAX_STATUS,
   isTaxStatus,
   type SelfReportedPayment,
   type TaxStatus,
   type ThresholdInvoice,
+  type ThresholdPayout,
 } from "./calculator";
 
 export type TaxProfile = {
@@ -92,4 +93,29 @@ export async function getPaidInvoicesForDeadlines(
     ...row,
     amountMKD: subtotal * exchangeRateMKD,
   }));
+}
+
+// Payments without an invoice received in `year`, with the payer's country;
+// getLocalSupplies() counts the ones from clients in North Macedonia.
+export async function getPayoutsForThreshold(
+  userId: string,
+  year: number
+): Promise<ThresholdPayout[]> {
+  const rows = await getDb()
+    .select({
+      clientCountry: clients.country,
+      receivedOn: payments.receivedOn,
+      valueMKD: sql<number>`(${payments.amount} + ${payments.fees} + ${payments.taxWithheld}) * ${payments.rateToMKD}`,
+    })
+    .from(payments)
+    .innerJoin(clients, eq(payments.clientId, clients.id))
+    .where(
+      and(
+        eq(payments.userId, userId),
+        isNull(payments.invoiceId),
+        gte(payments.receivedOn, `${year}-01-01`),
+        lte(payments.receivedOn, `${year}-12-31`)
+      )
+    );
+  return rows.map((r) => ({ ...r, valueMKD: Number(r.valueMKD) }));
 }

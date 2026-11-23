@@ -17,6 +17,7 @@ import {
   getTaxProfile,
   getPaidInvoicesForDeadlines,
   getInvoicesForThreshold,
+  getPayoutsForThreshold,
 } from "@/lib/tax/queries";
 import { formatTaxDate, formatTaxPeriod, taxDeadlineLabel } from "@/lib/tax/labels";
 import { formatDate, cn } from "@/lib/utils";
@@ -101,7 +102,11 @@ export default async function DashboardPage() {
   const thisYear = Number(today.slice(0, 4));
   const localSupplies = vatRegistered
     ? { totalMKD: 0, count: 0 }
-    : getLocalSupplies(await getInvoicesForThreshold(session.userId, thisYear), thisYear);
+    : getLocalSupplies(
+        await getInvoicesForThreshold(session.userId, thisYear),
+        thisYear,
+        await getPayoutsForThreshold(session.userId, thisYear)
+      );
   const showDdv = !vatRegistered && localSupplies.count > 0;
   const ddvStatus = getDDVStatus(localSupplies.totalMKD);
   const notRegistered = taxStatus === "paid_from_abroad";
