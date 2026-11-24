@@ -74,11 +74,12 @@ export function parseNbrsmRates(json: unknown): NbrsmRate[] {
 export async function fetchNbrsmRates(
   from: string,
   to: string,
-  fetchImpl: typeof fetch = fetch
+  fetchImpl: typeof fetch = fetch,
+  timeoutMs: number = NBRSM_TIMEOUT_MS
 ): Promise<NbrsmRate[] | null> {
   try {
     const res = await fetchImpl(nbrsmUrl(from, to), {
-      signal: AbortSignal.timeout(NBRSM_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
       cache: "no-store",
       headers: { accept: "application/json" },
     });

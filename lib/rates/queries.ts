@@ -87,3 +87,34 @@ export async function getRatesForRange(
           );
   return new Map(rows.map((r) => [r.id, r.rate]));
 }
+
+// The middle rates for these days and currencies, keyed "YYYY-MM-DD:EUR":
+// from the cache, and whatever is missing in one request for the days it
+// spans (cached too). What the service can't give within `timeoutMs` is
+// left out, for the caller to fall back on.
+export async function getRatesFor(
+  wanted: readonly { date: string; currency: string }[],
+  { timeoutMs }: { timeoutMs?: number } = {}
+): Promise<Map<string, number>> {
+  const ids = [
+    ...new Set(wanted.filter((w) => w.currency !== "MKD").map((w) => `${w.date}:${w.currency}`)),
+  ];
+  const rates = new Map<string, number>();
+  if (ids.length === 0) return rates;
+  const cached = await getDb()
+    .select({ id: exchangeRateCache.id, rate: exchangeRateCache.rate })
+    .from(exchangeRateCache)
+    .where(and(inArray(exchangeRateCache.id, ids), eq(exchangeRateCache.source, "nbrsm")));
+  for (const r of cached) rates.set(r.id, r.rate);
+  const missingDays = ids.filter((id) => !rates.has(id)).map((id) => id.slice(0, 10)).sort();
+  if (missingDays.length === 0) return rates;
+  const fetched = await fetchNbrsmRates(missingDays[0], missingDays[missingDays.length - 1], fetch, timeoutMs);
+  if (!fetched) return rates;
+  await cacheRates(fetched);
+  const wantedIds = new Set(ids);
+  for (const r of fetched) {
+    const id = `${r.date}:${r.code}`;
+    if (wantedIds.has(id)) rates.set(id, r.rate);
+  }
+  return rates;
+}
