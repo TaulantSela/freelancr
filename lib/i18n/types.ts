@@ -436,6 +436,29 @@ export type Dictionary = {
     businessGross: string;
     otherRatesFlag: string;
     evidenceHint: string;
+    epdd: {
+      title: string;
+      intro: string;
+      // "Payment {n} of {count}: {client}"
+      payment: string;
+      receivedOn: string;
+      country: string;
+      currency: string;
+      amount: string;
+      // "exactly {amount}"
+      exact: string;
+      taxPaidAbroad: string;
+      taxPaidAbroadHint: string;
+      kind: string;
+      kindServices: string;
+      // "{rate}" is a percentage
+      kindAuthor: string;
+      ujpWill: string;
+      ujpLine: string;
+      ujpLineNoCredit: string;
+      total: string;
+      totalNote: string;
+    };
     treatments: {
       business: string;
       withheld: string;
