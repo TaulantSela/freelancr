@@ -11,10 +11,11 @@ import { emailHtml } from "@/lib/email/html";
 import { getDictionary } from "@/lib/i18n/server";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
 import { formatMessage } from "@/lib/i18n/format";
-import { dueReminders, isReminderDay, previousMonth, type PlannedReminder } from "./plan";
+import { dueReminders, inWindow, isReminderDay, previousMonth, type PlannedReminder } from "./plan";
 
 // At most this many emails a run, one at a time with a pause (Resend's free
-// tier takes about 2 a second); anything left goes out on a later run.
+// tier takes about 2 a second); anything left goes out on the next day's run
+// while the reminder is still due (lib/reminders/plan.ts).
 export const REMINDERS_PER_RUN = 100;
 const PAUSE_MS = 600;
 
@@ -22,7 +23,7 @@ type Recipient = { id: string; email: string; name: string; locale: string };
 
 // The reminders due today (Skopje) for every user who wants them (not demo
 // accounts), each sent once: the log row goes in first, and only a row that
-// went in is sent; a failed send deletes it so a later run can retry.
+// went in is sent; a failed send deletes it so the next run can retry.
 export async function runReminders(now: Date): Promise<{ due: number; sent: number; failed: number }> {
   const today = toSkopjeDate(now);
   const result = { due: 0, sent: 0, failed: 0 };
@@ -52,7 +53,7 @@ export async function runReminders(now: Date): Promise<{ due: number; sent: numb
     if (user.taxStatus !== "self_employed") {
       const rows = await getPaymentsReceived(user.id, `${lastMonth}-01`, `${lastMonth}-31`);
       summary = summarizeMonths(rows, today).find((m) => m.month === lastMonth) ?? null;
-      if (today.slice(5) === "05-20") {
+      if (inWindow("annual-return", today)) {
         const [any] = await db
           .select({ id: payments.id })
           .from(payments)
