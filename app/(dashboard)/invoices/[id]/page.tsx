@@ -14,6 +14,9 @@ import { DownloadPdfButton } from "@/components/invoices/download-pdf-button";
 import { IssueInvoiceButton } from "@/components/invoices/issue-invoice-button";
 import { CancelInvoiceButton } from "@/components/invoices/cancel-invoice-button";
 import { DuplicateInvoiceButton } from "@/components/invoices/duplicate-invoice-button";
+import { EmailInvoiceButton } from "@/components/invoices/email-invoice-button";
+import { getInvoiceEmailLog, invoiceEmailDefaults } from "@/lib/invoices/emails";
+import { isEmailConfigured } from "@/lib/email/config";
 import { CreditNoteForm } from "@/components/credit-notes/credit-note-form";
 import { DeleteCreditNoteButton } from "@/components/credit-notes/delete-credit-note-button";
 import { getInvoiceCreditNotes, getLatestCreditNoteId } from "@/lib/credit-notes/queries";
@@ -38,11 +41,12 @@ export default async function InvoiceDetailPage({
   const { id } = await params;
   const { t } = await getTranslations();
 
-  const [data, payments, creditNotes, latestCreditNoteId] = await Promise.all([
+  const [data, payments, creditNotes, latestCreditNoteId, emailLog] = await Promise.all([
     getInvoiceDetail(id, session.userId),
     getInvoicePayments(id, session.userId),
     getInvoiceCreditNotes(id, session.userId),
     getLatestCreditNoteId(session.userId),
+    getInvoiceEmailLog(id, session.userId),
   ]);
   if (!data) notFound();
 
@@ -63,6 +67,21 @@ export default async function InvoiceDetailPage({
   const creditable = creditableAmount(invoice.total, credited);
   const ip = t.invoices.payments;
   const cnt = t.creditNotes;
+  // Why "Email to client" can't be used here, if it can't.
+  const emailBlocked = session.isDemo
+    ? t.common.demoUnavailable
+    : !isEmailConfigured()
+    ? t.invoices.email.notConfigured
+    : null;
+  const sentAt = (value: string) =>
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Skopje",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(`${value.replace(" ", "T")}Z`));
 
   return (
     <div className="p-4 sm:p-6 max-w-3xl mx-auto space-y-6">
@@ -306,6 +325,28 @@ export default async function InvoiceDetailPage({
 
           {invoice.status === "cancelled" && (
             <p className="text-xs text-muted-foreground">{t.invoices.cancel.note}</p>
+          )}
+
+          {issued && invoice.number && (
+            <div className="space-y-2">
+              <Separator />
+              <EmailInvoiceButton
+                invoiceId={invoice.id}
+                number={invoice.number}
+                accountEmail={session.email}
+                defaults={invoiceEmailDefaults(data)}
+                disabledReason={emailBlocked}
+              />
+            </div>
+          )}
+          {emailLog.length > 0 && (
+            <ul className="space-y-0.5 text-xs text-muted-foreground">
+              {emailLog.map((e) => (
+                <li key={e.id}>
+                  {formatMessage(t.invoices.email.emailedTo, { to: e.toAddress, date: sentAt(e.sentAt) })}
+                </li>
+              ))}
+            </ul>
           )}
         </CardContent>
       </Card>

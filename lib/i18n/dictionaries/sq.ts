@@ -19,6 +19,7 @@ export const sq: Dictionary = {
     viewAll: "Shiko të gjitha",
     signOut: "Dil",
     language: "Gjuha",
+    demoUnavailable: "Nuk është në dispozicion në llogarinë demo.",
   },
   nav: {
     features: "Veçoritë",
@@ -51,6 +52,38 @@ export const sq: Dictionary = {
       emailExists: "Ekziston tashmë një llogari me këtë email",
       invalidCredentials: "Email ose fjalëkalim i pavlefshëm",
       passwordTooShort: "Fjalëkalimi duhet të ketë të paktën 8 karaktere",
+    },
+    passwordChanged: "Fjalëkalimi u ndryshua. Hyr me fjalëkalimin e ri.",
+    forgot: {
+      link: "Harrove fjalëkalimin?",
+      title: "Rivendos fjalëkalimin",
+      desc:
+        "Shkruaj email-in e llogarisë dhe do të të dërgojmë një lidhje për të vendosur fjalëkalim të ri.",
+      submit: "Dërgo lidhjen",
+      sent: "Nëse ekziston një llogari me atë email, të kemi dërguar një lidhje. Vlen 60 minuta.",
+      notConfigured:
+        "Email-i ende nuk është konfiguruar në këtë server, ndaj lidhjet për rivendosje nuk mund të dërgohen.",
+      back: "Kthehu te hyrja",
+      errors: {
+        emailRequired: "Shkruaj adresën tënde të email-it.",
+        notConfigured:
+          "Email-i ende nuk është konfiguruar në këtë server, ndaj lidhjet për rivendosje nuk mund të dërgohen.",
+      },
+    },
+    reset: {
+      title: "Vendos fjalëkalim të ri",
+      desc: "Zgjidh një fjalëkalim të ri për llogarinë. Do të dalësh nga llogaria kudo tjetër.",
+      new: "Fjalëkalimi i ri",
+      confirm: "Përsërit fjalëkalimin e ri",
+      submit: "Vendos fjalëkalimin",
+      invalid: "Kjo lidhje është e pavlefshme, ka skaduar ose është përdorur tashmë.",
+      requestNew: "Kërko lidhje të re",
+      errors: {
+        required: "Plotëso të dyja fushat.",
+        tooShort: "Fjalëkalimi i ri duhet të ketë të paktën 8 karaktere.",
+        mismatch: "Dy fjalëkalimet nuk përputhen.",
+        invalidToken: "Kjo lidhje është e pavlefshme, ka skaduar ose është përdorur tashmë.",
+      },
     },
   },
   landing: {
@@ -332,6 +365,33 @@ export const sq: Dictionary = {
       hasCreditNotes: "Kjo faturë ka nota krediti, ndaj nuk anulohet: ato tashmë e korrigjojnë.",
       note:
         "E anuluar. Mbetet në evidencën tënde për pesë vitet që faturat duhet të ruhen (Ligji për TVSH, neni 56).",
+    },
+    email: {
+      button: "Dërgoja klientit",
+      title: "Dërgoja {number} klientit",
+      attachmentNote: "PDF-ja shkon si bashkëngjitje. Përgjigjet vijnë te {email}.",
+      to: "Për",
+      subject: "Subjekti",
+      message: "Mesazhi",
+      copy: "Më dërgo një kopje",
+      send: "Dërgo",
+      sent: "U dërgua te {to}",
+      notConfigured: "Email-i ende nuk është konfiguruar në këtë server.",
+      emailedTo: "U dërgua te {to} më {date}",
+      defaultSubject: "Fatura {number} nga {name}",
+      defaultMessage:
+        "Të nderuar,\n\nNë bashkëngjitje është fatura {number} në shumë prej {total}, me afat pagese {due}.\n\nMe respekt,\n{name}",
+      defaultMessageNoDue:
+        "Të nderuar,\n\nNë bashkëngjitje është fatura {number} në shumë prej {total}.\n\nMe respekt,\n{name}",
+      errors: {
+        toInvalid: "Shkruaj një adresë email të vlefshme.",
+        subjectRequired: "Shto një subjekt.",
+        notIssued: "Mund të dërgohen vetëm fatura të lëshuara që nuk janë anuluar.",
+        dailyLimit: "Ke dërguar 20 fatura me email në 24 orët e fundit. Provo më vonë.",
+        notConfigured: "Email-i ende nuk është konfiguruar në këtë server.",
+        demo: "Nuk është në dispozicion në llogarinë demo.",
+        sendFailed: "Email-i nuk u dërgua. Provo përsëri pas pak.",
+      },
     },
   },
   creditNotes: {
@@ -687,6 +747,7 @@ export const sq: Dictionary = {
         wrongCurrent: "Fjalëkalimi aktual nuk është i saktë.",
         tooShort: "Fjalëkalimi i ri duhet të ketë të paktën 8 karaktere.",
         mismatch: "Dy fjalëkalimet e reja nuk përputhen.",
+        demo: "Nuk është në dispozicion në llogarinë demo.",
       },
     },
     errors: {
@@ -697,6 +758,14 @@ export const sq: Dictionary = {
         "Kjo duket si numër personal (EMBG). Shkruaj numrin tatimor (EDB) ose lëre bosh: aplikacioni nuk e shtyp kurrë EMBG-në.",
       ibanInvalid:
         "Ky IBAN nuk është i saktë. Kopjoje nga dokumentet e bankës, p.sh. MK07 2501 2000 0058 984.",
+    },
+    reminders: {
+      title: "Kujtesa me email",
+      toggle: "Më dërgo email para afateve të UJP-së",
+      hint:
+        "Nëse nuk ke veprimtari të regjistruar: më 5 dhe 9 derisa llogaritja (е-ПДД) e muajit të kaluar të mos jetë dorëzuar, më 13 derisa tatimi të mos jetë paguar, dhe më 20 maj për deklaratën vjetore (ГДП). Nëse je i vetëpunësuar: më 12 për akontimin mujor.",
+      notConfigured: "Email-i ende nuk është konfiguruar në këtë server.",
+      saved: "U ruajt",
     },
   },
   tax: {
@@ -787,6 +856,48 @@ export const sq: Dictionary = {
       advanceSet:
         "Shuma që e ke shkruar: 1/12 e tatimit në bilancin vjetor të vitit të kaluar.",
       addInSettings: "Shtoje te Cilësimet",
+    },
+  },
+  emails: {
+    reset: {
+      subject: "Rivendosja e fjalëkalimit për Freelancr",
+      greeting: "Përshëndetje {name},",
+      body:
+        "Dikush kërkoi rivendosjen e fjalëkalimit të llogarisë tënde në Freelancr. Nëse ishe ti, përdor lidhjen më poshtë për të vendosur një të ri. Vlen {minutes} minuta dhe funksionon një herë.",
+      button: "Vendos fjalëkalim të ri",
+      ignore: "Nëse nuk e kërkove këtë, injoroje këtë email: fjalëkalimi yt mbetet i njëjtë.",
+    },
+    reminders: {
+      greeting: "Përshëndetje {name},",
+      button: "Hap pagesat",
+      footer:
+        "E merr këtë sepse kujtesat për afatet janë të ndezura te Cilësimet e Freelancr; mund t'i fikësh atje.",
+      fileBy10: {
+        subject: "Dorëzo llogaritjen (е-ПДД) për {month} deri më 10",
+        body:
+          "Llogaritja (е-ПДД) për të ardhurat e muajit {month} duhet dorëzuar në UJP deri më {date}. Tatimi është {amount}; paguaje deri më 15.",
+      },
+      fileTomorrow: {
+        subject: "Nesër: llogaritja (е-ПДД) për {month}",
+        body:
+          "Llogaritja (е-ПДД) për të ardhurat e muajit {month} duhet dorëzuar nesër, më {date}. Tatimi, {amount}, paguhet deri më 15.",
+      },
+      payBy15: {
+        subject: "Paguaj {amount} te UJP deri më 15",
+        body:
+          "Nga tatimi për të ardhurat e muajit {month}, {amount} ende nuk është shënuar si i paguar. Paguaje deri më {date}, sipas urdhëresës (ПП53) të llogaritjes së miratuar.",
+      },
+      annualReturn: {
+        subject: "Konfirmo deklaratën vjetore (ГДП) për {year} deri më 31 maj",
+        body:
+          "UJP përgatit deklaratën tatimore vjetore (ГДП) për {year}. Konfirmoje ose korrigjoje deri më {date}; tatimi që tregon paguhet deri më 30 qershor.",
+      },
+      advance: {
+        subject: "Paguaj akontimin mujor deri më 15",
+        body: "Paguaj akontimin e tatimit për {month}, {amount}, deri më {date}.",
+        bodyNoAmount:
+          "Paguaj akontimin e tatimit për {month} deri më {date}. Shto shumën te Cilësimet që ta shohësh këtu.",
+      },
     },
   },
 };

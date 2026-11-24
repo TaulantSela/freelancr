@@ -77,6 +77,9 @@ async function main() {
     bankName: "Komercijalna Banka AD",
     iban: "MK07 2501 2000 0058 984",
     bic: "KOBSMK2X",
+    // Its password is public: no password changes, resets, email or
+    // reminders.
+    isDemo: true,
   });
   const taxStatus = "paid_from_abroad";
 

@@ -66,6 +66,19 @@ export const users = pgTable("users", {
   // The VAT number (ДДВ број, e.g. "MK4030000000000"), printed on invoices
   // when registered.
   vatNumber: text("vat_number"),
+  // A shared account whose password is public (the demo, and Phase 5's
+  // per-visitor sandboxes): it can't change its password, reset it, send
+  // email or get reminders.
+  isDemo: boolean("is_demo").notNull().default(false),
+  // Carried in the session token as `sv`; a password change or reset bumps
+  // it, which ends every session issued before (lib/auth/session.ts).
+  sessionVersion: integer("session_version").notNull().default(0),
+  // The language emails to the user are written in: the UI language at
+  // sign-up, then whatever they switch to while signed in.
+  locale: text("locale").notNull().default("mk"),
+  // Emails before UJP deadlines (app/api/cron/daily); on unless turned off
+  // in Settings.
+  remindersEnabled: boolean("reminders_enabled").notNull().default(true),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
 });
 
@@ -214,6 +227,69 @@ export const payments = pgTable("payments", {
     "payments_deemed_costs_rate_allowed",
     sql`${table.deemedCostsRate} in (0, 0.2, 0.3, 0.4, 0.5)`
   ),
+]);
+
+// Deadline reminders that went out: one row per user, kind and period
+// (e.g. "file-by-10", "2026-10"). The row is written before the email, so
+// a second run of the cron sends nothing; a failed send deletes it again.
+export const reminderLog = pgTable("reminder_log", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  kind: text("kind").notNull(),
+  period: text("period").notNull(),
+  sentAt: timestamp("sent_at", { mode: "string" }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("reminder_log_user_id_kind_period_unique").on(table.userId, table.kind, table.period),
+]);
+
+// Every attempt to email an invoice to a client: a row is written before
+// the send (so at most 20 a user a day, counted in the same statement) and
+// completed with Resend's id, or the error.
+export const invoiceEmails = pgTable("invoice_emails", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  invoiceId: text("invoice_id")
+    .notNull()
+    .references(() => invoices.id),
+  toAddress: text("to_address").notNull(),
+  sentAt: timestamp("sent_at", { mode: "string" }).notNull().defaultNow(),
+  providerId: text("provider_id"),
+  error: text("error"),
+}, (table) => [
+  index("invoice_emails_user_id_sent_at_idx").on(table.userId, table.sentAt),
+  index("invoice_emails_invoice_id_idx").on(table.invoiceId),
+]);
+
+// Password reset links: a token goes out by email, only its sha256 is kept.
+// It lasts 60 minutes and works once; a successful reset marks all of the
+// user's tokens used (lib/auth/reset.ts). At most 3 a user an hour.
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  // sha256 of the token, hex.
+  tokenHash: text("token_hash").notNull(),
+  expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
+  usedAt: timestamp("used_at", { mode: "string" }),
+  createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("password_reset_tokens_token_hash_unique").on(table.tokenHash),
+  index("password_reset_tokens_user_id_created_at_idx").on(table.userId, table.createdAt),
+]);
+
+// Every "forgot password" request, by a keyed hash of the requester's IP
+// (not the IP itself), to allow at most 10 an hour from one IP.
+export const passwordResetRequests = pgTable("password_reset_requests", {
+  id: text("id").primaryKey(),
+  ipHash: text("ip_hash").notNull(),
+  createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
+}, (table) => [
+  index("password_reset_requests_ip_hash_created_at_idx").on(table.ipHash, table.createdAt),
 ]);
 
 // A credit note (книжно одобрение) on an issued invoice: it lowers what the

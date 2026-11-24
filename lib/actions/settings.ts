@@ -6,6 +6,7 @@ import { getDb, users } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { eq } from "drizzle-orm";
 import { isTaxStatus } from "@/lib/tax/calculator";
+import { isEmailConfigured } from "@/lib/email/config";
 import { formatIban, isValidIban, looksLikeEmbg } from "@/lib/profile";
 
 export type SettingsErrorKey =
@@ -89,4 +90,21 @@ export async function updateProfile(
     .where(eq(users.id, session.userId));
 
   revalidatePath("/settings");
+}
+
+// "Email me before UJP deadlines" (the daily cron reads it). Not for demo
+// accounts, and only while email is set up.
+export async function setRemindersEnabled(
+  enabled: boolean
+): Promise<{ errorKey: "demo" | "notConfigured" } | { ok: true }> {
+  const session = await getSession();
+  if (!session) redirect("/sign-in");
+  if (session.isDemo) return { errorKey: "demo" };
+  if (!isEmailConfigured()) return { errorKey: "notConfigured" };
+  await getDb()
+    .update(users)
+    .set({ remindersEnabled: enabled === true })
+    .where(eq(users.id, session.userId));
+  revalidatePath("/settings");
+  return { ok: true };
 }

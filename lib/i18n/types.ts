@@ -18,6 +18,7 @@ export type Dictionary = {
     viewAll: string;
     signOut: string;
     language: string;
+    demoUnavailable: string;
   };
   nav: {
     features: string;
@@ -50,6 +51,35 @@ export type Dictionary = {
       emailExists: string;
       invalidCredentials: string;
       passwordTooShort: string;
+    };
+    passwordChanged: string;
+    forgot: {
+      link: string;
+      title: string;
+      desc: string;
+      submit: string;
+      sent: string;
+      notConfigured: string;
+      back: string;
+      errors: {
+        emailRequired: string;
+        notConfigured: string;
+      };
+    };
+    reset: {
+      title: string;
+      desc: string;
+      new: string;
+      confirm: string;
+      submit: string;
+      invalid: string;
+      requestNew: string;
+      errors: {
+        required: string;
+        tooShort: string;
+        mismatch: string;
+        invalidToken: string;
+      };
     };
   };
   landing: {
@@ -288,6 +318,31 @@ export type Dictionary = {
       hasPayments: string;
       hasCreditNotes: string;
       note: string;
+    };
+    email: {
+      button: string;
+      title: string;
+      attachmentNote: string;
+      to: string;
+      subject: string;
+      message: string;
+      copy: string;
+      send: string;
+      sent: string;
+      notConfigured: string;
+      emailedTo: string;
+      defaultSubject: string;
+      defaultMessage: string;
+      defaultMessageNoDue: string;
+      errors: {
+        toInvalid: string;
+        subjectRequired: string;
+        notIssued: string;
+        dailyLimit: string;
+        notConfigured: string;
+        demo: string;
+        sendFailed: string;
+      };
     };
   };
   creditNotes: {
@@ -615,6 +670,7 @@ export type Dictionary = {
         wrongCurrent: string;
         tooShort: string;
         mismatch: string;
+        demo: string;
       };
     };
     errors: {
@@ -623,6 +679,13 @@ export type Dictionary = {
       vatNumberRequired: string;
       looksLikeEmbg: string;
       ibanInvalid: string;
+    };
+    reminders: {
+      title: string;
+      toggle: string;
+      hint: string;
+      notConfigured: string;
+      saved: string;
     };
   };
   tax: {
@@ -673,6 +736,41 @@ export type Dictionary = {
       advancePayBy: string;
       advanceSet: string;
       addInSettings: string;
+    };
+  };
+  emails: {
+    reset: {
+      subject: string;
+      greeting: string;
+      body: string;
+      button: string;
+      ignore: string;
+    };
+    reminders: {
+      greeting: string;
+      button: string;
+      footer: string;
+      fileBy10: {
+        subject: string;
+        body: string;
+      };
+      fileTomorrow: {
+        subject: string;
+        body: string;
+      };
+      payBy15: {
+        subject: string;
+        body: string;
+      };
+      annualReturn: {
+        subject: string;
+        body: string;
+      };
+      advance: {
+        subject: string;
+        body: string;
+        bodyNoAmount: string;
+      };
     };
   };
 };

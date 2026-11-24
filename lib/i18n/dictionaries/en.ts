@@ -19,6 +19,7 @@ export const en: Dictionary = {
     viewAll: "View all",
     signOut: "Sign out",
     language: "Language",
+    demoUnavailable: "Not available in the demo account.",
   },
   nav: {
     features: "Features",
@@ -51,6 +52,35 @@ export const en: Dictionary = {
       emailExists: "An account with this email already exists",
       invalidCredentials: "Invalid email or password",
       passwordTooShort: "The password needs at least 8 characters",
+    },
+    passwordChanged: "Your password is changed. Sign in with the new one.",
+    forgot: {
+      link: "Forgot password?",
+      title: "Reset your password",
+      desc: "Enter your account's email and we'll send you a link to set a new password.",
+      submit: "Send the link",
+      sent: "If an account exists for that email, we've sent a link. It's valid for 60 minutes.",
+      notConfigured: "Email isn't set up on this server yet, so reset links can't be sent.",
+      back: "Back to sign in",
+      errors: {
+        emailRequired: "Enter your email address.",
+        notConfigured: "Email isn't set up on this server yet, so reset links can't be sent.",
+      },
+    },
+    reset: {
+      title: "Set a new password",
+      desc: "Choose a new password for your account. You'll be signed out everywhere else.",
+      new: "New password",
+      confirm: "Repeat the new password",
+      submit: "Set password",
+      invalid: "This link is invalid, has expired or was already used.",
+      requestNew: "Request a new link",
+      errors: {
+        required: "Fill in both fields.",
+        tooShort: "The new password needs at least 8 characters.",
+        mismatch: "The two passwords don't match.",
+        invalidToken: "This link is invalid, has expired or was already used.",
+      },
     },
   },
   landing: {
@@ -332,6 +362,33 @@ export const en: Dictionary = {
         "This invoice has credit notes, so it isn't cancelled: they already correct it.",
       note:
         "Cancelled. It stays in your records for the five years invoices have to be kept (VAT law Art. 56).",
+    },
+    email: {
+      button: "Email to client",
+      title: "Email {number} to the client",
+      attachmentNote: "The PDF goes as an attachment. Replies come to {email}.",
+      to: "To",
+      subject: "Subject",
+      message: "Message",
+      copy: "Send me a copy",
+      send: "Send",
+      sent: "Sent to {to}",
+      notConfigured: "Email isn't set up on this server yet.",
+      emailedTo: "Emailed to {to} on {date}",
+      defaultSubject: "Invoice {number} from {name}",
+      defaultMessage:
+        "Hello,\n\nPlease find attached invoice {number} for {total}, due on {due}.\n\nKind regards,\n{name}",
+      defaultMessageNoDue:
+        "Hello,\n\nPlease find attached invoice {number} for {total}.\n\nKind regards,\n{name}",
+      errors: {
+        toInvalid: "Enter one valid email address.",
+        subjectRequired: "Add a subject.",
+        notIssued: "Only issued invoices that aren't cancelled can be emailed.",
+        dailyLimit: "You've emailed 20 invoices in the last 24 hours. Try again later.",
+        notConfigured: "Email isn't set up on this server yet.",
+        demo: "Not available in the demo account.",
+        sendFailed: "The email didn't go out. Try again in a moment.",
+      },
     },
   },
   creditNotes: {
@@ -687,6 +744,7 @@ export const en: Dictionary = {
         wrongCurrent: "The current password isn't right.",
         tooShort: "The new password needs at least 8 characters.",
         mismatch: "The two new passwords don't match.",
+        demo: "Not available in the demo account.",
       },
     },
     errors: {
@@ -697,6 +755,14 @@ export const en: Dictionary = {
         "That looks like a personal ID number (ЕМБГ). Enter a tax number (ЕДБ) instead, or leave it empty: the app never prints an ЕМБГ.",
       ibanInvalid:
         "That IBAN doesn't check out. Copy it from your bank's documents, e.g. MK07 2501 2000 0058 984.",
+    },
+    reminders: {
+      title: "Email reminders",
+      toggle: "Email me before UJP deadlines",
+      hint:
+        "If you're not registered for an activity: on the 5th and 9th while last month's е-ПДД isn't filed, on the 13th while its tax isn't paid, and on 20 May for the annual return (ГДП). If you're self-employed: on the 12th for the monthly advance.",
+      notConfigured: "Email isn't set up on this server yet.",
+      saved: "Saved",
     },
   },
   tax: {
@@ -786,6 +852,48 @@ export const en: Dictionary = {
       advanceSet:
         "The amount you entered: 1/12 of the tax in last year's annual balance.",
       addInSettings: "Add it in Settings",
+    },
+  },
+  emails: {
+    reset: {
+      subject: "Reset your Freelancr password",
+      greeting: "Hello {name},",
+      body:
+        "Someone asked to reset the password of your Freelancr account. If it was you, use the link below to set a new one. It's valid for {minutes} minutes and works once.",
+      button: "Set a new password",
+      ignore: "If you didn't ask for this, ignore this email: your password stays as it is.",
+    },
+    reminders: {
+      greeting: "Hello {name},",
+      button: "Open your payments",
+      footer:
+        "You get this because deadline reminders are on in Freelancr's Settings; you can turn them off there.",
+      fileBy10: {
+        subject: "File the е-ПДД for {month} by the 10th",
+        body:
+          "The calculation (е-ПДД) for your {month} income is due with UJP by {date}. The tax on it is {amount}; pay it by the 15th.",
+      },
+      fileTomorrow: {
+        subject: "Tomorrow: the е-ПДД for {month}",
+        body:
+          "The calculation (е-ПДД) for your {month} income is due tomorrow, {date}. The tax on it, {amount}, is due by the 15th.",
+      },
+      payBy15: {
+        subject: "Pay {amount} to UJP by the 15th",
+        body:
+          "Of the tax on your {month} income, {amount} isn't marked paid yet. Pay it by {date}, against the payment order (ПП53) on the approved calculation.",
+      },
+      annualReturn: {
+        subject: "Confirm UJP's annual return (ГДП) for {year} by 31 May",
+        body:
+          "UJP prepares the annual tax return (ГДП) for {year}. Confirm or correct it by {date}; any tax it shows is due by 30 June.",
+      },
+      advance: {
+        subject: "Pay your monthly advance by the 15th",
+        body: "Pay the income tax advance for {month}, {amount}, by {date}.",
+        bodyNoAmount:
+          "Pay the income tax advance for {month} by {date}. Add its amount in Settings to see it here.",
+      },
     },
   },
 };

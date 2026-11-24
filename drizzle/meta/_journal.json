@@ -92,6 +92,48 @@
       "when": 1795469431597,
       "tag": "0012_attachments",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1795472964197,
+      "tag": "0013_demo_accounts",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1795473016268,
+      "tag": "0014_session_version",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1795473062358,
+      "tag": "0015_user_locale",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1795473215797,
+      "tag": "0016_password_resets",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1795473361367,
+      "tag": "0017_invoice_emails",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1795473488595,
+      "tag": "0018_reminders",
+      "breakpoints": true
     }
   ]
 }
