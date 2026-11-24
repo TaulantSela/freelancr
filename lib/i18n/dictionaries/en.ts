@@ -4,7 +4,7 @@ export const en: Dictionary = {
   meta: {
     title: "Freelancr: clients, invoices and what you owe UJP",
     description:
-      "Invoice clients at home and abroad in their language, record each payment at the National Bank's rate for the day, and see what you owe UJP every month, with the е-ПДД deadlines. For freelancers in North Macedonia.",
+      "Invoice clients at home and abroad in their language, record each payment at the National Bank's rate for the day, and see what you owe UJP every month, with the e-PDD deadlines. For freelancers in North Macedonia.",
   },
   common: {
     appName: "Freelancr",
@@ -88,7 +88,7 @@ export const en: Dictionary = {
     badge: "For freelancers in North Macedonia",
     heroTitle: "Clients, invoices and what you owe UJP, in one place",
     heroSubtitle:
-      "Invoice clients at home and abroad in their language, record each payment at the National Bank's rate for the day it arrived, and see what you owe UJP every month, with the е-ПДД deadlines.",
+      "Invoice clients at home and abroad in their language, record each payment at the National Bank's rate for the day it arrived, and see what you owe UJP every month, with the e-PDD deadlines.",
     featuresTitle: "What it does",
     features: [
       {
@@ -499,7 +499,7 @@ export const en: Dictionary = {
     otherRatesFlag:
       "Some payments this month use a rate other than the National Bank's for their day (the invoice's rate, or one typed in), so the amounts in MKD here are approximate.",
     evidenceHint:
-      "Attach proof to the calculation (е-ПДД): the contract or the client's confirmation of the work, and the bank statement (извод) showing the money arrived.",
+      "Attach proof to the calculation (e-PDD): the contract or the client's confirmation of the work, and the bank statement (извод) showing the money arrived.",
     treatments: {
       business: "Business income",
       withheld: "Tax withheld by the client",
@@ -507,11 +507,11 @@ export const en: Dictionary = {
     },
     treatmentNotes: {
       business:
-        "You're registered self-employed: this is business income for your annual balance, with no monthly calculation (е-ПДД).",
+        "You're registered self-employed: this is business income for your annual balance, with no monthly calculation (e-PDD).",
       withheld:
         "A company in North Macedonia pays you 90% and pays the 10% tax to UJP for you (Personal Income Tax law Art. 80). Nothing to file.",
       self_reported:
-        "A client abroad or a private person in North Macedonia: you file the calculation (е-ПДД) by the 10th of next month and pay the 10% tax by the 15th.",
+        "A client abroad or a private person in North Macedonia: you file the calculation (e-PDD) by the 10th of next month and pay the 10% tax by the 15th.",
     },
     ujpStatuses: {
       nothing: "Nothing to file",
@@ -801,7 +801,7 @@ export const en: Dictionary = {
       title: "Email reminders",
       toggle: "Email me before UJP deadlines",
       hint:
-        "If you're not registered for an activity: on the 5th and 9th while last month's е-ПДД isn't filed, on the 13th while its tax isn't paid, and on 20 May for the annual return (ГДП). If you're self-employed: on the 12th for the monthly advance.",
+        "If you're not registered for an activity: on the 5th and 9th while last month's e-PDD isn't filed, on the 13th while its tax isn't paid, and on 20 May for the annual return (ГДП). If you're self-employed: on the 12th for the monthly advance.",
       notConfigured: "Email isn't set up on this server yet.",
       saved: "Saved",
     },
@@ -836,7 +836,7 @@ export const en: Dictionary = {
     ],
     rules: {
       paid_from_abroad:
-        "For each month in which a client abroad or a private person in North Macedonia paid you, submit the tax calculation (е-ПДД) to UJP by the 10th of the next month and pay the tax by the 15th. Companies in North Macedonia withhold the tax when they pay you, so their payments don't add a month.",
+        "For each month in which a client abroad or a private person in North Macedonia paid you, submit the tax calculation (e-PDD) to UJP by the 10th of the next month and pay the tax by the 15th. Companies in North Macedonia withhold the tax when they pay you, so their payments don't add a month.",
       self_employed:
         "Pay an income tax advance by the 15th of each month for the previous month. File the annual tax balance (ПДД-ДБ) and the statement of income and expenses by 15 March of the next year, and pay any difference by 30 March.",
     },
@@ -877,7 +877,7 @@ export const en: Dictionary = {
       tileDue: "{month} income · pay by {date}",
       forMonth: "Tax on {month} income",
       soFar: "{month} so far",
-      fileAndPay: "File the calculation (е-ПДД) by {reportBy}, pay by {payBy}",
+      fileAndPay: "File the calculation (e-PDD) by {reportBy}, pay by {payBy}",
       nothing:
         "Nothing to pay. When you record a payment from a client abroad or a private person in North Macedonia, the tax on it shows up here.",
       note:
@@ -910,14 +910,14 @@ export const en: Dictionary = {
       footer:
         "You get this because deadline reminders are on in Freelancr's Settings; you can turn them off there.",
       fileBy10: {
-        subject: "File the е-ПДД for {month} by the 10th",
+        subject: "File the e-PDD for {month} by the 10th",
         body:
-          "The calculation (е-ПДД) for your {month} income is due with UJP by {date}. The tax on it is {amount}; pay it by the 15th.",
+          "The calculation (e-PDD) for your {month} income is due with UJP by {date}. The tax on it is {amount}; pay it by the 15th.",
       },
       fileTomorrow: {
-        subject: "Tomorrow: the е-ПДД for {month}",
+        subject: "Tomorrow: the e-PDD for {month}",
         body:
-          "The calculation (е-ПДД) for your {month} income is due tomorrow, {date}. The tax on it, {amount}, is due by the 15th.",
+          "The calculation (e-PDD) for your {month} income is due tomorrow, {date}. The tax on it, {amount}, is due by the 15th.",
       },
       payBy15: {
         subject: "Pay {amount} to UJP by the 15th",

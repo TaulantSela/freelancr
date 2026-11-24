@@ -77,11 +77,11 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
       {
         id: "tax",
         title: "What you owe UJP",
-        caption: "Each month, the tax on the income you report yourself: file the е-ПДД by the 10th and pay by the 15th.",
+        caption: "Each month, the tax on the income you report yourself: file the e-PDD by the 10th and pay by the 15th.",
         guide: [
           "The Payments page shows each month: what came in, the income and the tax on it.",
           "On income you report yourself, from clients abroad, the tax is 10%, less any tax already paid abroad.",
-          "File the calculation (е-ПДД) by the 10th of the next month and pay by the 15th; the month's card shows both dates.",
+          "File the calculation (e-PDD) by the 10th of the next month and pay by the 15th; the month's card shows both dates.",
         ],
       },
       {
@@ -98,7 +98,7 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         title: "Filing with UJP",
         caption: "Mark the month filed, approved and paid as you go, with UJP's numbers.",
         guide: [
-          "After you file the е-ПДД on UJP's site, mark the month filed with the calculation's number.",
+          "After you file the e-PDD on UJP's site, mark the month filed with the calculation's number.",
           "When UJP approves it, add the folio number; once you've paid, mark it paid.",
           "Each step shows on the month, and a month that misses a deadline turns red.",
         ],
