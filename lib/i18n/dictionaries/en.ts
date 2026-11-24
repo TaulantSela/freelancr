@@ -215,9 +215,9 @@ export const en: Dictionary = {
       invoiceLanguageHint: "The language of this client's invoice PDFs, whatever language you use the app in.",
       looksLikeEmbg:
         "That looks like a personal ID number (ЕМБГ). Enter the company's tax number, or leave it empty.",
-      deemedCosts: "Deemed costs (author's rights only)",
+      deemedCosts: "What this client pays you for",
       deemedCostsHint:
-        "Only income from author's and related rights is taxed after deemed costs (Personal Income Tax law Art. 40): 50% for sculpture, tapestry, ceramics and stained glass; 40% for art photography, painting, graphic works, industrial design, costume and fashion design, stage design, music and film works, and restoration; 30% for scientific, professional and journalistic works and for performing serious music, ballet, opera or acting; 20% for translations, lectures and other author's works. Most freelance work (software, consulting, most services) is income from work (Art. 14), with no deemed costs: leave it at 0%. New payments from this client start with this rate.",
+        "Most freelancers: services or work, with nothing deducted. Only author's work gets a share deducted before the 10% tax. New payments from this client start with this choice.",
     },
     types: {
       company: "Company",
@@ -536,11 +536,28 @@ export const en: Dictionary = {
       other: "Other",
     },
     deemedOptions: {
-      "0": "None (0%): income from work",
-      "0.2": "20%: translations, lectures, other author's works",
-      "0.3": "30%: scientific, professional, journalistic works",
-      "0.4": "40%: art photography, painting, graphics, design, music, film",
-      "0.5": "50%: sculpture, tapestry, ceramics, stained glass",
+      "0": "Services or work (most freelancers): nothing deducted",
+      "0.2": "Translations, lectures, other author's works: 20% deducted",
+      "0.3": "Scientific, professional or journalistic works: 30% deducted",
+      "0.4": "Art photography, painting, industrial or fashion design, music, film: 40% deducted",
+      "0.5": "Sculpture, tapestry, ceramics, stained glass: 50% deducted",
+    },
+    deemedKinds: {
+      "0": "Services or work: development, consulting, most freelance jobs",
+      "0.2": "Translations, lectures, other author's works",
+      "0.3": "Scientific, professional or journalistic works; performing classical music, ballet, opera or acting",
+      "0.4": "Art photography, painting, graphic art, industrial or fashion design, stage design, music and film works",
+      "0.5": "Sculpture, tapestry, ceramics, stained glass",
+    },
+    deemedHelp: {
+      summary: "How does this work?",
+      intro: "Income tax is 10% of what you're paid. When you're paid for author's work under an author's contract, the law first deducts a fixed share as costs (Personal Income Tax law, Art. 40), and the 10% is on the rest.",
+      example: "Example: you're paid €1,000 for a translation. 20% is deducted, so the tax is 10% of €800: €80 instead of €100.",
+      work: "What you're paid for",
+      deducted: "Deducted",
+      taxOn: "Tax on €1,000",
+      taxAmount: "€{n}",
+      services: "Development, consulting and other services are income from work (Art. 14), so nothing is deducted. If you're unsure, the contract decides: ask your accountant.",
     },
     calendar: {
       title: "Tax deadlines {year}",
@@ -596,9 +613,9 @@ export const en: Dictionary = {
       rateUnavailable:
         "The National Bank's rate for {date} couldn't be fetched. Type the rate from its exchange rate list:",
       manualRate: "MKD for 1 {currency}",
-      deemedCosts: "Deemed costs",
+      deemedCosts: "What this payment is for",
       deemedCostsHint:
-        "Only for income from author's rights (Art. 40). Most freelance work is income from work (Art. 14): 0%.",
+        "Starts with the client's choice. Only author's work gets a share deducted before the 10% tax.",
       channel: "Received via",
       note: "Note",
       previewReceived: "Received",
