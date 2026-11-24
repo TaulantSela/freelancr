@@ -130,21 +130,21 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
     ],
   },
   mk: {
-    tagline: "Клиенти, фактури, плаќања и колку должите на UJP",
+    tagline: "Клиенти, фактури, плаќања и колку должите на УЈП",
     chapters: [
       {
         id: "intro",
         title: "Freelancr",
-        caption: "Клиенти, фактури, плаќања и колку должите на UJP, на едно место.",
+        caption: "Клиенти, фактури, плаќања и колку должите на УЈП, на едно место.",
         guide: [],
       },
       {
         id: "profile",
         title: "Вашиот профил",
-        caption: "Како сте регистрирани ги одредува роковите кон UJP и дали фактурата смее да има ДДВ.",
+        caption: "Како сте регистрирани ги одредува роковите кон УЈП и дали фактурата смее да има ДДВ.",
         guide: [
-          "Започнете во Поставки. Изберете како сте регистрирани за данок: без регистрирана дејност (вообичаено за приход од клиенти од странство) или како самостоен вршител на дејност. Тоа ги одредува роковите кон UJP и како се пресметува данокот на секое плаќање.",
-          "Штиклирајте регистрација за ДДВ само ако UJP ве регистрирала за ДДВ; инаку фактурите немаат ДДВ. Внесете ги банката, IBAN и BIC/SWIFT за да се печатат на секоја фактура.",
+          "Започнете во Поставки. Изберете како сте регистрирани за данок: без регистрирана дејност (вообичаено за приход од клиенти од странство) или како самостоен вршител на дејност. Тоа ги одредува роковите кон УЈП и како се пресметува данокот на секое плаќање.",
+          "Штиклирајте регистрација за ДДВ само ако УЈП ве регистрирала за ДДВ; инаку фактурите немаат ДДВ. Внесете ги банката, IBAN и BIC/SWIFT за да се печатат на секоја фактура.",
         ],
       },
       {
@@ -173,13 +173,13 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         caption: "Евидентирајте ги парите што стигнале; курсот на Народната банка за тој ден се пополнува сам.",
         guide: [
           "Кога парите ќе стигнат на сметката, евидентирајте ги на фактурата: денот кога стигнале, колку е одобрено и провизиите што ги зела банката или платформата.",
-          "Средниот курс на Народната банка за тој ден се пополнува сам, како што пресметува и UJP, а штом плаќањата ја покријат фактурата, таа е платена.",
+          "Средниот курс на Народната банка за тој ден се пополнува сам, како што пресметува и УЈП, а штом плаќањата ја покријат фактурата, таа е платена.",
           "Исплатите без фактура, од платформа како Upwork, се евидентираат на ист начин.",
         ],
       },
       {
         id: "tax",
-        title: "Колку должите на UJP",
+        title: "Колку должите на УЈП",
         caption: "Секој месец, данокот на доходот што сами го пријавувате: е-ПДД до 10-ти, плаќање до 15-ти.",
         guide: [
           "Страницата Плаќања го прикажува секој месец: што стигнало, доходот и данокот на него.",
@@ -192,17 +192,17 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         title: "Данок задржан за вас",
         caption: "Фирма од Северна Македонија го задржува данокот од 10% и го плаќа за вас, па се гледа како веќе платен.",
         guide: [
-          "Кога ве плаќа фирма од Северна Македонија, таа го задржува данокот од 10% и сама го уплатува во UJP.",
+          "Кога ве плаќа фирма од Северна Македонија, таа го задржува данокот од 10% и сама го уплатува во УЈП.",
           "Евидентирајте колку ви платила и колку данок задржала: месецот го прикажува тој данок како веќе платен за вас, па не се брои повторно во тоа што го должите.",
         ],
       },
       {
         id: "filing",
-        title: "Поднесување до UJP",
-        caption: "Означете го месецот како поднесен, одобрен и платен, со броевите од UJP.",
+        title: "Поднесување до УЈП",
+        caption: "Означете го месецот како поднесен, одобрен и платен, со броевите од УЈП.",
         guide: [
-          "Откако ќе го поднесете е-ПДД на страницата на UJP, означете го месецот како поднесен со бројот на пресметката.",
-          "Кога UJP ќе ја одобри, внесете го фолио бројот; откако ќе платите, означете го како платен.",
+          "Откако ќе го поднесете е-ПДД на страницата на УЈП, означете го месецот како поднесен со бројот на пресметката.",
+          "Кога УЈП ќе ја одобри, внесете го фолио бројот; откако ќе платите, означете го како платен.",
           "Секој чекор се гледа на месецот, а месец што пропуштил рок станува црвен.",
         ],
       },
@@ -211,7 +211,7 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         title: "Докази и извоз",
         caption: "Прикачете го изводот од банката на плаќањето и извезете CSV за сметководителот.",
         guide: [
-          "UJP може да побара доказ за плаќање: прикачете му го изводот од банката, договорот или потврдата, како PDF или слика.",
+          "УЈП може да побара доказ за плаќање: прикачете му го изводот од банката, договорот или потврдата, како PDF или слика.",
           "Извезете ги плаќањата, фактурите или книжните одобренија за годината како CSV-датотеки што се отвораат во Excel, со заглавија на вашиот јазик.",
         ],
       },
@@ -220,7 +220,7 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         title: "Контролна табла",
         caption: "Колку должите и до кога, што стигнало и што уште ви должат клиентите.",
         guide: [
-          "Контролната табла ги собира на едно место: колку должите на UJP и наредниот рок, колку сте примиле оваа година и фактурите што клиентите уште ви ги должат.",
+          "Контролната табла ги собира на едно место: колку должите на УЈП и наредниот рок, колку сте примиле оваа година и фактурите што клиентите уште ви ги должат.",
           "Покажува и колку е вашиот промет во Северна Македонија блиску до прагот за ДДВ од 2.000.000 денари.",
         ],
       },
@@ -233,21 +233,21 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
     ],
   },
   sq: {
-    tagline: "Klientët, faturat, pagesat dhe sa i detyrohesh UJP-së",
+    tagline: "Klientët, faturat, pagesat dhe sa i detyrohesh DAP-it",
     chapters: [
       {
         id: "intro",
         title: "Freelancr",
-        caption: "Klientët, faturat, pagesat dhe sa i detyrohesh UJP-së, në një vend.",
+        caption: "Klientët, faturat, pagesat dhe sa i detyrohesh DAP-it, në një vend.",
         guide: [],
       },
       {
         id: "profile",
         title: "Profili yt",
-        caption: "Mënyra si je regjistruar vendos afatet e tua në UJP dhe nëse fatura mund të ketë TVSH.",
+        caption: "Mënyra si je regjistruar vendos afatet e tua në DAP dhe nëse fatura mund të ketë TVSH.",
         guide: [
-          "Fillo te Cilësimet. Zgjidh si je regjistruar për tatim: pa veprimtari të regjistruar (rasti i zakonshëm për të ardhura nga klientë jashtë vendit) ose i vetëpunësuar i regjistruar. Kjo vendos afatet në UJP dhe si llogaritet tatimi i çdo pagese.",
-          "Shëno regjistrimin për TVSH vetëm nëse UJP të ka regjistruar për TVSH; përndryshe faturat nuk kanë TVSH. Shto bankën, IBAN-in dhe BIC/SWIFT që të shtypen në çdo faturë.",
+          "Fillo te Cilësimet. Zgjidh si je regjistruar për tatim: pa veprimtari të regjistruar (rasti i zakonshëm për të ardhura nga klientë jashtë vendit) ose i vetëpunësuar i regjistruar. Kjo vendos afatet në DAP dhe si llogaritet tatimi i çdo pagese.",
+          "Shëno regjistrimin për TVSH vetëm nëse DAP-i të ka regjistruar për TVSH; përndryshe faturat nuk kanë TVSH. Shto bankën, IBAN-in dhe BIC/SWIFT që të shtypen në çdo faturë.",
         ],
       },
       {
@@ -276,18 +276,18 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         caption: "Regjistro paratë që arritën; kursi i Bankës Popullore për atë ditë plotësohet vetë.",
         guide: [
           "Kur paratë arrijnë në llogari, regjistroji te fatura: ditën kur arritën, sa u kreditua dhe tarifat që mori banka ose platforma.",
-          "Kursi mesatar i Bankës Popullore për atë ditë plotësohet vetë, ashtu siç e konverton UJP, dhe kur pagesat e mbulojnë faturën, ajo shfaqet e paguar.",
+          "Kursi mesatar i Bankës Popullore për atë ditë plotësohet vetë, ashtu siç e konverton DAP-i, dhe kur pagesat e mbulojnë faturën, ajo shfaqet e paguar.",
           "Pagesat pa faturë, nga një platformë si Upwork, regjistrohen njësoj.",
         ],
       },
       {
         id: "tax",
-        title: "Sa i detyrohesh UJP-së",
-        caption: "Çdo muaj, tatimi për të ardhurat që i deklaron vetë: е-ПДД deri më 10 dhe pagesa deri më 15.",
+        title: "Sa i detyrohesh DAP-it",
+        caption: "Çdo muaj, tatimi për të ardhurat që i deklaron vetë: e-PDD deri më 10 dhe pagesa deri më 15.",
         guide: [
           "Faqja Pagesat tregon çdo muaj: çfarë arriti, të ardhurat dhe tatimin për to.",
           "Për të ardhurat që i deklaron vetë, nga klientë jashtë vendit, tatimi është 10%, minus tatimin e paguar tashmë jashtë vendit.",
-          "Dorëzo llogaritjen (е-ПДД) deri më 10 të muajit pasues dhe paguaj deri më 15; karta e muajit i tregon të dyja datat.",
+          "Dorëzo llogaritjen (e-PDD) deri më 10 të muajit pasues dhe paguaj deri më 15; karta e muajit i tregon të dyja datat.",
         ],
       },
       {
@@ -295,17 +295,17 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         title: "Tatimi i mbajtur për ty",
         caption: "Një kompani në Maqedoninë e Veriut e mban tatimin 10% dhe e paguan për ty, ndaj shfaqet si i paguar tashmë.",
         guide: [
-          "Kur të paguan një kompani në Maqedoninë e Veriut, ajo e mban tatimin 10% dhe ia paguan vetë UJP-së.",
+          "Kur të paguan një kompani në Maqedoninë e Veriut, ajo e mban tatimin 10% dhe ia paguan vetë DAP-it.",
           "Regjistro sa të pagoi dhe sa tatim mbajti: muaji e tregon atë tatim si të paguar tashmë për ty, që të mos numërohet sërish në atë që detyrohesh.",
         ],
       },
       {
         id: "filing",
-        title: "Dorëzimi në UJP",
-        caption: "Shëno muajin si të dorëzuar, të miratuar dhe të paguar, me numrat e UJP-së.",
+        title: "Dorëzimi në DAP",
+        caption: "Shëno muajin si të dorëzuar, të miratuar dhe të paguar, me numrat e DAP-it.",
         guide: [
-          "Pasi ta dorëzosh е-ПДД në faqen e UJP-së, shëno muajin si të dorëzuar me numrin e llogaritjes.",
-          "Kur UJP ta miratojë, shto numrin e folios; pasi të paguash, shënoje si të paguar.",
+          "Pasi ta dorëzosh e-PDD në faqen e DAP-it, shëno muajin si të dorëzuar me numrin e llogaritjes.",
+          "Kur DAP-i ta miratojë, shto numrin e folios; pasi të paguash, shënoje si të paguar.",
           "Çdo hap shihet te muaji, dhe muaji që kalon një afat bëhet i kuq.",
         ],
       },
@@ -314,7 +314,7 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         title: "Dëshmi dhe eksporte",
         caption: "Bashkëngjit ekstraktin bankar te pagesa dhe eksporto CSV për kontabilistin.",
         guide: [
-          "UJP mund të kërkojë dëshmi për një pagesë: bashkëngjit ekstraktin bankar, kontratën ose konfirmimin, si PDF ose imazh.",
+          "DAP-i mund të kërkojë dëshmi për një pagesë: bashkëngjit ekstraktin bankar, kontratën ose konfirmimin, si PDF ose imazh.",
           "Eksporto pagesat, faturat ose notat e kreditit të vitit si skedarë CSV që hapen në Excel, me titujt në gjuhën tënde.",
         ],
       },
@@ -323,7 +323,7 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         title: "Paneli",
         caption: "Sa detyrohesh dhe deri kur, çfarë arriti dhe çfarë të detyrohen ende klientët.",
         guide: [
-          "Paneli i bashkon: sa i detyrohesh UJP-së dhe afatin e radhës, sa ke marrë këtë vit dhe faturat që klientët ende t'i detyrohen.",
+          "Paneli i bashkon: sa i detyrohesh DAP-it dhe afatin e radhës, sa ke marrë këtë vit dhe faturat që klientët ende t'i detyrohen.",
           "Tregon edhe sa afër është furnizimi yt në Maqedoninë e Veriut pragut të TVSH-së prej 2.000.000 denarësh.",
         ],
       },

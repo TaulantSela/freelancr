@@ -163,7 +163,7 @@ export const en: Dictionary = {
     mustRegister: "Must register for DDV",
     notRequired: "Not required yet",
     ddvLocalOnly:
-      "Counts invoices to clients in North Macedonia by date of supply, paid or not, and their payments without an invoice by the day received. Services to clients abroad are supplied abroad (VAT law Art. 14-а), so they don't count toward the threshold.",
+      "Counts invoices to clients in North Macedonia by date of supply, paid or not, and their payments without an invoice by the day received. Services to clients abroad are supplied abroad (VAT law Art. 14-a), so they don't count toward the threshold.",
     nextDeadline: "Next tax deadline",
     daysAway: "{date} — {days} days away",
     dueToday: "{date} — today",
@@ -316,7 +316,7 @@ export const en: Dictionary = {
       addLine: "Add line item",
       ddv: "DDV (VAT)",
       ddvHint:
-        "For services to a business abroad the place of supply is abroad (VAT law Art. 14-а), so no Macedonian DDV is charged.",
+        "For services to a business abroad the place of supply is abroad (VAT law Art. 14-a), so no Macedonian DDV is charged.",
       noVatRegistration:
         "You aren't registered for VAT (DDV), so this invoice won't show VAT (VAT law Art. 51(3)).",
       ddvRateInvalid: "Choose one of the listed DDV rates.",
