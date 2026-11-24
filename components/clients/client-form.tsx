@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createClient, updateClient } from "@/lib/actions/clients";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { DeemedCostsHelp } from "@/components/payments/deemed-costs-help";
 import { useTranslations } from "@/lib/i18n/client";
 import { SUPPORTED_CURRENCIES } from "@/lib/tax/calculator";
 import {
@@ -229,7 +230,7 @@ export function ClientForm({
             name="deemedCostsRate"
             id="deemedCostsRate"
             defaultValue={String(client?.deemedCostsRate ?? 0)}
-            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:w-1/2"
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
             {DEEMED_COSTS_RATES.map((r) => (
               <option key={r} value={String(r)} className="bg-card">
@@ -238,6 +239,7 @@ export function ClientForm({
             ))}
           </select>
           <p className="text-xs text-muted-foreground">{t.clients.form.deemedCostsHint}</p>
+          <DeemedCostsHelp />
         </div>
       )}
 

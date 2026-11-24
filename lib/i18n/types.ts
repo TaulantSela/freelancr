@@ -474,6 +474,26 @@ export type Dictionary = {
       "0.4": string;
       "0.5": string;
     };
+    // The kinds of work, without the deduction (the help table).
+    deemedKinds: {
+      "0": string;
+      "0.2": string;
+      "0.3": string;
+      "0.4": string;
+      "0.5": string;
+    };
+    // "How does this work?" under the choice (components/payments/deemed-costs-help.tsx).
+    deemedHelp: {
+      summary: string;
+      intro: string;
+      example: string;
+      work: string;
+      deducted: string;
+      taxOn: string;
+      // {n}: the tax on 1,000 in the currency of the example.
+      taxAmount: string;
+      services: string;
+    };
     calendar: {
       title: string;
       passed: string;

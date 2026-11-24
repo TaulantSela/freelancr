@@ -19,6 +19,7 @@ import {
 import { paymentTax } from "@/lib/tax/payments";
 import { SUPPORTED_CURRENCIES, formatCurrency, formatMKD } from "@/lib/tax/calculator";
 import { formatTaxDate } from "@/lib/tax/labels";
+import { DeemedCostsHelp } from "@/components/payments/deemed-costs-help";
 import { useTranslations } from "@/lib/i18n/client";
 import { formatMessage } from "@/lib/i18n/format";
 import { useNbrsmRate } from "@/components/rates/use-nbrsm-rate";
@@ -423,6 +424,7 @@ export function PaymentForm({
             ))}
           </select>
           <p className="text-xs text-muted-foreground">{f.deemedCostsHint}</p>
+          <DeemedCostsHelp />
         </div>
       )}
 

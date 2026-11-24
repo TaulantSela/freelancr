@@ -218,9 +218,9 @@ export const sq: Dictionary = {
       invoiceLanguageHint: "Gjuha e faturave PDF për këtë klient, pavarësisht gjuhës që përdor në aplikacion.",
       looksLikeEmbg:
         "Kjo duket si numër personal (EMBG). Shkruaj numrin tatimor të kompanisë ose lëre bosh.",
-      deemedCosts: "Shpenzimet e normuara (vetëm të drejtat e autorit)",
+      deemedCosts: "Për çfarë të paguan ky klient",
       deemedCostsHint:
-        "Vetëm të ardhurat nga të drejtat e autorit dhe të drejtat e përafërta tatohen pas zbritjes së shpenzimeve të normuara (Ligji për tatimin mbi të ardhurat personale, neni 40): 50% për vepra skulpturore, tapiceri, qeramikë dhe vitrazh; 40% për fotografi artistike, pikturë, vepra grafike, dizajn industrial, kostumografi dhe kreacion mode, skenografi, vepra muzikore dhe kinematografike dhe restaurim; 30% për vepra shkencore, profesionale dhe publicistike dhe për interpretimin e muzikës serioze, baletit, operës ose aktrimit; 20% për përkthime, ligjërata dhe vepra të tjera autoriale. Shumica e punëve freelance (softuer, konsulencë, shumica e shërbimeve) janë të ardhura nga puna (neni 14), pa shpenzime të normuara: lëre 0%. Pagesat e reja nga ky klient fillojnë me këtë normë.",
+        "Te shumica e freelancerëve janë shërbime ose punë, pa zbritje. Vetëm për vepër autoriale zbritet një pjesë para tatimit 10%. Pagesat e reja nga ky klient fillojnë me këtë zgjedhje.",
     },
     types: {
       company: "Kompani",
@@ -539,11 +539,28 @@ export const sq: Dictionary = {
       other: "Tjetër",
     },
     deemedOptions: {
-      "0": "Pa (0%): të ardhura nga puna",
-      "0.2": "20%: përkthime, ligjërata, vepra të tjera autoriale",
-      "0.3": "30%: vepra shkencore, profesionale, publicistike",
-      "0.4": "40%: fotografi artistike, pikturë, grafikë, dizajn, muzikë, film",
-      "0.5": "50%: skulpturë, tapiceri, qeramikë, vitrazh",
+      "0": "Shërbime ose punë (shumica e freelancerëve): pa zbritje",
+      "0.2": "Përkthime, ligjërata, vepra të tjera autoriale: zbritet 20%",
+      "0.3": "Vepra shkencore, profesionale ose publicistike: zbritet 30%",
+      "0.4": "Fotografi artistike, pikturë, dizajn industrial ose i modës, muzikë, film: zbritet 40%",
+      "0.5": "Skulpturë, tapiseri, qeramikë, vitrazh: zbritet 50%",
+    },
+    deemedKinds: {
+      "0": "Shërbime ose punë: programim, konsulencë, shumica e punëve si freelancer",
+      "0.2": "Përkthime, ligjërata, vepra të tjera autoriale",
+      "0.3": "Vepra shkencore, profesionale ose publicistike; interpretim i muzikës serioze, baletit, operës ose aktrim",
+      "0.4": "Fotografi artistike, pikturë, grafikë, dizajn industrial ose i modës, skenografi, vepra muzikore dhe filmike",
+      "0.5": "Skulpturë, tapiseri, qeramikë, vitrazh",
+    },
+    deemedHelp: {
+      summary: "Si funksionon kjo?",
+      intro: "Tatimi personal mbi të ardhurat është 10% e asaj që të paguhet. Kur paguhesh për vepër autoriale me kontratë autoriale (авторски договор), ligji fillimisht zbret një pjesë fikse si shpenzime të normuara (Ligji për tatimin personal mbi të ardhurat, neni 40), dhe 10% paguhet mbi pjesën që mbetet.",
+      example: "Shembull: të paguhen 1.000 € për një përkthim. Zbritet 20%, kështu që tatimi është 10% e 800 €: 80 € në vend të 100 €.",
+      work: "Për çfarë paguhesh",
+      deducted: "Zbritet",
+      taxOn: "Tatimi për 1.000 €",
+      taxAmount: "{n} €",
+      services: "Programimi, konsulenca dhe shërbimet e tjera janë të ardhura nga puna (neni 14), kështu që nuk zbritet asgjë. Nëse nuk je i sigurt, vendos kontrata: pyet kontabilistin tënd.",
     },
     calendar: {
       title: "Afatet tatimore {year}",
@@ -599,9 +616,9 @@ export const sq: Dictionary = {
       rateUnavailable:
         "Kursi i Bankës Popullore për {date} nuk u mor. Shkruaj kursin nga lista e saj e kurseve:",
       manualRate: "MKD për 1 {currency}",
-      deemedCosts: "Shpenzimet e normuara",
+      deemedCosts: "Për çfarë është kjo pagesë",
       deemedCostsHint:
-        "Vetëm për të ardhurat nga të drejtat e autorit (neni 40). Shumica e punëve freelance janë të ardhura nga puna (neni 14): 0%.",
+        "Fillon me zgjedhjen e klientit. Vetëm për vepër autoriale zbritet një pjesë para tatimit 10%.",
       channel: "Pranuar përmes",
       note: "Shënim",
       previewReceived: "Pranuar",
