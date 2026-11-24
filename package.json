@@ -8,6 +8,7 @@
     "vercel-build": "tsx lib/db/migrate.ts && next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "node --import tsx --test \"lib/**/*.test.ts\"",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:migrate": "node --env-file=.env.local --import tsx lib/db/migrate.ts",

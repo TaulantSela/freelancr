@@ -501,6 +501,28 @@ export const en: Dictionary = {
       "Some payments this month use a rate other than the National Bank's for their day (the invoice's rate, or one typed in), so the amounts in MKD here are approximate.",
     evidenceHint:
       "Attach proof to the calculation (e-PDD): the contract or the client's confirmation of the work, and the bank statement (извод) showing the money arrived.",
+    epdd: {
+      title: "What to type into e-PDD",
+      intro:
+        "One calculation per payment: UJP's form takes one item each, with amounts in whole units. UJP converts them at the National Bank's rate for the day the money arrived and works in whole denars.",
+      payment: "Payment {n} of {count}: {client}",
+      receivedOn: "Date the money arrived",
+      country: "Payer's country",
+      currency: "Currency",
+      amount: "Amount",
+      exact: "exactly {amount}",
+      taxPaidAbroad: "Tax paid abroad",
+      taxPaidAbroadHint: "rounded down; needs the foreign tax authority's certificate",
+      kind: "Kind of income",
+      kindServices: "Services (no deemed costs)",
+      kindAuthor: "Author's rights, {rate}% deemed costs",
+      ujpWill: "UJP's calculation should show",
+      ujpLine: "income {income} · tax {tax} · credit {credit} · to pay {owed}",
+      ujpLineNoCredit: "income {income} · tax {tax} · to pay {owed}",
+      total: "To pay on this month's calculations",
+      totalNote:
+        "Whole units can make this a few denars different from the month's figure above. Pay what UJP's approved calculation says.",
+    },
     treatments: {
       business: "Business income",
       withheld: "Tax withheld by the client",

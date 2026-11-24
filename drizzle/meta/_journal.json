@@ -148,6 +148,13 @@
       "when": 1795534747444,
       "tag": "0020_email_log",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1795562571236,
+      "tag": "0021_email_case_insensitive",
+      "breakpoints": true
     }
   ]
 }

@@ -4,7 +4,8 @@ import { after } from "next/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+import { normalizeEmail } from "@/lib/auth/email";
 import { getDb, users } from "@/lib/db";
 import { getSessionSecret } from "@/lib/env";
 import { generateId } from "@/lib/utils";
@@ -36,7 +37,7 @@ export async function requestPasswordReset(
   formData: FormData
 ): Promise<ForgotPasswordState> {
   if (!isEmailConfigured()) return { errorKey: "notConfigured" };
-  const email = String(formData.get("email") ?? "").trim();
+  const email = normalizeEmail(formData.get("email"));
   if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+$/.test(email)) {
     return { errorKey: "emailRequired" };
   }
@@ -53,7 +54,7 @@ async function sendResetLink(email: string, ipHash: string) {
   const [user] = await db
     .select({ id: users.id, email: users.email, name: users.name, isDemo: users.isDemo, locale: users.locale })
     .from(users)
-    .where(eq(users.email, email))
+    .where(eq(sql`lower(${users.email})`, email))
     .limit(1);
   if (!user || user.isDemo) return;
   const base = appUrl();

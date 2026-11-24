@@ -504,6 +504,28 @@ export const sq: Dictionary = {
       "Disa pagesa këtë muaj përdorin kurs tjetër nga ai i Bankës Popullore për ditën e tyre (kursin e faturës ose një të shkruar me dorë), ndaj shumat në denarë këtu janë të përafërta.",
     evidenceHint:
       "Llogaritjes (e-PDD) bashkëngjitja dëshmitë: kontratën ose konfirmimin e klientit për punën dhe ekstraktin bankar (извод) që tregon se paratë arritën.",
+    epdd: {
+      title: "Çfarë të shkruash në e-PDD",
+      intro:
+        "Një llogaritje për çdo pagesë: formulari i DAP-it pranon një zë për secilën, me shuma në njësi të plota. DAP-i i konverton me kursin e Bankës Popullore për ditën kur arritën paratë dhe llogarit në denarë të plotë.",
+      payment: "Pagesa {n} nga {count}: {client}",
+      receivedOn: "Data kur arritën paratë",
+      country: "Shteti i paguesit",
+      currency: "Monedha",
+      amount: "Shuma",
+      exact: "saktësisht {amount}",
+      taxPaidAbroad: "Tatimi i paguar jashtë",
+      taxPaidAbroadHint: "rrumbullakuar poshtë; duhet vërtetimi i autoritetit tatimor të huaj",
+      kind: "Lloji i të ardhurave",
+      kindServices: "Shërbime (pa shpenzime të normuara)",
+      kindAuthor: "Të drejta autori, {rate}% shpenzime të normuara",
+      ujpWill: "Llogaritja e DAP-it duhet të tregojë",
+      ujpLine: "të ardhura {income} · tatim {tax} · zbritje {credit} · për t'u paguar {owed}",
+      ujpLineNoCredit: "të ardhura {income} · tatim {tax} · për t'u paguar {owed}",
+      total: "Për t'u paguar sipas llogaritjeve të këtij muaji",
+      totalNote:
+        "Për shkak të njësive të plota, kjo mund të ndryshojë me disa denarë nga shuma e muajit më lart. Paguaj atë që tregon llogaritja e miratuar e DAP-it.",
+    },
     treatments: {
       business: "Të ardhura nga veprimtaria",
       withheld: "Tatimin e mbajti klienti",

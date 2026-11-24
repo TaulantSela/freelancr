@@ -22,9 +22,10 @@ import {
 } from "@/lib/tax/payments";
 import { MonthUjpActions, UseNbrsmRatesButton } from "@/components/payments/month-actions";
 import { TaxCalendar } from "@/components/payments/tax-calendar";
+import { EpddPanel } from "@/components/payments/epdd-panel";
 import { AttachmentCount } from "@/components/attachments/attachment-list";
 import { getPaymentAttachmentCounts } from "@/lib/attachments/queries";
-import type { Dictionary } from "@/lib/i18n/types";
+import type { Dictionary, Locale } from "@/lib/i18n/types";
 
 const STATUS_COLORS: Record<UjpMonthStatus, string> = {
   nothing: "text-muted-foreground border-border",
@@ -61,7 +62,7 @@ export default async function PaymentsPage({
   const session = await getSession();
   if (!session) redirect("/sign-in");
 
-  const { t } = await getTranslations();
+  const { t, locale } = await getTranslations();
   const today = toSkopjeDate(new Date());
   const currentYear = Number(today.slice(0, 4));
   const { year: yearParam } = await searchParams;
@@ -209,6 +210,7 @@ export default async function PaymentsPage({
             fileCounts={fileCounts}
             notRegistered={notRegistered}
             today={today}
+            locale={locale}
             t={t}
           />
         ))
@@ -233,6 +235,7 @@ function MonthCard({
   fileCounts,
   notRegistered,
   today,
+  locale,
   t,
 }: {
   month: MonthSummary;
@@ -241,6 +244,7 @@ function MonthCard({
   fileCounts: ReadonlyMap<string, number>;
   notRegistered: boolean;
   today: string;
+  locale: Locale;
   t: Dictionary;
 }) {
   const p = t.payments;
@@ -340,6 +344,15 @@ function MonthCard({
             <span className="flex-1 min-w-[12rem]">{p.otherRatesFlag}</span>
             {hasInvoiceRates && <UseNbrsmRatesButton month={month.month} />}
           </div>
+        )}
+
+        {notRegistered && selfReported.length > 0 && month.status !== "paid" && (
+          <EpddPanel
+            payments={selfReported}
+            open={month.status === "to_file" || (month.status === "late" && !month.filed)}
+            locale={locale}
+            t={t}
+          />
         )}
 
         {notRegistered && selfReported.length > 0 && month.status !== "paid" && (

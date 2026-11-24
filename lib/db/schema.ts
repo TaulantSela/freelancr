@@ -86,6 +86,8 @@ export const users = pgTable("users", {
   demoExpiresAt: timestamp("demo_expires_at", { mode: "string" }),
 }, (table) => [
   index("users_demo_expires_at_idx").on(table.demoExpiresAt),
+  // One account per address whatever the case (lib/auth/email.ts).
+  uniqueIndex("users_email_lower_unique").on(sql`lower(${table.email})`),
 ]);
 
 export const clients = pgTable("clients", {

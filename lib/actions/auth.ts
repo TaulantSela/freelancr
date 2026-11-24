@@ -7,11 +7,12 @@ import { createSession, deleteSession, getSession } from "@/lib/auth/session";
 import { BCRYPT_COST, MIN_PASSWORD_LENGTH } from "@/lib/auth/password";
 import { generateId } from "@/lib/utils";
 import { eq, sql } from "drizzle-orm";
+import { normalizeEmail } from "@/lib/auth/email";
 import type { AuthErrorKey } from "@/lib/i18n/format";
 import { getLocale } from "@/lib/i18n/server";
 
 export async function signUp(formData: FormData) {
-  const email = formData.get("email") as string;
+  const email = normalizeEmail(formData.get("email"));
   const password = formData.get("password") as string;
   const name = formData.get("name") as string;
 
@@ -24,7 +25,7 @@ export async function signUp(formData: FormData) {
   }
 
   const existing = (
-    await getDb().select().from(users).where(eq(users.email, email))
+    await getDb().select().from(users).where(eq(sql`lower(${users.email})`, email))
   )[0];
   if (existing) {
     return { errorKey: "emailExists" as AuthErrorKey };
@@ -42,7 +43,7 @@ export async function signUp(formData: FormData) {
 }
 
 export async function signIn(formData: FormData) {
-  const email = formData.get("email") as string;
+  const email = normalizeEmail(formData.get("email"));
   const password = formData.get("password") as string;
 
   if (!email || !password) {
@@ -50,7 +51,7 @@ export async function signIn(formData: FormData) {
   }
 
   const user = (
-    await getDb().select().from(users).where(eq(users.email, email))
+    await getDb().select().from(users).where(eq(sql`lower(${users.email})`, email))
   )[0];
   if (!user) {
     return { errorKey: "invalidCredentials" as AuthErrorKey };
