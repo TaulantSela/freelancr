@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
 import { SandboxButton } from "@/components/demo/sandbox-button";
 import { DemoPlayer } from "@/components/demo/demo-player";
+import { getSession } from "@/lib/auth/session";
 import { getTranslations } from "@/lib/i18n/server";
 import { formatMessage } from "@/lib/i18n/format";
 import { DEMO_SCRIPT } from "@/lib/demo/script";
@@ -27,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
 // with its chapters, the same steps written out with a screenshot each,
 // and the ways in. Public.
 export default async function DemoPage() {
-  const { locale, t } = await getTranslations();
+  const [{ locale, t }, session] = await Promise.all([getTranslations(), getSession()]);
   const script = DEMO_SCRIPT[locale];
   const recording = RECORDINGS[locale];
   const dir = `/demo/${locale}`;
@@ -87,18 +88,22 @@ export default async function DemoPage() {
           ))}
         </section>
 
-        <section className="rounded-lg border border-border bg-card px-6 py-12 text-center">
-          <h2 className="text-2xl font-semibold mb-3">{t.demo.endTitle}</h2>
-          <p className="text-muted-foreground text-sm mb-8 max-w-md mx-auto">{t.demo.endText}</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center sm:items-start">
-            <SandboxButton />
-            <Link href="/sign-up">
-              <Button size="lg" variant="outline" className="gap-2">
-                {t.demo.createAccount} <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </section>
+        {/* Signed in, the header offers the dashboard instead: a sandbox
+            started from here would replace the session. */}
+        {!session && (
+          <section className="rounded-lg border border-border bg-card px-6 py-12 text-center">
+            <h2 className="text-2xl font-semibold mb-3">{t.demo.endTitle}</h2>
+            <p className="text-muted-foreground text-sm mb-8 max-w-md mx-auto">{t.demo.endText}</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center sm:items-start">
+              <SandboxButton />
+              <Link href="/sign-up">
+                <Button size="lg" variant="outline" className="gap-2">
+                  {t.demo.createAccount} <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </section>
+        )}
       </main>
       <footer className="border-t border-border">
         <p className="max-w-6xl mx-auto px-4 sm:px-6 py-8 text-xs text-muted-foreground leading-relaxed">
