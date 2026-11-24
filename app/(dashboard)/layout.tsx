@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { MobileNav, Sidebar } from "@/components/dashboard/sidebar";
+import { SandboxBanner } from "@/components/demo/sandbox-banner";
 
 export default async function DashboardLayout({
   children,
@@ -15,6 +16,7 @@ export default async function DashboardLayout({
       <Sidebar userName={session.name} />
       <MobileNav userName={session.name} />
       <main className="flex-1 overflow-auto">
+        {session.demoExpiresAt && <SandboxBanner />}
         {children}
       </main>
     </div>

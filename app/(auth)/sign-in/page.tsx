@@ -11,6 +11,7 @@ import { FileText, Loader2 } from "lucide-react";
 import { signIn } from "@/lib/actions/auth";
 import { useTranslations } from "@/lib/i18n/client";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { SandboxButton } from "@/components/demo/sandbox-button";
 import type { AuthErrorKey } from "@/lib/i18n/format";
 
 export default function SignInPage() {
@@ -110,6 +111,16 @@ export default function SignInPage() {
             </p>
           </CardContent>
         </Card>
+
+        <div className="mt-6 flex flex-col items-center gap-3">
+          <SandboxButton size="default" variant="outline" wide className="w-full" />
+          <Link
+            href="/demo"
+            className="text-sm text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+          >
+            {t.demo.seeHow}
+          </Link>
+        </div>
       </div>
     </div>
   );

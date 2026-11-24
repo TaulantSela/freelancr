@@ -2,9 +2,9 @@ import type { Dictionary } from "../types";
 
 export const en: Dictionary = {
   meta: {
-    title: "Freelancr — Invoice & Tax Platform for Macedonian Freelancers",
+    title: "Freelancr: clients, invoices and what you owe UJP",
     description:
-      "An invoicing and compliance platform built for North Macedonia's freelancers. Multi-currency invoices, DDV threshold monitoring, UJP tax deadlines.",
+      "Invoice clients at home and abroad in their language, record each payment at the National Bank's rate for the day, and see what you owe UJP every month, with the е-ПДД deadlines. For freelancers in North Macedonia.",
   },
   common: {
     appName: "Freelancr",
@@ -31,6 +31,7 @@ export const en: Dictionary = {
     payments: "Payments",
     menu: "Menu",
     settings: "Settings",
+    howItWorks: "How it works",
   },
   auth: {
     welcomeBack: "Welcome back",
@@ -84,38 +85,59 @@ export const en: Dictionary = {
     },
   },
   landing: {
-    badge: "Built for North Macedonia · MKD + EUR + USD invoicing",
-    heroTitle: "The invoicing platform that actually understands Macedonian freelancers",
+    badge: "For freelancers in North Macedonia",
+    heroTitle: "Clients, invoices and what you owe UJP, in one place",
     heroSubtitle:
-      "Stop invoicing in Word and tracking income in Excel. Freelancr keeps your clients at home and abroad and your invoices in one place, and shows your UJP deadlines with roughly what you owe.",
-    createAccount: "Create an account",
-    signInAccount: "Sign in to your account",
-    featuresTitle: "Everything a Macedonian freelancer needs",
-    featuresSubtitle:
-      "Global tools don't know what DDV is. Your Excel doesn't know your tax deadlines. Freelancr knows both.",
+      "Invoice clients at home and abroad in their language, record each payment at the National Bank's rate for the day it arrived, and see what you owe UJP every month, with the е-ПДД deadlines.",
+    featuresTitle: "What it does",
     features: [
       {
-        title: "Multi-currency invoicing",
-        desc: "Create invoices in MKD, EUR, or USD. The MKD equivalent is calculated automatically at the National Bank's middle rate.",
+        title: "Invoices",
+        desc: "Numbered when you issue them, in Macedonian, Albanian or English, with the details the law asks an invoice to state, and credit notes when something changes.",
       },
       {
-        title: "DDV threshold monitoring",
-        desc: "Tracks your invoices to clients in North Macedonia against the 2,000,000 MKD threshold, with alerts at 70%, 85% and 100%. Services to clients abroad don't count.",
+        title: "Payments",
+        desc: "Partial payments, bank and platform fees, payouts without an invoice, each converted at the National Bank's rate for the day it arrived.",
       },
       {
-        title: "Tax deadline calendar",
-        desc: "The UJP deadlines for how you're registered: monthly report and payment dates for income you report yourself (from clients abroad or private persons), or monthly advances and the 15 March annual balance if you're self-employed.",
+        title: "What you owe UJP, month by month",
+        desc: "10% of the income you report yourself, credit for tax paid abroad, and the 10% companies in North Macedonia already withheld. Mark each month filed, approved and paid, and get an email before each deadline.",
       },
       {
-        title: "Annual income tracker",
-        desc: "Yearly income by client and currency, and roughly what you owe UJP for each month.",
+        title: "The DDV threshold",
+        desc: "Your supplies in North Macedonia against the 2,000,000 MKD threshold, counted the way the law counts them: services to clients abroad don't count.",
+      },
+      {
+        title: "For your accountant",
+        desc: "CSV exports of payments, invoices and credit notes, and the bank statements and contracts attached to each payment and client.",
       },
     ],
-    ctaTitle: "Ready to replace Excel + Word?",
+    ctaTitle: "Try it before you sign up",
     ctaSubtitle:
-      "Issue numbered invoices in your client's language and see what you owe UJP each month.",
-    ctaButton: "Create your account",
+      "A sandbox with six months of sample data opens in a few seconds and is deleted after 24 hours.",
+    disclaimer:
+      "Freelancr helps you keep records and work out what you owe. UJP's approved calculation is the final figure; this isn't tax advice.",
     footerTagline: "Built for North Macedonia · Изградено за Македонија · Ndërtuar për Maqedoninë",
+  },
+  demo: {
+    tryButton: "Try it with sample data",
+    preparing: "Preparing the sample data…",
+    busy: "The demo is busy, try again later.",
+    banner: "You're trying Freelancr with sample data. It's deleted after 24 hours.",
+    createOwn: "Create your own account",
+    seeHow: "See how it works",
+    createAccount: "Create your account",
+    pageTitle: "How Freelancr works",
+    pageIntro:
+      "A two-minute walkthrough with the sample data a sandbox gets: a business that invoices clients at home and abroad, and the tax it owes UJP each month.",
+    metaDescription:
+      "A walkthrough of Freelancr: clients, invoices, payments and what you owe UJP, step by step.",
+    chapters: "Chapters",
+    guide: "Step by step",
+    step: "Step {n}",
+    videoFallback: "Your browser can't play this video. The steps are below.",
+    endTitle: "Try it yourself",
+    endText: "Open a sandbox with the same sample data, or create your account.",
   },
   dashboard: {
     title: "Dashboard",
@@ -683,6 +705,7 @@ export const en: Dictionary = {
     none: "No files yet.",
     upload: "Upload a file",
     limits: "PDF, PNG or JPEG, up to 4 MB each (100 MB in all).",
+    limitsDemo: "PDF, PNG or JPEG, up to 4 MB each (5 MB in all in a demo account).",
     uploaded: "Uploaded {name}",
     delete: "Delete file",
     deleteTitle: "Delete {name}?",
@@ -693,6 +716,7 @@ export const en: Dictionary = {
       tooLarge: "That file is over 4 MB.",
       type: "Only PDF, PNG or JPEG files, checked from the file itself.",
       quota: "That would take you over the 100 MB for files. Delete some first.",
+      demoQuota: "Demo accounts keep up to 5 MB of files. Delete one first.",
       notFound: "That isn't one of yours.",
       invalid: "The upload didn't work. Try again.",
     },

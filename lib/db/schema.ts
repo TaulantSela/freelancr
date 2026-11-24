@@ -80,7 +80,13 @@ export const users = pgTable("users", {
   // in Settings.
   remindersEnabled: boolean("reminders_enabled").notNull().default(true),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-});
+  // A visitor's sandbox ("Try it with sample data", lib/demo/sandbox.ts): a
+  // demo account (is_demo) the daily cron deletes once this has passed. Null
+  // for everyone else, the shared demo account included.
+  demoExpiresAt: timestamp("demo_expires_at", { mode: "string" }),
+}, (table) => [
+  index("users_demo_expires_at_idx").on(table.demoExpiresAt),
+]);
 
 export const clients = pgTable("clients", {
   id: text("id").primaryKey(),
@@ -290,6 +296,17 @@ export const passwordResetRequests = pgTable("password_reset_requests", {
   createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
 }, (table) => [
   index("password_reset_requests_ip_hash_created_at_idx").on(table.ipHash, table.createdAt),
+]);
+
+// Every "Try it with sample data" request, by a keyed hash of the
+// requester's IP (not the IP itself), to allow at most 5 sandboxes an hour
+// from one IP.
+export const sandboxRequests = pgTable("sandbox_requests", {
+  id: text("id").primaryKey(),
+  ipHash: text("ip_hash").notNull(),
+  createdAt: timestamp("created_at", { mode: "string" }).notNull().defaultNow(),
+}, (table) => [
+  index("sandbox_requests_ip_hash_created_at_idx").on(table.ipHash, table.createdAt),
 ]);
 
 // A credit note (книжно одобрение) on an issued invoice: it lowers what the

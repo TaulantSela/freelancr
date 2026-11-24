@@ -5,11 +5,13 @@
 export const MAX_ATTACHMENT_BYTES = 4 * 1024 * 1024;
 // Everything one user keeps.
 export const ATTACHMENT_QUOTA_BYTES = 100 * 1024 * 1024;
+// Demo accounts (the shared one and the sandboxes) keep less.
+export const DEMO_ATTACHMENT_QUOTA_BYTES = 5 * 1024 * 1024;
 
 export type AttachmentType = "application/pdf" | "image/png" | "image/jpeg";
 
 // Why an upload was refused (the upload route answers with one of these).
-export type UploadErrorKey = "tooLarge" | "type" | "quota" | "notFound" | "invalid";
+export type UploadErrorKey = "tooLarge" | "type" | "quota" | "demoQuota" | "notFound" | "invalid";
 
 const EXTENSIONS: Record<AttachmentType, string[]> = {
   "application/pdf": ["pdf"],

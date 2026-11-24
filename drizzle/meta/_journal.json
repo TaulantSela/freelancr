@@ -134,6 +134,13 @@
       "when": 1795473488595,
       "tag": "0018_reminders",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1795518400153,
+      "tag": "0019_sandboxes",
+      "breakpoints": true
     }
   ]
 }

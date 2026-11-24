@@ -1,0 +1,61 @@
+{
+  "duration": 105.4,
+  "webm": true,
+  "chapters": [
+    {
+      "id": "intro",
+      "title": "Freelancr",
+      "start": 0
+    },
+    {
+      "id": "profile",
+      "title": "Profili yt",
+      "start": 7.4
+    },
+    {
+      "id": "clients",
+      "title": "Klientët",
+      "start": 16.8
+    },
+    {
+      "id": "invoice",
+      "title": "Fatura",
+      "start": 25.4
+    },
+    {
+      "id": "payment",
+      "title": "Pagesa",
+      "start": 44
+    },
+    {
+      "id": "tax",
+      "title": "Sa i detyrohesh UJP-së",
+      "start": 56.2
+    },
+    {
+      "id": "withheld",
+      "title": "Tatimi i mbajtur për ty",
+      "start": 62.6
+    },
+    {
+      "id": "filing",
+      "title": "Dorëzimi në UJP",
+      "start": 67.9
+    },
+    {
+      "id": "proof",
+      "title": "Dëshmi dhe eksporte",
+      "start": 79.8
+    },
+    {
+      "id": "dashboard",
+      "title": "Paneli",
+      "start": 91.4
+    },
+    {
+      "id": "end",
+      "title": "Provoje",
+      "start": 101.2
+    }
+  ]
+}

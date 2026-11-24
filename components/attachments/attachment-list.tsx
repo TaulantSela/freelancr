@@ -35,9 +35,12 @@ export type AttachmentItem = {
 export function AttachmentList({
   owner,
   items,
+  demo = false,
 }: {
   owner: { paymentId: string } | { clientId: string };
   items: AttachmentItem[];
+  // A demo account: 5 MB of files in all, not 100.
+  demo?: boolean;
 }) {
   const t = useTranslations();
   const a = t.attachments;
@@ -121,7 +124,7 @@ export function AttachmentList({
           {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
           {a.upload}
         </Button>
-        <span className="text-xs text-muted-foreground">{a.limits}</span>
+        <span className="text-xs text-muted-foreground">{demo ? a.limitsDemo : a.limits}</span>
       </div>
     </div>
   );

@@ -1,0 +1,61 @@
+{
+  "duration": 105.4,
+  "webm": true,
+  "chapters": [
+    {
+      "id": "intro",
+      "title": "Freelancr",
+      "start": 0
+    },
+    {
+      "id": "profile",
+      "title": "Your profile",
+      "start": 7.4
+    },
+    {
+      "id": "clients",
+      "title": "Clients",
+      "start": 16.8
+    },
+    {
+      "id": "invoice",
+      "title": "An invoice",
+      "start": 25.4
+    },
+    {
+      "id": "payment",
+      "title": "A payment",
+      "start": 44
+    },
+    {
+      "id": "tax",
+      "title": "What you owe UJP",
+      "start": 56.2
+    },
+    {
+      "id": "withheld",
+      "title": "Tax withheld for you",
+      "start": 62.6
+    },
+    {
+      "id": "filing",
+      "title": "Filing with UJP",
+      "start": 67.9
+    },
+    {
+      "id": "proof",
+      "title": "Proof and exports",
+      "start": 79.8
+    },
+    {
+      "id": "dashboard",
+      "title": "The dashboard",
+      "start": 91.4
+    },
+    {
+      "id": "end",
+      "title": "Try it",
+      "start": 101.2
+    }
+  ]
+}

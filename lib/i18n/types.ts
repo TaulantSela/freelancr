@@ -30,6 +30,7 @@ export type Dictionary = {
     payments: string;
     menu: string;
     settings: string;
+    howItWorks: string;
   };
   auth: {
     welcomeBack: string;
@@ -86,15 +87,30 @@ export type Dictionary = {
     badge: string;
     heroTitle: string;
     heroSubtitle: string;
-    createAccount: string;
-    signInAccount: string;
     featuresTitle: string;
-    featuresSubtitle: string;
     features: { title: string; desc: string }[];
     ctaTitle: string;
     ctaSubtitle: string;
-    ctaButton: string;
+    disclaimer: string;
     footerTagline: string;
+  };
+  demo: {
+    tryButton: string;
+    preparing: string;
+    busy: string;
+    banner: string;
+    createOwn: string;
+    seeHow: string;
+    createAccount: string;
+    pageTitle: string;
+    pageIntro: string;
+    metaDescription: string;
+    chapters: string;
+    guide: string;
+    step: string;
+    videoFallback: string;
+    endTitle: string;
+    endText: string;
   };
   dashboard: {
     title: string;
@@ -614,6 +630,7 @@ export type Dictionary = {
     none: string;
     upload: string;
     limits: string;
+    limitsDemo: string;
     uploaded: string;
     delete: string;
     deleteTitle: string;
@@ -624,6 +641,7 @@ export type Dictionary = {
       tooLarge: string;
       type: string;
       quota: string;
+      demoQuota: string;
       notFound: string;
       invalid: string;
     };
