@@ -880,12 +880,12 @@ export const sq: Dictionary = {
       fileTomorrow: {
         subject: "Nesër: llogaritja (е-ПДД) për {month}",
         body:
-          "Llogaritja (е-ПДД) për të ardhurat e muajit {month} duhet dorëzuar nesër, më {date}. Tatimi është {amount}.",
+          "Llogaritja (е-ПДД) për të ardhurat e muajit {month} duhet dorëzuar nesër, më {date}. Tatimi, {amount}, paguhet deri më 15.",
       },
       payBy15: {
         subject: "Paguaj {amount} te UJP deri më 15",
         body:
-          "Tatimi për të ardhurat e muajit {month} që nuk është shënuar si i paguar është {amount}. Paguaje deri më {date}, sipas urdhëresës (ПП53) të llogaritjes së miratuar.",
+          "Nga tatimi për të ardhurat e muajit {month}, {amount} ende nuk është shënuar si i paguar. Paguaje deri më {date}, sipas urdhëresës (ПП53) të llogaritjes së miratuar.",
       },
       annualReturn: {
         subject: "Konfirmo deklaratën vjetore (ГДП) për {year} deri më 31 maj",

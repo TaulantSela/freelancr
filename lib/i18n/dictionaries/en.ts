@@ -876,12 +876,12 @@ export const en: Dictionary = {
       fileTomorrow: {
         subject: "Tomorrow: the е-ПДД for {month}",
         body:
-          "The calculation (е-ПДД) for your {month} income is due tomorrow, {date}. The tax on it is {amount}.",
+          "The calculation (е-ПДД) for your {month} income is due tomorrow, {date}. The tax on it, {amount}, is due by the 15th.",
       },
       payBy15: {
         subject: "Pay {amount} to UJP by the 15th",
         body:
-          "The tax on your {month} income that isn't marked paid is {amount}. Pay it by {date}, against the payment order (ПП53) on the approved calculation.",
+          "Of the tax on your {month} income, {amount} isn't marked paid yet. Pay it by {date}, against the payment order (ПП53) on the approved calculation.",
       },
       annualReturn: {
         subject: "Confirm UJP's annual return (ГДП) for {year} by 31 May",
