@@ -90,6 +90,21 @@ export default function SignUpPage() {
                 {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 {t.auth.signUp}
               </Button>
+              <p className="text-xs text-muted-foreground text-center leading-relaxed">
+                {t.legal.agree.split(/(\{terms\}|\{privacy\})/).map((part, i) =>
+                  part === "{terms}" ? (
+                    <Link key={i} href="/terms" className="text-primary hover:underline">
+                      {t.legal.termsLink}
+                    </Link>
+                  ) : part === "{privacy}" ? (
+                    <Link key={i} href="/privacy" className="text-primary hover:underline">
+                      {t.legal.privacyLink}
+                    </Link>
+                  ) : (
+                    <span key={i}>{part}</span>
+                  )
+                )}
+              </p>
             </form>
 
             <p className="text-center text-sm text-muted-foreground mt-6">

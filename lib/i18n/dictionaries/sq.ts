@@ -792,6 +792,21 @@ export const sq: Dictionary = {
         demo: "Nuk është në dispozicion në llogarinë demo.",
       },
     },
+    deleteAccount: {
+      title: "Fshije llogarinë",
+      desc: "Fshin llogarinë tënde dhe gjithçka në të: klientët, faturat, pagesat, notat e kreditit dhe skedarët. Kjo nuk mund të kthehet.",
+      exportHint:
+        "Ligji mund të kërkojë t'i ruash faturat dhe të dhënat tatimore, prandaj së pari shkarko eksportet CSV (te faqet Pagesat dhe Faturat).",
+      password: "Fjalëkalimi yt",
+      confirm: "E kuptoj që gjithçka në llogarinë time do të fshihet.",
+      submit: "Fshije llogarinë time",
+      errors: {
+        required: "Shkruaj fjalëkalimin.",
+        wrongPassword: "Fjalëkalimi nuk është i saktë.",
+        notConfirmed: "Shëno kutinë për ta konfirmuar.",
+        demo: "Nuk është në dispozicion në llogarinë demo.",
+      },
+    },
     errors: {
       nameRequired: "Emri është i detyrueshëm",
       advanceInvalid: "Shkruaj akontimin mujor si shumë në MKD, ose lëre bosh.",
@@ -940,6 +955,18 @@ export const sq: Dictionary = {
         bodyNoAmount:
           "Paguaj akontimin e tatimit për {month} deri më {date}. Shto shumën te Cilësimet që ta shohësh këtu.",
       },
+    },
+  },
+  legal: {
+    privacy: "Politika e privatësisë",
+    terms: "Kushtet e përdorimit",
+    agree: "Duke krijuar llogari, pranon {terms} dhe {privacy}.",
+    termsLink: "kushtet e përdorimit",
+    privacyLink: "politikën e privatësisë",
+    accountDeleted: {
+      title: "Llogaria jote u fshi",
+      body: "Gjithçka në të u hoq nga Freelancr. Nga kopjet rezervë të enkriptuara fshihet brenda 14 ditëve.",
+      home: "Kthehu në faqen kryesore",
     },
   },
 };

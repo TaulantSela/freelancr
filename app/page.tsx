@@ -114,7 +114,15 @@ export default async function LandingPage() {
               <span>{t.common.appName}</span>
             </div>
             <span className="text-center">{t.landing.footerTagline}</span>
-            <div>© 2026 Freelancr</div>
+            <div className="flex items-center gap-4">
+              <Link href="/privacy" className="hover:text-foreground transition-colors">
+                {t.legal.privacy}
+              </Link>
+              <Link href="/terms" className="hover:text-foreground transition-colors">
+                {t.legal.terms}
+              </Link>
+              <span>© 2026 Freelancr</span>
+            </div>
           </div>
         </div>
       </footer>
