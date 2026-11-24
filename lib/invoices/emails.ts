@@ -1,4 +1,4 @@
-import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { getDb, invoiceEmails } from "@/lib/db";
 import type { InvoiceDetail } from "@/lib/invoices/queries";
 import { getDictionary } from "@/lib/i18n/server";
@@ -43,7 +43,8 @@ export async function completeInvoiceEmail(
     .where(eq(invoiceEmails.id, id));
 }
 
-// The invoice's emails that went out, newest first.
+// The invoice's emails that went out (the send cleared the 'sending'
+// placeholder), newest first.
 export async function getInvoiceEmailLog(invoiceId: string, userId: string) {
   return getDb()
     .select({ id: invoiceEmails.id, toAddress: invoiceEmails.toAddress, sentAt: invoiceEmails.sentAt })
@@ -52,7 +53,7 @@ export async function getInvoiceEmailLog(invoiceId: string, userId: string) {
       and(
         eq(invoiceEmails.invoiceId, invoiceId),
         eq(invoiceEmails.userId, userId),
-        isNotNull(invoiceEmails.providerId)
+        isNull(invoiceEmails.error)
       )
     )
     .orderBy(desc(invoiceEmails.sentAt));
