@@ -102,12 +102,15 @@ is. Freelancr puts the invoices and the local tax picture in one place.
   password is public) and the sandboxes can't change or reset a password,
   send email or get reminders, and keep at most 5 MB of files. A sandbox
   can't be signed into again once you sign out, and the daily cron deletes
-  it after 24 hours.
+  it after 24 hours. The daily cron also seeds the shared demo account
+  again, dated from that day, so anything a visitor changes there is gone
+  the next morning.
 - **Backups are nightly and logical.** Up to a day of changes can be lost.
   A backup is built in memory, which is fine up to a few hundred MB of data,
   attachments included. A restore needs the database at the backup's
-  migration level. Nothing alerts on a failed backup: the cron's result in
-  the Vercel logs says `"backup": {"failed": 1}`.
+  migration level. A failed backup is emailed to `ALERT_EMAIL` (and the
+  cron's result says `"backup": {"failed": 1}`); if the cron stops running
+  altogether, nothing notices.
 - **The legal pages aren't reviewed by a lawyer.**
 
 ## How it works
@@ -171,7 +174,8 @@ is. Freelancr puts the invoices and the local tax picture in one place.
    (`lib/reminders/plan.ts`), and each is logged before it's sent, once per
    user, kind and period.
 9. **Sandboxes and the walkthrough.** `lib/demo/sample-data.ts` builds the
-   sample data for the shared demo account (`scripts/seed-demo.ts`) and for
+   sample data for the shared demo account (`scripts/seed-demo.ts`, and
+   every day `lib/demo/shared.ts`, keeping its id and password) and for
    each sandbox (`lib/demo/sandbox.ts`, `lib/actions/demo.ts`): rates from
    the cache, then one National Bank request, then the fixed rates, marked.
    A sandbox is created in one statement that also enforces the cap of 300;
@@ -255,6 +259,7 @@ send something say so.
 | `APP_URL` | Optional: the base URL for links in emails. Defaults to `https://$VERCEL_PROJECT_PRODUCTION_URL`; links are never built from a request's host |
 | `CRON_SECRET` | The bearer token Vercel Cron sends to `/api/cron/daily`; anything else gets a 401 |
 | `EMAIL_DAILY_CAP` | Optional: at most this many emails in any 24 hours, for all users together (default 100) |
+| `ALERT_EMAIL` | Optional: where the daily cron reports a failed backup or demo refresh |
 
 `RESEND_API_BASE` exists only so tests can point the API at a local stub.
 To run the cron by hand:
