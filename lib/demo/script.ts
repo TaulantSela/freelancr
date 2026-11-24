@@ -233,21 +233,21 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
     ],
   },
   sq: {
-    tagline: "Klientët, faturat, pagesat dhe sa i detyrohesh UJP-së",
+    tagline: "Klientët, faturat, pagesat dhe sa i detyrohesh DAP-it",
     chapters: [
       {
         id: "intro",
         title: "Freelancr",
-        caption: "Klientët, faturat, pagesat dhe sa i detyrohesh UJP-së, në një vend.",
+        caption: "Klientët, faturat, pagesat dhe sa i detyrohesh DAP-it, në një vend.",
         guide: [],
       },
       {
         id: "profile",
         title: "Profili yt",
-        caption: "Mënyra si je regjistruar vendos afatet e tua në UJP dhe nëse fatura mund të ketë TVSH.",
+        caption: "Mënyra si je regjistruar vendos afatet e tua në DAP dhe nëse fatura mund të ketë TVSH.",
         guide: [
-          "Fillo te Cilësimet. Zgjidh si je regjistruar për tatim: pa veprimtari të regjistruar (rasti i zakonshëm për të ardhura nga klientë jashtë vendit) ose i vetëpunësuar i regjistruar. Kjo vendos afatet në UJP dhe si llogaritet tatimi i çdo pagese.",
-          "Shëno regjistrimin për TVSH vetëm nëse UJP të ka regjistruar për TVSH; përndryshe faturat nuk kanë TVSH. Shto bankën, IBAN-in dhe BIC/SWIFT që të shtypen në çdo faturë.",
+          "Fillo te Cilësimet. Zgjidh si je regjistruar për tatim: pa veprimtari të regjistruar (rasti i zakonshëm për të ardhura nga klientë jashtë vendit) ose i vetëpunësuar i regjistruar. Kjo vendos afatet në DAP dhe si llogaritet tatimi i çdo pagese.",
+          "Shëno regjistrimin për TVSH vetëm nëse DAP-i të ka regjistruar për TVSH; përndryshe faturat nuk kanë TVSH. Shto bankën, IBAN-in dhe BIC/SWIFT që të shtypen në çdo faturë.",
         ],
       },
       {
@@ -276,18 +276,18 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         caption: "Regjistro paratë që arritën; kursi i Bankës Popullore për atë ditë plotësohet vetë.",
         guide: [
           "Kur paratë arrijnë në llogari, regjistroji te fatura: ditën kur arritën, sa u kreditua dhe tarifat që mori banka ose platforma.",
-          "Kursi mesatar i Bankës Popullore për atë ditë plotësohet vetë, ashtu siç e konverton UJP, dhe kur pagesat e mbulojnë faturën, ajo shfaqet e paguar.",
+          "Kursi mesatar i Bankës Popullore për atë ditë plotësohet vetë, ashtu siç e konverton DAP-i, dhe kur pagesat e mbulojnë faturën, ajo shfaqet e paguar.",
           "Pagesat pa faturë, nga një platformë si Upwork, regjistrohen njësoj.",
         ],
       },
       {
         id: "tax",
-        title: "Sa i detyrohesh UJP-së",
-        caption: "Çdo muaj, tatimi për të ardhurat që i deklaron vetë: е-ПДД deri më 10 dhe pagesa deri më 15.",
+        title: "Sa i detyrohesh DAP-it",
+        caption: "Çdo muaj, tatimi për të ardhurat që i deklaron vetë: e-PDD deri më 10 dhe pagesa deri më 15.",
         guide: [
           "Faqja Pagesat tregon çdo muaj: çfarë arriti, të ardhurat dhe tatimin për to.",
           "Për të ardhurat që i deklaron vetë, nga klientë jashtë vendit, tatimi është 10%, minus tatimin e paguar tashmë jashtë vendit.",
-          "Dorëzo llogaritjen (е-ПДД) deri më 10 të muajit pasues dhe paguaj deri më 15; karta e muajit i tregon të dyja datat.",
+          "Dorëzo llogaritjen (e-PDD) deri më 10 të muajit pasues dhe paguaj deri më 15; karta e muajit i tregon të dyja datat.",
         ],
       },
       {
@@ -295,17 +295,17 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         title: "Tatimi i mbajtur për ty",
         caption: "Një kompani në Maqedoninë e Veriut e mban tatimin 10% dhe e paguan për ty, ndaj shfaqet si i paguar tashmë.",
         guide: [
-          "Kur të paguan një kompani në Maqedoninë e Veriut, ajo e mban tatimin 10% dhe ia paguan vetë UJP-së.",
+          "Kur të paguan një kompani në Maqedoninë e Veriut, ajo e mban tatimin 10% dhe ia paguan vetë DAP-it.",
           "Regjistro sa të pagoi dhe sa tatim mbajti: muaji e tregon atë tatim si të paguar tashmë për ty, që të mos numërohet sërish në atë që detyrohesh.",
         ],
       },
       {
         id: "filing",
-        title: "Dorëzimi në UJP",
-        caption: "Shëno muajin si të dorëzuar, të miratuar dhe të paguar, me numrat e UJP-së.",
+        title: "Dorëzimi në DAP",
+        caption: "Shëno muajin si të dorëzuar, të miratuar dhe të paguar, me numrat e DAP-it.",
         guide: [
-          "Pasi ta dorëzosh е-ПДД në faqen e UJP-së, shëno muajin si të dorëzuar me numrin e llogaritjes.",
-          "Kur UJP ta miratojë, shto numrin e folios; pasi të paguash, shënoje si të paguar.",
+          "Pasi ta dorëzosh e-PDD në faqen e DAP-it, shëno muajin si të dorëzuar me numrin e llogaritjes.",
+          "Kur DAP-i ta miratojë, shto numrin e folios; pasi të paguash, shënoje si të paguar.",
           "Çdo hap shihet te muaji, dhe muaji që kalon një afat bëhet i kuq.",
         ],
       },
@@ -314,7 +314,7 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         title: "Dëshmi dhe eksporte",
         caption: "Bashkëngjit ekstraktin bankar te pagesa dhe eksporto CSV për kontabilistin.",
         guide: [
-          "UJP mund të kërkojë dëshmi për një pagesë: bashkëngjit ekstraktin bankar, kontratën ose konfirmimin, si PDF ose imazh.",
+          "DAP-i mund të kërkojë dëshmi për një pagesë: bashkëngjit ekstraktin bankar, kontratën ose konfirmimin, si PDF ose imazh.",
           "Eksporto pagesat, faturat ose notat e kreditit të vitit si skedarë CSV që hapen në Excel, me titujt në gjuhën tënde.",
         ],
       },
@@ -323,7 +323,7 @@ export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
         title: "Paneli",
         caption: "Sa detyrohesh dhe deri kur, çfarë arriti dhe çfarë të detyrohen ende klientët.",
         guide: [
-          "Paneli i bashkon: sa i detyrohesh UJP-së dhe afatin e radhës, sa ke marrë këtë vit dhe faturat që klientët ende t'i detyrohen.",
+          "Paneli i bashkon: sa i detyrohesh DAP-it dhe afatin e radhës, sa ke marrë këtë vit dhe faturat që klientët ende t'i detyrohen.",
           "Tregon edhe sa afër është furnizimi yt në Maqedoninë e Veriut pragut të TVSH-së prej 2.000.000 denarësh.",
         ],
       },

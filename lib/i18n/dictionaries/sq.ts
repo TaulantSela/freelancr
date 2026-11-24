@@ -2,9 +2,9 @@ import type { Dictionary } from "../types";
 
 export const sq: Dictionary = {
   meta: {
-    title: "Freelancr: klientët, faturat dhe sa i detyrohesh UJP-së",
+    title: "Freelancr: klientët, faturat dhe sa i detyrohesh DAP-it",
     description:
-      "Fatura klientët në vend dhe jashtë në gjuhën e tyre, regjistro çdo pagesë me kursin e Bankës Popullore për atë ditë dhe shiko sa i detyrohesh UJP-së çdo muaj, me afatet e е-ПДД. Për freelancerët në Maqedoninë e Veriut.",
+      "Fatura klientët në vend dhe jashtë në gjuhën e tyre, regjistro çdo pagesë me kursin e Bankës Popullore për atë ditë dhe shiko sa i detyrohesh DAP-it çdo muaj, me afatet e e-PDD. Për freelancerët në Maqedoninë e Veriut.",
   },
   common: {
     appName: "Freelancr",
@@ -89,9 +89,9 @@ export const sq: Dictionary = {
   },
   landing: {
     badge: "Për freelancerët në Maqedoninë e Veriut",
-    heroTitle: "Klientët, faturat dhe sa i detyrohesh UJP-së, në një vend",
+    heroTitle: "Klientët, faturat dhe sa i detyrohesh DAP-it, në një vend",
     heroSubtitle:
-      "Fatura klientët në vend dhe jashtë në gjuhën e tyre, regjistro çdo pagesë me kursin e Bankës Popullore për ditën kur arriti dhe shiko sa i detyrohesh UJP-së çdo muaj, me afatet e е-ПДД.",
+      "Fatura klientët në vend dhe jashtë në gjuhën e tyre, regjistro çdo pagesë me kursin e Bankës Popullore për ditën kur arriti dhe shiko sa i detyrohesh Drejtorisë së të Ardhurave Publike (DAP) çdo muaj, me afatet e e-PDD.",
     featuresTitle: "Çfarë bën",
     features: [
       {
@@ -103,7 +103,7 @@ export const sq: Dictionary = {
         desc: "Pagesa të pjesshme, tarifa të bankës dhe të platformës, pagesa pa faturë, secila me kursin e Bankës Popullore për ditën kur arriti.",
       },
       {
-        title: "Sa i detyrohesh UJP-së, muaj pas muaji",
+        title: "Sa i detyrohesh DAP-it, muaj pas muaji",
         desc: "10% e të ardhurave që i deklaron vetë, minus tatimin e paguar jashtë vendit, dhe 10% që kompanitë në Maqedoninë e Veriut i kanë mbajtur tashmë. Shëno çdo muaj si të dorëzuar, të miratuar dhe të paguar, dhe merr email para çdo afati.",
       },
       {
@@ -119,7 +119,7 @@ export const sq: Dictionary = {
     ctaSubtitle:
       "Një llogari prove me gjashtë muaj të dhëna shembull hapet për pak sekonda dhe fshihet pas 24 orësh.",
     disclaimer:
-      "Freelancr të ndihmon të mbash evidencë dhe të llogaritësh sa detyrohesh. Shuma përfundimtare është në llogaritjen që e miraton UJP; kjo nuk është këshillë tatimore.",
+      "Freelancr të ndihmon të mbash evidencë dhe të llogaritësh sa detyrohesh. Shuma përfundimtare është në llogaritjen që e miraton DAP-i; kjo nuk është këshillë tatimore.",
     footerTagline: "Built for North Macedonia · Изградено за Македонија · Ndërtuar për Maqedoninë",
   },
   demo: {
@@ -132,9 +132,9 @@ export const sq: Dictionary = {
     createAccount: "Krijo llogarinë",
     pageTitle: "Si funksionon Freelancr",
     pageIntro:
-      "Një prezantim dyminutësh me të dhënat shembull që merr llogaria e provës: një biznes që faturon klientë në vend dhe jashtë, dhe tatimi që i detyrohet UJP-së çdo muaj.",
+      "Një prezantim dyminutësh me të dhënat shembull që merr llogaria e provës: një biznes që faturon klientë në vend dhe jashtë, dhe tatimi që i detyrohet DAP-it çdo muaj.",
     metaDescription:
-      "Prezantim i Freelancr: klientët, faturat, pagesat dhe sa i detyrohesh UJP-së, hap pas hapi.",
+      "Prezantim i Freelancr: klientët, faturat, pagesat dhe sa i detyrohesh DAP-it, hap pas hapi.",
     chapters: "Kapitujt",
     guide: "Hap pas hapi",
     step: "Hapi {n}",
@@ -475,18 +475,18 @@ export const sq: Dictionary = {
     received: "Pranuar",
     grossIncome: "Të ardhurat (të pranuara plus tatimi i mbajtur në burim)",
     totalIncomeTax: "Tatimi mbi të ardhurat",
-    owedPart: "Ti i paguan UJP-së",
+    owedPart: "Ti i paguan DAP-it",
     creditPart: "Paguar jashtë vendit (zbritet)",
     alreadyPaidPart: "Paguar tashmë në emrin tënd",
-    notPaidYet: "Ende e papaguar te UJP",
+    notPaidYet: "Ende e papaguar te DAP-i",
     annualReturn:
-      "UJP të dërgon deklaratën tatimore vjetore (ГДП) për {year}: konfirmoje ose korrigjoje deri më {confirmBy} dhe paguaj diferencën që tregon deri më {payBy} (Ligji për tatimin mbi të ardhurat personale, nenet 96 dhe 100).",
+      "DAP-i të dërgon deklaratën tatimore vjetore (ГДП) për {year}: konfirmoje ose korrigjoje deri më {confirmBy} dhe paguaj diferencën që tregon deri më {payBy} (Ligji për tatimin mbi të ardhurat personale, nenet 96 dhe 100).",
     selfEmployedAdvance:
       "Je i regjistruar si person që ushtron veprimtari të pavarur: këtu pagesat vetëm i ndjekin të ardhurat. Tatimi yt është akontimi mujor prej {amount} deri më 15 dhe bilanci vjetor deri më 15 mars.",
     selfEmployedNoAdvance:
       "Je i regjistruar si person që ushtron veprimtari të pavarur: këtu pagesat vetëm i ndjekin të ardhurat. Tatimi yt është akontimi mujor deri më 15 dhe bilanci vjetor deri më 15 mars.",
     conversionNote:
-      "Çdo pagesë konvertohet me kursin mesatar të Bankës Popullore në ditën kur arriti në llogari, ashtu siç konverton UJP.",
+      "Çdo pagesë konvertohet me kursin mesatar të Bankës Popullore në ditën kur arriti në llogari, ashtu siç konverton DAP-i.",
     feesNote:
       "Provizionet e bankave dhe platformave nuk janë të ardhura: tatimi është mbi atë që u pranua plus tatimin e mbajtur në burim.",
     byClient: "Sipas klientit",
@@ -502,7 +502,7 @@ export const sq: Dictionary = {
     otherRatesFlag:
       "Disa pagesa këtë muaj përdorin kurs tjetër nga ai i Bankës Popullore për ditën e tyre (kursin e faturës ose një të shkruar me dorë), ndaj shumat në denarë këtu janë të përafërta.",
     evidenceHint:
-      "Llogaritjes (е-ПДД) bashkëngjitja dëshmitë: kontratën ose konfirmimin e klientit për punën dhe ekstraktin bankar (извод) që tregon se paratë arritën.",
+      "Llogaritjes (e-PDD) bashkëngjitja dëshmitë: kontratën ose konfirmimin e klientit për punën dhe ekstraktin bankar (извод) që tregon se paratë arritën.",
     treatments: {
       business: "Të ardhura nga veprimtaria",
       withheld: "Tatimin e mbajti klienti",
@@ -510,11 +510,11 @@ export const sq: Dictionary = {
     },
     treatmentNotes: {
       business:
-        "Je i regjistruar si person që ushtron veprimtari të pavarur: këto janë të ardhura për bilancin vjetor, pa llogaritje mujore (е-ПДД).",
+        "Je i regjistruar si person që ushtron veprimtari të pavarur: këto janë të ardhura për bilancin vjetor, pa llogaritje mujore (e-PDD).",
       withheld:
-        "Një kompani në Maqedoninë e Veriut të paguan 90%, ndërsa tatimin prej 10% ia paguan UJP-së në emrin tënd (Ligji për tatimin mbi të ardhurat personale, neni 80). S'ke asgjë për të deklaruar.",
+        "Një kompani në Maqedoninë e Veriut të paguan 90%, ndërsa tatimin prej 10% ia paguan DAP-it në emrin tënd (Ligji për tatimin mbi të ardhurat personale, neni 80). S'ke asgjë për të deklaruar.",
       self_reported:
-        "Klient nga jashtë ose person fizik në Maqedoninë e Veriut: dorëzo llogaritjen (е-ПДД) deri më 10 të muajit pasues dhe paguaj tatimin prej 10% deri më 15.",
+        "Klient nga jashtë ose person fizik në Maqedoninë e Veriut: dorëzo llogaritjen (e-PDD) deri më 10 të muajit pasues dhe paguaj tatimin prej 10% deri më 15.",
     },
     ujpStatuses: {
       nothing: "S'ka për të deklaruar",
@@ -588,7 +588,7 @@ export const sq: Dictionary = {
       fees: "Provizione",
       feesHint: "Ajo që mori banka ose platforma gjatë rrugës.",
       taxWithheldLocal: "10% që mbajti klienti",
-      taxWithheldLocalHint: "Kompania ia pagoi UJP-së në emrin tënd (neni 80).",
+      taxWithheldLocalHint: "Kompania ia pagoi DAP-it në emrin tënd (neni 80).",
       taxWithheldAbroad: "Tatim i mbajtur jashtë vendit",
       taxWithheldAbroadHint:
         "Zbritet vetëm deri në 10% që detyrohen këtu, dhe vetëm me vërtetimin e organit tatimor të huaj. Provizionet nuk numërohen.",
@@ -608,7 +608,7 @@ export const sq: Dictionary = {
       previewGross: "Të ardhurat",
       previewTax: "Tatimi mbi të ardhurat (10%)",
       previewCredit: "Paguar jashtë vendit (zbritet)",
-      previewOwed: "Ti i paguan UJP-së",
+      previewOwed: "Ti i paguan DAP-it",
       previewAlreadyPaid: "Paguar tashmë në emrin tënd",
       submit: "Ruaj pagesën",
       delete: "Fshi pagesën",
@@ -616,7 +616,7 @@ export const sq: Dictionary = {
       deleteDesc:
         "Fatura e saj kthehet në të papaguar ose të paguar pjesërisht, dhe tatimi i muajit ndryshon. Kjo nuk mund të kthehet.",
       filedWarning:
-        "Muaji i kësaj pagese është dorëzuar tashmë në UJP. Nëse e ndryshon, ndryshon tatimi i atij muaji; mund të të duhet të dorëzosh një llogaritje të korrigjuar.",
+        "Muaji i kësaj pagese është dorëzuar tashmë në DAP. Nëse e ndryshon, ndryshon tatimi i atij muaji; mund të të duhet të dorëzosh një llogaritje të korrigjuar.",
       errors: {
         dateInvalid: "Shkruaj një datë të vlefshme kur arritën paratë.",
         dateFuture: "Dita kur arritën paratë nuk mund të jetë në të ardhmen.",
@@ -661,9 +661,9 @@ export const sq: Dictionary = {
       base_mkd: "Baza tatimore (MKD)",
       tax_mkd: "Tatimi mbi të ardhurat (MKD)",
       credit_mkd: "Paguar jashtë vendit, zbritet (MKD)",
-      owed_mkd: "Detyrimi ndaj UJP-së (MKD)",
+      owed_mkd: "Detyrimi ndaj DAP-it (MKD)",
       already_paid_for_you_mkd: "Paguar tashmë në emrin tënd (MKD)",
-      ujp_status: "Statusi te UJP",
+      ujp_status: "Statusi te DAP-i",
       ujp_reference: "Nr. i llogaritjes",
       ujp_folio: "Nr. i folios",
       tax_paid_on: "Tatimi u pagua më",
@@ -737,7 +737,7 @@ export const sq: Dictionary = {
       "EDB-ja jote, nëse ke (për shembull si i vetëpunësuar i regjistruar). Mos e shkruaj kurrë numrin personal (EMBG): faturat shkojnë te klientët e tu.",
     vatRegistered: "I regjistruar për TVSH",
     vatRegisteredHint:
-      "TVSH-në në faturë mund ta tregojnë vetëm tatimpaguesit e regjistruar për TVSH (Ligji për TVSH, neni 51 paragrafi 3); kush e tregon pa qenë i regjistruar, e detyrohet shumën e treguar (neni 55). Shënoje këtë vetëm nëse të ka regjistruar UJP.",
+      "TVSH-në në faturë mund ta tregojnë vetëm tatimpaguesit e regjistruar për TVSH (Ligji për TVSH, neni 51 paragrafi 3); kush e tregon pa qenë i regjistruar, e detyrohet shumën e treguar (neni 55). Shënoje këtë vetëm nëse të ka regjistruar DAP-i.",
     vatNumber: "Numri i TVSH-së",
     address: "Adresa",
     placeOfIssue: "Vendi i lëshimit",
@@ -785,9 +785,9 @@ export const sq: Dictionary = {
     },
     reminders: {
       title: "Kujtesa me email",
-      toggle: "Më dërgo email para afateve të UJP-së",
+      toggle: "Më dërgo email para afateve të DAP-it",
       hint:
-        "Nëse nuk ke veprimtari të regjistruar: më 5 dhe 9 derisa llogaritja (е-ПДД) e muajit të kaluar të mos jetë dorëzuar, më 13 derisa tatimi të mos jetë paguar, dhe më 20 maj për deklaratën vjetore (ГДП). Nëse je i vetëpunësuar: më 12 për akontimin mujor.",
+        "Nëse nuk ke veprimtari të regjistruar: më 5 dhe 9 derisa llogaritja (e-PDD) e muajit të kaluar të mos jetë dorëzuar, më 13 derisa tatimi të mos jetë paguar, dhe më 20 maj për deklaratën vjetore (ГДП). Nëse je i vetëpunësuar: më 12 për akontimin mujor.",
       notConfigured: "Email-i ende nuk është konfiguruar në këtë server.",
       saved: "U ruajt",
     },
@@ -804,7 +804,7 @@ export const sq: Dictionary = {
       paid_from_abroad:
         "Person fizik pa veprimtari të pavarur të regjistruar. Deklaron vetë atë që të paguajnë klientët nga jashtë dhe personat fizikë në Maqedoninë e Veriut; kompanitë në Maqedoninë e Veriut e mbajnë vetë tatimin.",
       self_employed:
-        "Je regjistruar në UJP si person që ushtron veprimtari të pavarur (самостоен вршител на дејност).",
+        "Je regjistruar në DAP si person që ushtron veprimtari të pavarur (самостоен вршител на дејност).",
     },
     months: [
       "janar",
@@ -822,7 +822,7 @@ export const sq: Dictionary = {
     ],
     rules: {
       paid_from_abroad:
-        "Për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut, dorëzo llogaritjen tatimore (е-ПДД) në UJP deri më 10 dhe paguaj tatimin deri më 15 të muajit pasues. Kompanitë në Maqedoninë e Veriut e mbajnë tatimin kur të paguajnë, ndaj pagesat e tyre nuk shtojnë muaj.",
+        "Për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut, dorëzo llogaritjen tatimore (e-PDD) në DAP deri më 10 dhe paguaj tatimin deri më 15 të muajit pasues. Kompanitë në Maqedoninë e Veriut e mbajnë tatimin kur të paguajnë, ndaj pagesat e tyre nuk shtojnë muaj.",
       self_employed:
         "Akontimi i tatimit paguhet deri më 15 të çdo muaji për muajin e kaluar. Bilanci tatimor vjetor (ПДД-ДБ) dhe pasqyra e të ardhurave dhe shpenzimeve dorëzohen deri më 15 mars të vitit pasues, dhe diferenca paguhet deri më 30 mars.",
     },
@@ -858,19 +858,19 @@ export const sq: Dictionary = {
       "Ende asnjë. Afatet shfaqen për çdo muaj në të cilin të ka paguar një klient nga jashtë ose një person fizik në Maqedoninë e Veriut.",
     then: "Pastaj: {label}, {date}",
     owed: {
-      title: "Detyrimi ndaj UJP-së",
+      title: "Detyrimi ndaj DAP-it",
       approximate: "Përafërsisht",
       tileDue: "Të ardhurat e muajit {month} · paguaj deri më {date}",
       forMonth: "Tatimi për të ardhurat e muajit {month}",
       soFar: "Deri tani në muajin {month}",
       fileAndPay:
-        "Dorëzo llogaritjen (е-ПДД) deri më {reportBy}, paguaj deri më {payBy}",
+        "Dorëzo llogaritjen (e-PDD) deri më {reportBy}, paguaj deri më {payBy}",
       nothing:
         "S'ka asgjë për të paguar. Kur regjistron një pagesë nga një klient jashtë vendit ose nga një person fizik në Maqedoninë e Veriut, tatimi mbi të shfaqet këtu.",
       note:
-        "Llogaritur nga pagesat që ke regjistruar, secila me kursin mesatar të Bankës Popullore në ditën kur arriti, ashtu siç konverton UJP. Shuma përfundimtare është ajo në llogaritjen që e miraton UJP: paguaj shumën nga urdhëresa e pagesës (ПП53).",
+        "Llogaritur nga pagesat që ke regjistruar, secila me kursin mesatar të Bankës Popullore në ditën kur arriti, ashtu siç konverton DAP-i. Shuma përfundimtare është ajo në llogaritjen që e miraton DAP-i: paguaj shumën nga urdhëresa e pagesës (ПП53).",
       noteApproximate:
-        "Përafërsisht: disa nga këto pagesa përdorin kurs tjetër nga ai i Bankës Popullore për ditën e tyre (kursin e faturës ose një të shkruar me dorë). Kaloji në kurset e Bankës Popullore te faqja „Pagesat”. Shuma përfundimtare është ajo në llogaritjen që e miraton UJP.",
+        "Përafërsisht: disa nga këto pagesa përdorin kurs tjetër nga ai i Bankës Popullore për ditën e tyre (kursin e faturës ose një të shkruar me dorë). Kaloji në kurset e Bankës Popullore te faqja „Pagesat”. Shuma përfundimtare është ajo në llogaritjen që e miraton DAP-i.",
       groupAmount: "Tatimi: {amount}",
       advanceTile: "Akontimi deri më {date}",
       advanceHint:
@@ -897,24 +897,24 @@ export const sq: Dictionary = {
       footer:
         "E merr këtë sepse kujtesat për afatet janë të ndezura te Cilësimet e Freelancr; mund t'i fikësh atje.",
       fileBy10: {
-        subject: "Dorëzo llogaritjen (е-ПДД) për {month} deri më 10",
+        subject: "Dorëzo llogaritjen (e-PDD) për {month} deri më 10",
         body:
-          "Llogaritja (е-ПДД) për të ardhurat e muajit {month} duhet dorëzuar në UJP deri më {date}. Tatimi është {amount}; paguaje deri më 15.",
+          "Llogaritja (e-PDD) për të ardhurat e muajit {month} duhet dorëzuar në DAP deri më {date}. Tatimi është {amount}; paguaje deri më 15.",
       },
       fileTomorrow: {
-        subject: "Nesër: llogaritja (е-ПДД) për {month}",
+        subject: "Nesër: llogaritja (e-PDD) për {month}",
         body:
-          "Llogaritja (е-ПДД) për të ardhurat e muajit {month} duhet dorëzuar nesër, më {date}. Tatimi, {amount}, paguhet deri më 15.",
+          "Llogaritja (e-PDD) për të ardhurat e muajit {month} duhet dorëzuar nesër, më {date}. Tatimi, {amount}, paguhet deri më 15.",
       },
       payBy15: {
-        subject: "Paguaj {amount} te UJP deri më 15",
+        subject: "Paguaj {amount} DAP-it deri më 15",
         body:
           "Nga tatimi për të ardhurat e muajit {month}, {amount} ende nuk është shënuar si i paguar. Paguaje deri më {date}, sipas urdhëresës (ПП53) të llogaritjes së miratuar.",
       },
       annualReturn: {
         subject: "Konfirmo deklaratën vjetore (ГДП) për {year} deri më 31 maj",
         body:
-          "UJP përgatit deklaratën tatimore vjetore (ГДП) për {year}. Konfirmoje ose korrigjoje deri më {date}; tatimi që tregon paguhet deri më 30 qershor.",
+          "DAP-i përgatit deklaratën tatimore vjetore (ГДП) për {year}. Konfirmoje ose korrigjoje deri më {date}; tatimi që tregon paguhet deri më 30 qershor.",
       },
       advance: {
         subject: "Paguaj akontimin mujor deri më 15",
