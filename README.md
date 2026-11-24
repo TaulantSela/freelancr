@@ -30,6 +30,9 @@ is. Freelancr puts the invoices and the local tax picture in one place.
 | Duplicate | Any invoice, in any state, copies into a new draft dated today: the client, currency, line items, notes and payment term, the rate for today, and its DDV rate only if you're registered for VAT now |
 | Credit notes | A credit note (книжно одобрение) on an issued invoice: a date, an amount up to what's left to credit (DDV included, split in the invoice's proportion) and a reason. Numbered CN-YYYY-NNN per year when it's issued; only your latest one can be deleted, so the numbers stay without gaps. It lowers what the client owes and, with DDV, the base and DDV in the period of its date (VAT law Art. 22(1)), and comes off the DDV threshold for a client in North Macedonia. The PDF is in the client's language. An invoice with credit notes isn't cancelled. Income tax follows payments, so a credit note doesn't change it; refunds aren't recorded |
 | Exports | CSV for a year: payments (with each one's tax), invoices (credited, paid, balance) and credit notes. UTF-8 with a BOM so Excel shows Cyrillic, headers in your language, plain numbers, and text that a spreadsheet would run as a formula neutralised |
+| Email to client | On an issued invoice that isn't cancelled: the PDF (the same as the download) to one address, with a subject and message prefilled in the invoice's language. It goes from "<business name> via Freelancr" on the server's sending address, replies come to your account's email, and you can get a copy. The invoice lists where and when it was emailed; at most 20 in 24 hours |
+| Reminders | An email before each UJP deadline, in your language, on unless you turn it off in Settings. Not registered for an activity: on the 5th and the 9th while last month's е-ПДД isn't filed, on the 13th while its tax isn't marked paid, and on 20 May for the annual return (ГДП) if last year had payments. Self-employed: on the 12th for the monthly advance. Each goes once; one that couldn't be sent goes out the next day while the deadline is still ahead |
+| Account | Email and password. "Forgot password?" emails a link that works once, for 60 minutes, with the same answer whether or not the account exists (at most 3 emails an hour to an account and 10 requests an hour from an IP). Changing or resetting the password signs you out everywhere else. Emails to you are in the language you last used while signed in |
 | Attachments | Proof for е-ПДД on each payment (the bank statement, the contract or confirmation) and contracts on each client: PDF, PNG or JPEG (told from the file's first bytes), up to 4 MB each and 100 MB in all, kept in the database and downloaded only by their owner. A file goes when its payment or client does |
 | PDF | In the client's invoice language, with what an invoice has to state: number, date and place of issue, date of supply, the issuer's VAT number or "The issuer is not registered for VAT.", the signatory with a line to sign, and bank, IBAN and BIC/SWIFT |
 | Clients | Company or private person, any country (ISO 3166 plus Kosovo), invoice language (Macedonian by default for clients in North Macedonia, English otherwise), tax ID, contact person and notes, and for clients whose payments you report yourself, the deemed costs their payments start with (author's rights only, Art. 40; 0% by default); a client with invoices or payments can't be deleted, and the app says why |
@@ -38,7 +41,7 @@ is. Freelancr puts the invoices and the local tax picture in one place.
 | DDV monitor | Your issued invoices to clients in North Macedonia this year, paid or not, by date of supply, plus their payments without an invoice by the day received, against 2,000,000 MKD, with warnings at 70%, 85% and over the threshold. Services to clients abroad don't count; hidden once you're registered for VAT or while there's no local supply |
 | Payments page | A year at a time, newest month first: each month's payments, its income and tax, what's owed to UJP with the deadlines and where the calculation stands, the steps to mark it filed, approved and paid, and a flag (with a one-click fix for backfilled ones) on months where a rate isn't the National Bank's for its day. Above them, the year's totals and income by client; below, the year's tax deadlines |
 | Tax deadlines | UJP's deadlines for how you're registered for tax. Not registered for an activity (the default): for each month in which a client abroad or a private person in North Macedonia paid you, submit the calculation by the 10th and pay the tax by the 15th of the next month (companies in North Macedonia withhold the tax themselves), and for each year with income, confirm or correct UJP's annual tax return (ГДП) by 31 May and pay what it shows by 30 June of the next year (Art. 96(3), 100(2)). Registered self-employed: the monthly advance by the 15th for the previous month, the annual tax balance (ПДД-ДБ) by 15 March and any difference by 30 March |
-| Settings | Business profile (EDB, address, place of issue, signatory, bank, IBAN, BIC/SWIFT, local account number), how you're registered for tax (and the monthly advance if self-employed), and VAT registration with the VAT number; changing your password. The personal ID number (ЕМБГ) is never asked for, and is refused as a tax or VAT number |
+| Settings | Business profile (EDB, address, place of issue, signatory, bank, IBAN, BIC/SWIFT, local account number), how you're registered for tax (and the monthly advance if self-employed), and VAT registration with the VAT number; changing your password; deadline reminders on or off. The personal ID number (ЕМБГ) is never asked for, and is refused as a tax or VAT number |
 | Languages | Macedonian (default), Albanian and English |
 
 ## Known limitations
@@ -56,10 +59,12 @@ is. Freelancr puts the invoices and the local tax picture in one place.
   foreign tax authority's certificate.
 - **UJP's steps are per month.** Filed, approved and paid apply to all of a
   month's self-reported payments at once, and nothing talks to UJP: you
-  record each step yourself. There are no attachments yet (е-ПДД needs the
-  contract or confirmation and the bank statement).
-- **Nothing is emailed.** There's no email sending at all, and tax
-  deadlines show up in the app only.
+  record each step yourself.
+- **Email needs Resend.** Without `RESEND_API_KEY` and `MAIL_FROM` nothing
+  is sent: the reset page, "Email to client" and the reminders toggle say
+  email isn't set up. Reminders go out once a day (07:00 UTC), at most 100 a
+  run; Resend's free plan sends 100 a day in all. Nothing tracks whether an
+  email was delivered or read.
 - **No refunds.** A credit note on an invoice that was already paid shows
   what was overpaid; paying it back isn't recorded, and income tax follows
   the payments received.
@@ -82,23 +87,33 @@ is. Freelancr puts the invoices and the local tax picture in one place.
   has deadlines once you record a self-reported payment received in it.
 - **No e-Faktura.** Nothing talks to UJP's systems.
 - **No billing or plans.**
-- **No password reset.** You can change your password in Settings, but
-  there's no reset by email, and changing it doesn't sign out other
-  sessions.
+- **The demo account is shared.** Its password is public, so it can't
+  change or reset it, send email or get reminders.
+- **Emails match exactly.** Signing in and resetting a password look the
+  email up as it was typed at sign-up, capitals included.
 
 ## How it works
 
 1. **Next.js 16 App Router.** Pages in `app/(dashboard)` are server components
    that query the database directly; writes go through Server Actions in
-   `lib/actions/` (auth, clients, invoices, credit notes, payments,
-   attachments, rates, settings, locale). Uploads, downloads, PDFs and CSV
-   exports are route handlers under `app/api/`.
+   `lib/actions/` (auth, password reset, clients, invoices, invoice email,
+   credit notes, payments, attachments, rates, settings, locale). Uploads,
+   downloads, PDFs, CSV exports and the daily cron are route handlers under
+   `app/api/`.
 2. **Auth.** Email and password with bcrypt hashes. The session is a JWT signed
-   with `jose` in an httpOnly cookie that lasts 30 days, and `proxy.ts` sends
-   signed-out visitors to `/sign-in`.
+   with `jose` in an httpOnly cookie that lasts 30 days, carrying the user's
+   session version; `proxy.ts` checks only the signature and sends signed-out
+   visitors to `/sign-in`, and pages check the version against the database
+   once per request (`lib/auth/session.ts`), so a password change or reset,
+   which bumps it, ends every other session. A reset token is 32 random
+   bytes of which only the SHA-256 is stored; using one changes the
+   password, bumps the version and uses up all of the user's tokens in one
+   statement (`lib/auth/reset.ts`). The limits are counted in the database,
+   the IP only as a keyed hash.
 3. **Data.** Drizzle ORM on Neon Postgres over Neon's serverless HTTP driver.
    Tables: users, clients, invoices, invoice items, payments, credit notes,
-   attachments, and the rate cache. Each invoice stores its rate (with where it came from and its day)
+   attachments, the rate cache, password reset tokens and requests, invoice
+   emails and the reminder log. Each invoice stores its rate (with where it came from and its day)
    and MKD total when it's saved. A draft gets its number when it's issued,
    in one `UPDATE` (`lib/invoices/numbering.ts`), with a unique index on
    (user, number); saving a draft only matches drafts
@@ -124,7 +139,16 @@ is. Freelancr puts the invoices and the local tax picture in one place.
    client's invoice language, using the full Noto Sans for Latin and
    Cyrillic.
 7. **i18n.** Typed dictionaries in `lib/i18n/dictionaries/` (`mk`, `en`,
-   `sq`); the chosen language is kept in a cookie.
+   `sq`); the chosen language is kept in a cookie and, for emails, on the
+   user.
+8. **Email.** `lib/email/` posts to Resend's HTTP API and escapes everything
+   that goes into the HTML. An invoice email reserves its place under the
+   daily limit in the same statement that logs it, then attaches the PDF
+   from the same renderer as the download. Vercel Cron calls
+   `/api/cron/daily` at 07:00 UTC (`vercel.json`) with `CRON_SECRET`; it runs
+   the jobs in `lib/cron/jobs.ts`, so far the reminders: which are due is a
+   pure function (`lib/reminders/plan.ts`), and each is logged before it's
+   sent, once per user, kind and period.
 
 Stack: Next.js 16 · TypeScript · Drizzle ORM · Neon Postgres · `jose` JWT
 sessions · Tailwind CSS 4 with shadcn/ui on Base UI · `@react-pdf/renderer`.
@@ -176,6 +200,8 @@ send something say so.
 | `CRON_SECRET` | The bearer token Vercel Cron sends to `/api/cron/daily`; anything else gets a 401 |
 
 `RESEND_API_BASE` exists only so tests can point the API at a local stub.
+To run the cron by hand:
+`curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/daily`.
 
 ## Deploy
 
