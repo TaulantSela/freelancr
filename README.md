@@ -11,8 +11,10 @@ until you're registered for VAT (DDV), how close your supplies in North
 Macedonia are to the 2,000,000 MKD registration threshold.
 It's an early MVP, in Macedonian, Albanian and English.
 
-**▶ [Try it live →](https://freelancr-mk.vercel.app)** — sign up with an email
-and password.
+**▶ [Try it live →](https://freelancr-mk.vercel.app)** — "Try it with sample
+data" opens your own copy of a sample account, no sign-up needed;
+[How it works](https://freelancr-mk.vercel.app/demo) is a two-minute
+walkthrough with the steps written out.
 
 If you invoice in Word and track income in a spreadsheet, you're doing the DDV
 and tax math by hand, and general-purpose invoicing tools don't know what DDV
@@ -42,6 +44,8 @@ is. Freelancr puts the invoices and the local tax picture in one place.
 | Payments page | A year at a time, newest month first: each month's payments, its income and tax, what's owed to UJP with the deadlines and where the calculation stands, the steps to mark it filed, approved and paid, and a flag (with a one-click fix for backfilled ones) on months where a rate isn't the National Bank's for its day. Above them, the year's totals and income by client; below, the year's tax deadlines |
 | Tax deadlines | UJP's deadlines for how you're registered for tax. Not registered for an activity (the default): for each month in which a client abroad or a private person in North Macedonia paid you, submit the calculation by the 10th and pay the tax by the 15th of the next month (companies in North Macedonia withhold the tax themselves), and for each year with income, confirm or correct UJP's annual tax return (ГДП) by 31 May and pay what it shows by 30 June of the next year (Art. 96(3), 100(2)). Registered self-employed: the monthly advance by the 15th for the previous month, the annual tax balance (ПДД-ДБ) by 15 March and any difference by 30 March |
 | Settings | Business profile (EDB, address, place of issue, signatory, bank, IBAN, BIC/SWIFT, local account number), how you're registered for tax (and the monthly advance if self-employed), and VAT registration with the VAT number; changing your password; deadline reminders on or off. The personal ID number (ЕМБГ) is never asked for, and is refused as a tax or VAT number |
+| Try it | "Try it with sample data" (on the landing page, the sign-in page and /demo) creates a sandbox: your own demo account with six months of sample clients, invoices and payments dated from today, in your language, signed in. It's deleted after 24 hours; at most 5 an hour from one IP and 300 at once |
+| How it works | /demo: the walkthrough video in your language with its chapters, and the same steps written out with a screenshot each |
 | Languages | Macedonian (default), Albanian and English |
 
 ## Known limitations
@@ -87,8 +91,11 @@ is. Freelancr puts the invoices and the local tax picture in one place.
   has deadlines once you record a self-reported payment received in it.
 - **No e-Faktura.** Nothing talks to UJP's systems.
 - **No billing or plans.**
-- **The demo account is shared.** Its password is public, so it can't
-  change or reset it, send email or get reminders.
+- **Demo accounts can't do everything.** The shared demo account (its
+  password is public) and the sandboxes can't change or reset a password,
+  send email or get reminders, and keep at most 5 MB of files. A sandbox
+  can't be signed into again once you sign out, and the daily cron deletes
+  it after 24 hours.
 - **Emails match exactly.** Signing in and resetting a password look the
   email up as it was typed at sign-up, capitals included.
 
@@ -146,9 +153,19 @@ is. Freelancr puts the invoices and the local tax picture in one place.
    daily limit in the same statement that logs it, then attaches the PDF
    from the same renderer as the download. Vercel Cron calls
    `/api/cron/daily` at 07:00 UTC (`vercel.json`) with `CRON_SECRET`; it runs
-   the jobs in `lib/cron/jobs.ts`, so far the reminders: which are due is a
-   pure function (`lib/reminders/plan.ts`), and each is logged before it's
-   sent, once per user, kind and period.
+   the jobs in `lib/cron/jobs.ts`: deleting expired sandboxes (whether or not
+   email is set up), then the reminders: which are due is a pure function
+   (`lib/reminders/plan.ts`), and each is logged before it's sent, once per
+   user, kind and period.
+9. **Sandboxes and the walkthrough.** `lib/demo/sample-data.ts` builds the
+   sample data for the shared demo account (`scripts/seed-demo.ts`) and for
+   each sandbox (`lib/demo/sandbox.ts`, `lib/actions/demo.ts`): rates from
+   the cache, then one National Bank request, then the fixed rates, marked.
+   A sandbox is created in one statement that also enforces the cap of 300;
+   the IP limit is counted like the password reset's. The walkthrough on
+   /demo is recorded by `scripts/record-demo.mts` from the captions and
+   guide in `lib/demo/script.ts`, so the video and the written steps say
+   the same thing.
 
 Stack: Next.js 16 · TypeScript · Drizzle ORM · Neon Postgres · `jose` JWT
 sessions · Tailwind CSS 4 with shadcn/ui on Base UI · `@react-pdf/renderer`.
@@ -175,8 +192,9 @@ and six months of payments dated from today (a partial payment, a company in
 North Macedonia paying net of withholding, a payment with tax withheld abroad,
 platform payouts without an invoice, a credit note on the overdue invoice,
 older months filed and paid with UJP).
-It fetches the National Bank's rates for those days, or uses the fixed ones,
-marked as such, if it can't.
+It uses the National Bank's rates for those days (cached, or fetched in one
+request), or the fixed ones, marked as such, if it can't. Each sandbox gets
+the same data from `lib/demo/sample-data.ts`.
 
 | Script | What it does |
 |--------|--------------|
@@ -185,6 +203,28 @@ marked as such, if it can't.
 | `npm run setup` | Both of the above |
 | `npm run db:generate` | Generate a migration from `lib/db/schema.ts` |
 | `npm run lint` | ESLint |
+| `npm run demo:record -- <url> --lang en` | Record the /demo walkthrough in one language (see below) |
+
+### Recording the walkthrough
+
+`scripts/record-demo.mts` drives the installed Google Chrome through the
+app (puppeteer-core), from "Try it with sample data" to the dashboard, and
+writes `public/demo/<lang>/`: `walkthrough.mp4` (and `.webm` when it's
+clearly smaller), `poster.webp`, a `step-<n>.webp` screenshot per chapter
+and `chapters.json` with each chapter's start. It needs ffmpeg and
+`pdftoppm` (poppler). Record against a local production build on a scratch
+database, never production: it creates a sandbox and records an invoice and
+a payment.
+
+```bash
+export DATABASE_URL=<a scratch Neon branch>   # in the shell, so it wins over .env.local
+npx tsx lib/db/migrate.ts
+npm run build && npm start
+npm run demo:record -- http://localhost:3000 --lang en   # then mk and sq
+```
+
+Change the words in `lib/demo/script.ts`, then record all three languages
+again.
 
 ### Email (optional)
 
