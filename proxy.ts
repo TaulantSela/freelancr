@@ -19,6 +19,9 @@ export async function proxy(request: NextRequest) {
     pathname === "/sign-up" ||
     pathname === "/forgot-password" ||
     pathname === "/reset-password" ||
+    // The walkthrough page and its video, poster and screenshots.
+    pathname === "/demo" ||
+    pathname.startsWith("/demo/") ||
     // Vercel Cron: no session, a bearer secret (checked by the route).
     pathname.startsWith("/api/cron/");
 

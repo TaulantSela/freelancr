@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { SiteHeader } from "@/components/site-header";
 import { SandboxButton } from "@/components/demo/sandbox-button";
 import { getTranslations } from "@/lib/i18n/server";
 import {
@@ -22,33 +22,7 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border/40 sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded bg-primary flex items-center justify-center">
-              <FileText className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-sm">{t.common.appName}</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-            <Link href="#features" className="hover:text-foreground transition-colors">
-              {t.nav.features}
-            </Link>
-            <Link href="/demo" className="hover:text-foreground transition-colors">
-              {t.nav.howItWorks}
-            </Link>
-          </nav>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <LanguageSwitcher compact />
-            <Link href="/sign-in">
-              <Button variant="ghost" size="sm">{t.nav.signIn}</Button>
-            </Link>
-            <Link href="/sign-up" className="hidden sm:block">
-              <Button size="sm">{t.nav.getStarted}</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-20 text-center">
         <Badge variant="outline" className="mb-6 text-xs font-normal text-muted-foreground">

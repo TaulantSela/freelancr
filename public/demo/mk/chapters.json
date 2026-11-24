@@ -1,0 +1,61 @@
+{
+  "duration": 105.4,
+  "webm": true,
+  "chapters": [
+    {
+      "id": "intro",
+      "title": "Freelancr",
+      "start": 0
+    },
+    {
+      "id": "profile",
+      "title": "Вашиот профил",
+      "start": 7.4
+    },
+    {
+      "id": "clients",
+      "title": "Клиенти",
+      "start": 16.8
+    },
+    {
+      "id": "invoice",
+      "title": "Фактура",
+      "start": 25.4
+    },
+    {
+      "id": "payment",
+      "title": "Плаќање",
+      "start": 44
+    },
+    {
+      "id": "tax",
+      "title": "Колку должите на UJP",
+      "start": 56.2
+    },
+    {
+      "id": "withheld",
+      "title": "Данок задржан за вас",
+      "start": 62.6
+    },
+    {
+      "id": "filing",
+      "title": "Поднесување до UJP",
+      "start": 67.9
+    },
+    {
+      "id": "proof",
+      "title": "Докази и извоз",
+      "start": 79.8
+    },
+    {
+      "id": "dashboard",
+      "title": "Контролна табла",
+      "start": 91.4
+    },
+    {
+      "id": "end",
+      "title": "Пробајте",
+      "start": 101.2
+    }
+  ]
+}
