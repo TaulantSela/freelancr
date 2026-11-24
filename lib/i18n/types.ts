@@ -358,6 +358,7 @@ export type Dictionary = {
         notConfigured: string;
         demo: string;
         sendFailed: string;
+        appDailyCap: string;
       };
     };
   };

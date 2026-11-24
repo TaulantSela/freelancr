@@ -298,6 +298,17 @@ export const passwordResetRequests = pgTable("password_reset_requests", {
   index("password_reset_requests_ip_hash_created_at_idx").on(table.ipHash, table.createdAt),
 ]);
 
+// Every email that went out (password resets, invoice emails, reminders),
+// whichever provider sent it: the app-wide cap counts the last 24 hours
+// (lib/email/log.ts). The daily cron drops rows older than 2 days.
+export const emailLog = pgTable("email_log", {
+  id: text("id").primaryKey(),
+  kind: text("kind").notNull(),
+  sentAt: timestamp("sent_at", { mode: "string" }).notNull().defaultNow(),
+}, (table) => [
+  index("email_log_sent_at_idx").on(table.sentAt),
+]);
+
 // Every "Try it with sample data" request, by a keyed hash of the
 // requester's IP (not the IP itself), to allow at most 5 sandboxes an hour
 // from one IP.

@@ -6,12 +6,26 @@
 //   RESEND_API_KEY   the API key
 //   MAIL_FROM        the sender, "Name <address@domain>"
 //   RESEND_API_BASE  tests only: points the API at a local stub
+//   EMAIL_DAILY_CAP  at most this many emails in 24 hours (default 100)
 //   APP_URL          the base URL for links in emails; without it,
 //                    https://<VERCEL_PROJECT_PRODUCTION_URL>
 //   CRON_SECRET      the bearer token Vercel Cron sends (app/api/cron)
 
 export function isEmailConfigured(): boolean {
   return Boolean(process.env.RESEND_API_KEY && process.env.MAIL_FROM);
+}
+
+// The app-wide daily cap: every email that went out is logged (email_log),
+// and nothing more is sent once EMAIL_DAILY_CAP went out in the last 24
+// hours. It protects the sending account (Resend's free plan sends 100 a
+// day). Soft under concurrency: two sends at the same moment can both pass.
+export const DEFAULT_EMAIL_DAILY_CAP = 100;
+
+// EMAIL_DAILY_CAP, a whole number from 0 up; anything else is the default.
+export function emailDailyCap(): number {
+  const raw = process.env.EMAIL_DAILY_CAP?.trim();
+  const cap = raw ? Number(raw) : NaN;
+  return Number.isInteger(cap) && cap >= 0 ? cap : DEFAULT_EMAIL_DAILY_CAP;
 }
 
 export function resendBase(): string {

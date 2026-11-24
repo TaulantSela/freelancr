@@ -413,6 +413,7 @@ export const sq: Dictionary = {
         notConfigured: "Email-i ende nuk është konfiguruar në këtë server.",
         demo: "Nuk është në dispozicion në llogarinë demo.",
         sendFailed: "Email-i nuk u dërgua. Provo përsëri pas pak.",
+        appDailyCap: "Freelancr i ka dërguar të gjithë emailat për sot. Provo sërish nesër.",
       },
     },
   },

@@ -410,6 +410,7 @@ export const en: Dictionary = {
         notConfigured: "Email isn't set up on this server yet.",
         demo: "Not available in the demo account.",
         sendFailed: "The email didn't go out. Try again in a moment.",
+        appDailyCap: "Freelancr has sent all its email for today. Try again tomorrow.",
       },
     },
   },

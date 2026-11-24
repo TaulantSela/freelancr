@@ -1,8 +1,12 @@
-import { resendBase } from "./config";
+import { getDb } from "@/lib/db";
+import { emailDailyCap, resendBase } from "./config";
+import { logSent, sentInLast24Hours, type EmailKind } from "./log";
 
 export type EmailAttachment = { filename: string; content: string /* base64 */ };
 
 export type EmailMessage = {
+  // What it is, for the log the daily cap counts.
+  kind: EmailKind;
   from: string;
   to: string;
   subject: string;
@@ -15,12 +19,30 @@ export type EmailMessage = {
 
 export type SendResult = { ok: true; id: string | null } | { ok: false; error: string };
 
-// One email through Resend's HTTP API (POST /emails). Never throws: a
-// failure comes back as { ok: false } with what Resend (or the network)
-// said, for the caller to log.
+// What sendEmail says when the app's daily cap is reached.
+export const DAILY_CAP_ERROR = "daily cap";
+
+// One email through Resend's HTTP API, unless the app already sent
+// EMAIL_DAILY_CAP in the last 24 hours. Each one that goes out is logged for
+// the cap. Never throws: a failure comes back as { ok: false } with what
+// went wrong, for the caller to log.
 export async function sendEmail(message: EmailMessage): Promise<SendResult> {
   const key = process.env.RESEND_API_KEY;
   if (!key) return { ok: false, error: "RESEND_API_KEY is not set" };
+  const db = getDb();
+  try {
+    if ((await sentInLast24Hours(db)) >= emailDailyCap()) return { ok: false, error: DAILY_CAP_ERROR };
+  } catch (error) {
+    return { ok: false, error: String(error).slice(0, 500) };
+  }
+  const result = await sendWithResend(key, message);
+  // Counted once it went out; a failed log write doesn't undo the send.
+  if (result.ok) await logSent(db, message.kind).catch(() => {});
+  return result;
+}
+
+// Resend's HTTP API (POST /emails).
+async function sendWithResend(key: string, message: EmailMessage): Promise<SendResult> {
   try {
     const res = await fetch(`${resendBase()}/emails`, {
       method: "POST",
