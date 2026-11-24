@@ -11,9 +11,9 @@ until you're registered for VAT (DDV), how close your supplies in North
 Macedonia are to the 2,000,000 MKD registration threshold.
 It's an early MVP, in Macedonian, Albanian and English.
 
-**▶ [Try it live →](https://freelancr-mk.vercel.app)** — "Try it with sample
+**▶ [Try it live →](https://freelancr.taulantsela.com)** — "Try it with sample
 data" opens your own copy of a sample account, no sign-up needed;
-[How it works](https://freelancr-mk.vercel.app/demo) is a two-minute
+[How it works](https://freelancr.taulantsela.com/demo) is a two-minute
 walkthrough with the steps written out.
 
 If you invoice in Word and track income in a spreadsheet, you're doing the DDV

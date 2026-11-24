@@ -5,6 +5,13 @@ import { getSessionSecret } from "@/lib/env";
 
 const SESSION_COOKIE = "freelancr_session";
 
+// The app lives at freelancr.taulantsela.com; its old address forwards
+// there. Not the cron route: Vercel Cron calls the production URL and
+// doesn't follow redirects, so a redirect there would skip the job. (A
+// redirect set on the domain in Vercel can't make that exception.)
+const OLD_HOST = "freelancr-mk.vercel.app";
+const HOST = "freelancr.taulantsela.com";
+
 // Checks the session token's signature only; pages check it against the
 // database (lib/auth/session.ts), which can end a session this lets
 // through. Signed-in visitors to /sign-in and /sign-up are sent on by the
@@ -12,6 +19,14 @@ const SESSION_COOKIE = "freelancr_session";
 // it here would bounce a stale one back and forth.
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (request.nextUrl.hostname === OLD_HOST && !pathname.startsWith("/api/cron/")) {
+    const url = request.nextUrl.clone();
+    url.protocol = "https:";
+    url.hostname = HOST;
+    url.port = "";
+    return NextResponse.redirect(url, 308);
+  }
 
   const isPublic =
     pathname === "/" ||

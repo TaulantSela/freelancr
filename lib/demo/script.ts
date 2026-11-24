@@ -23,7 +23,7 @@ export type DemoScript = {
 };
 
 // Where the end card sends people.
-export const DEMO_SITE = "freelancr-mk.vercel.app";
+export const DEMO_SITE = "freelancr.taulantsela.com";
 
 export const DEMO_SCRIPT: Record<Locale, DemoScript> = {
   en: {
