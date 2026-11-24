@@ -166,7 +166,7 @@ export const sq: Dictionary = {
     mustRegister: "Duhet regjistrim TVSH",
     notRequired: "Ende nuk kërkohet",
     ddvLocalOnly:
-      "Numërohen faturat për klientët në Maqedoninë e Veriut sipas datës së furnizimit, të paguara ose jo, dhe pagesat e tyre pa faturë sipas ditës së pranimit. Shërbimet për klientët jashtë vendit kryhen jashtë (Ligji për TVSH, neni 14-а), ndaj nuk numërohen në prag.",
+      "Numërohen faturat për klientët në Maqedoninë e Veriut sipas datës së furnizimit, të paguara ose jo, dhe pagesat e tyre pa faturë sipas ditës së pranimit. Shërbimet për klientët jashtë vendit kryhen jashtë (Ligji për TVSH, neni 14-a), ndaj nuk numërohen në prag.",
     nextDeadline: "Afati i ardhshëm tatimor",
     daysAway: "{date} — për {days} ditë",
     dueToday: "{date} — sot",
@@ -318,7 +318,7 @@ export const sq: Dictionary = {
       addLine: "Shto artikull",
       ddv: "TVSH",
       ddvHint:
-        "Për shërbimet ndaj një biznesi jashtë vendit, vendi i furnizimit është jashtë (Ligji për TVSH, neni 14-а), ndaj nuk llogaritet TVSH maqedonase.",
+        "Për shërbimet ndaj një biznesi jashtë vendit, vendi i furnizimit është jashtë (Ligji për TVSH, neni 14-a), ndaj nuk llogaritet TVSH maqedonase.",
       noVatRegistration:
         "Nuk je i regjistruar për TVSH, ndaj kjo faturë nuk do të tregojë TVSH (Ligji për TVSH, neni 51 paragrafi 3).",
       ddvRateInvalid: "Zgjidh një nga normat e listuara të TVSH-së.",
