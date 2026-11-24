@@ -474,7 +474,7 @@ export const sq: Dictionary = {
     yearLabel: "Viti",
     yearSummary: "Gjithsej për {year}",
     received: "Pranuar",
-    grossIncome: "Të ardhurat (të pranuara plus tatimi i mbajtur në burim)",
+    grossIncome: "Të ardhurat (të pranuara plus provizionet dhe tatimi i mbajtur në burim)",
     totalIncomeTax: "Tatimi mbi të ardhurat",
     owedPart: "Ti i paguan DAP-it",
     creditPart: "Paguar jashtë vendit (zbritet)",
@@ -489,7 +489,7 @@ export const sq: Dictionary = {
     conversionNote:
       "Çdo pagesë konvertohet me kursin mesatar të Bankës Popullore në ditën kur arriti në llogari, ashtu siç konverton DAP-i.",
     feesNote:
-      "Provizionet e bankave dhe platformave nuk janë të ardhura: tatimi është mbi atë që u pranua plus tatimin e mbajtur në burim.",
+      "Provizionet që mori banka ose platforma janë pjesë e të ardhurave të tua: tatimi është mbi atë që pagoi klienti, pra atë që u pranua plus provizionet plus tatimin e mbajtur në burim.",
     byClient: "Sipas klientit",
     paymentsCount: "{count} pagesë(a)",
     empty:

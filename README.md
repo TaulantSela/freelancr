@@ -39,7 +39,7 @@ is. Freelancr puts the invoices and the local tax picture in one place.
 | PDF | In the client's invoice language, with what an invoice has to state: number, date and place of issue, date of supply, the issuer's VAT number or "The issuer is not registered for VAT.", the signatory with a line to sign, and bank, IBAN and BIC/SWIFT |
 | Clients | Company or private person, any country (ISO 3166 plus Kosovo), invoice language (Macedonian by default for clients in North Macedonia, English otherwise), tax ID, contact person and notes, and for clients whose payments you report yourself, the deemed costs their payments start with (author's rights only, Art. 40; 0% by default); a client with invoices or payments can't be deleted, and the app says why |
 | Dashboard | What you owe UJP (late months in red, the month due by the 15th, this month so far, and what companies already paid for you this year), what you received this year, outstanding invoices with their balance, the DDV monitor, the next tax deadline still to meet, and recent invoices with their balance |
-| Owed to UJP | Not registered for an activity, for each self-reported payment: income = (credited + tax withheld at source) × the NBRSM rate on the day received; base = income × (1 − deemed costs); tax = 10% of the base (Art. 11); tax paid abroad is credited up to that 10% (Art. 8(4)). Fees aren't income, so they're not in the base. A month's calculation (e-PDD) is due by the 10th of the next month and the tax by the 15th; each month goes from to file to filed (with the calculation number), approved (with UJP's folio number) and paid, and it's late once it misses either date. A company in North Macedonia withholds the 10% for you (Art. 80), which shows as "already paid for you". Registered self-employed: the monthly advance you enter in Settings |
+| Owed to UJP | Not registered for an activity, for each self-reported payment: income = (credited + fees + tax withheld at source) × the NBRSM rate on the day received, i.e. what the client paid; base = income × (1 − deemed costs); tax = 10% of the base (Art. 11); tax paid abroad is credited up to that 10% (Art. 8(4)). Fees are part of the income: the client paid them. A month's calculation (e-PDD) is due by the 10th of the next month and the tax by the 15th; each month goes from to file to filed (with the calculation number), approved (with UJP's folio number) and paid, and it's late once it misses either date. A company in North Macedonia withholds the 10% for you (Art. 80), which shows as "already paid for you". Registered self-employed: the monthly advance you enter in Settings |
 | DDV monitor | Your issued invoices to clients in North Macedonia this year, paid or not, by date of supply, plus their payments without an invoice by the day received, against 2,000,000 MKD, with warnings at 70%, 85% and over the threshold. Services to clients abroad don't count; hidden once you're registered for VAT or while there's no local supply |
 | Payments page | A year at a time, newest month first: each month's payments, its income and tax, what's owed to UJP with the deadlines and where the calculation stands, the steps to mark it filed, approved and paid, and a flag (with a one-click fix for backfilled ones) on months where a rate isn't the National Bank's for its day. Above them, the year's totals and income by client; below, the year's tax deadlines |
 | Tax deadlines | UJP's deadlines for how you're registered for tax. Not registered for an activity (the default): for each month in which a client abroad or a private person in North Macedonia paid you, submit the calculation by the 10th and pay the tax by the 15th of the next month (companies in North Macedonia withhold the tax themselves), and for each year with income, confirm or correct UJP's annual tax return (ГДП) by 31 May and pay what it shows by 30 June of the next year (Art. 96(3), 100(2)). Registered self-employed: the monthly advance by the 15th for the previous month, the annual tax balance (ПДД-ДБ) by 15 March and any difference by 30 March |
@@ -59,11 +59,12 @@ is. Freelancr puts the invoices and the local tax picture in one place.
   approximate) and a payment asks you to type the rate; those payments, and
   ones backfilled from invoices marked paid before payments existed, are
   flagged until they use the National Bank's rate.
-- **Fees aren't income.** The tax base is what was credited plus tax
-  withheld at source; what a bank or platform deducted on the way is left
-  out, though it still counts toward settling the invoice. If a platform's
-  deduction is really a tax, enter it as tax withheld, and only with the
-  foreign tax authority's certificate.
+- **Fees are income.** The income is what the client paid: what was
+  credited, plus what a bank or platform deducted on the way (an Upwork or
+  Payoneer fee), plus tax withheld at source. An individual not registered
+  for an activity can't deduct costs (only Art. 40's deemed costs), so a fee
+  doesn't lower the tax. If a platform's deduction is really a tax, enter it
+  as tax withheld, and only with the foreign tax authority's certificate.
 - **UJP's steps are per month.** Filed, approved and paid apply to all of a
   month's self-reported payments at once, and nothing talks to UJP: you
   record each step yourself.
