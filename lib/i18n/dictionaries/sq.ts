@@ -2,9 +2,9 @@ import type { Dictionary } from "../types";
 
 export const sq: Dictionary = {
   meta: {
-    title: "Freelancr — Platformë faturimi dhe tatimesh për freelancerët",
+    title: "Freelancr: klientët, faturat dhe sa i detyrohesh UJP-së",
     description:
-      "Platformë për faturim dhe përputhshmëri e ndërtuar për freelancerët e Maqedonisë së Veriut. Fatura shumëvalutore, monitorim i pragut TVSH, afatet tatimore të UJP-së.",
+      "Fatura klientët në vend dhe jashtë në gjuhën e tyre, regjistro çdo pagesë me kursin e Bankës Popullore për atë ditë dhe shiko sa i detyrohesh UJP-së çdo muaj, me afatet e е-ПДД. Për freelancerët në Maqedoninë e Veriut.",
   },
   common: {
     appName: "Freelancr",
@@ -31,6 +31,7 @@ export const sq: Dictionary = {
     payments: "Pagesat",
     menu: "Menyja",
     settings: "Cilësimet",
+    howItWorks: "Si funksionon",
   },
   auth: {
     welcomeBack: "Mirë se u ktheve",
@@ -87,37 +88,38 @@ export const sq: Dictionary = {
     },
   },
   landing: {
-    badge: "Ndërtuar për Maqedoninë e Veriut · Fatura MKD + EUR + USD",
-    heroTitle: "Platforma e faturimit që e kupton freelancerin maqedonas",
+    badge: "Për freelancerët në Maqedoninë e Veriut",
+    heroTitle: "Klientët, faturat dhe sa i detyrohesh UJP-së, në një vend",
     heroSubtitle:
-      "Ndalo faturimin në Word dhe ndjekjen e të ardhurave në Excel. Freelancr i mban në një vend klientët në Maqedoni dhe jashtë saj dhe faturat, dhe të tregon afatet në UJP me përafërsisht sa detyrohesh.",
-    createAccount: "Krijo llogari",
-    signInAccount: "Hyr në llogarinë tënde",
-    featuresTitle: "Gjithçka që i nevojitet freelancerit maqedonas",
-    featuresSubtitle:
-      "Mjetet globale nuk dinë çfarë është TVSH. Excel-i yt nuk i di afatet e tua tatimore. Freelancr i di të dyja.",
+      "Fatura klientët në vend dhe jashtë në gjuhën e tyre, regjistro çdo pagesë me kursin e Bankës Popullore për ditën kur arriti dhe shiko sa i detyrohesh UJP-së çdo muaj, me afatet e е-ПДД.",
+    featuresTitle: "Çfarë bën",
     features: [
       {
-        title: "Faturim shumëvalutor",
-        desc: "Krijo fatura në MKD, EUR ose USD. Ekuivalenti MKD llogaritet automatikisht sipas kursit mesatar të Bankës Popullore.",
+        title: "Faturat",
+        desc: "Të numëruara kur i lëshon, në maqedonisht, shqip ose anglisht, me të dhënat që ligji kërkon në një faturë, dhe nota krediti kur diçka ndryshon.",
       },
       {
-        title: "Monitorim i pragut TVSH",
-        desc: "Ndjek faturat për klientët në Maqedoninë e Veriut kundrejt pragut 2.000.000 MKD, me alarme në 70%, 85% dhe 100%. Shërbimet për klientët jashtë vendit nuk numërohen.",
+        title: "Pagesat",
+        desc: "Pagesa të pjesshme, tarifa të bankës dhe të platformës, pagesa pa faturë, secila me kursin e Bankës Popullore për ditën kur arriti.",
       },
       {
-        title: "Kalendar i afateve tatimore",
-        desc: "Afatet e UJP-së sipas mënyrës si je regjistruar: afatet mujore të llogaritjes dhe pagesës për të ardhurat që i deklaron vetë (nga klientë jashtë vendit ose persona fizikë), ose akontimet mujore dhe bilanci vjetor deri më 15 mars për vetëpunësimin e regjistruar.",
+        title: "Sa i detyrohesh UJP-së, muaj pas muaji",
+        desc: "10% e të ardhurave që i deklaron vetë, minus tatimin e paguar jashtë vendit, dhe 10% që kompanitë në Maqedoninë e Veriut i kanë mbajtur tashmë. Shëno çdo muaj si të dorëzuar, të miratuar dhe të paguar, dhe merr email para çdo afati.",
       },
       {
-        title: "Ndjekës i të ardhurave vjetore",
-        desc: "Të ardhurat vjetore sipas klientit dhe monedhës, dhe përafërsisht sa i detyrohesh UJP-së për çdo muaj.",
+        title: "Pragu i TVSH-së",
+        desc: "Furnizimet e tua në Maqedoninë e Veriut kundrejt pragut 2.000.000 denarë, të numëruara siç i numëron ligji: shërbimet për klientët jashtë vendit nuk numërohen.",
+      },
+      {
+        title: "Për kontabilistin",
+        desc: "Eksporte CSV të pagesave, faturave dhe notave të kreditit, dhe ekstraktet bankare dhe kontratat e bashkëngjitura te çdo pagesë dhe klient.",
       },
     ],
-    ctaTitle: "Gati të zëvendësosh Excel + Word?",
+    ctaTitle: "Provoje para se të regjistrohesh",
     ctaSubtitle:
-      "Lësho fatura të numëruara në gjuhën e klientit dhe shiko sa i detyrohesh UJP-së çdo muaj.",
-    ctaButton: "Krijo llogarinë tënde",
+      "Një llogari prove me gjashtë muaj të dhëna shembull hapet për pak sekonda dhe fshihet pas 24 orësh.",
+    disclaimer:
+      "Freelancr të ndihmon të mbash evidencë dhe të llogaritësh sa detyrohesh. Shuma përfundimtare është në llogaritjen që e miraton UJP; kjo nuk është këshillë tatimore.",
     footerTagline: "Built for North Macedonia · Изградено за Македонија · Ndërtuar për Maqedoninë",
   },
   demo: {

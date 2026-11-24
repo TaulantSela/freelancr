@@ -30,6 +30,7 @@ export type Dictionary = {
     payments: string;
     menu: string;
     settings: string;
+    howItWorks: string;
   };
   auth: {
     welcomeBack: string;
@@ -86,14 +87,11 @@ export type Dictionary = {
     badge: string;
     heroTitle: string;
     heroSubtitle: string;
-    createAccount: string;
-    signInAccount: string;
     featuresTitle: string;
-    featuresSubtitle: string;
     features: { title: string; desc: string }[];
     ctaTitle: string;
     ctaSubtitle: string;
-    ctaButton: string;
+    disclaimer: string;
     footerTagline: string;
   };
   demo: {
