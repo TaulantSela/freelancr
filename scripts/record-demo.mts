@@ -642,8 +642,10 @@ async function walkthrough(page: Page, film: Film) {
   );
 }
 
+// In English whatever the app's language: the client is abroad, and so is
+// its invoice's language.
 function demoItem() {
-  return ({ en: "Website redesign, phase 2", mk: "Редизајн на веб-страница, фаза 2", sq: "Ridizajnimi i faqes, faza 2" } as const)[lang];
+  return "Website redesign, phase 2";
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
