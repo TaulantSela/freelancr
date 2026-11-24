@@ -61,7 +61,7 @@ export default async function EditClientPage({
           <CardTitle className="text-base">{t.attachments.contractsTitle}</CardTitle>
         </CardHeader>
         <CardContent>
-          <AttachmentList owner={{ clientId: client.id }} items={contracts} />
+          <AttachmentList owner={{ clientId: client.id }} items={contracts} demo={session.isDemo} />
         </CardContent>
       </Card>
     </div>

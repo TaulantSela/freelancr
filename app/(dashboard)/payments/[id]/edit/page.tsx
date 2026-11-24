@@ -65,7 +65,7 @@ export default async function EditPaymentPage({
           <CardTitle className="text-base">{t.attachments.proofTitle}</CardTitle>
         </CardHeader>
         <CardContent>
-          <AttachmentList owner={{ paymentId: payment.id }} items={files} />
+          <AttachmentList owner={{ paymentId: payment.id }} items={files} demo={session.isDemo} />
         </CardContent>
       </Card>
     </div>

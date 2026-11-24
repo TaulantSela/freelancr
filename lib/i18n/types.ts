@@ -630,6 +630,7 @@ export type Dictionary = {
     none: string;
     upload: string;
     limits: string;
+    limitsDemo: string;
     uploaded: string;
     delete: string;
     deleteTitle: string;
