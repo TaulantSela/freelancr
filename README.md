@@ -43,7 +43,10 @@ is. Freelancr puts the invoices and the local tax picture in one place.
 | DDV monitor | Your issued invoices to clients in North Macedonia this year, paid or not, by date of supply, plus their payments without an invoice by the day received, against 2,000,000 MKD, with warnings at 70%, 85% and over the threshold. Services to clients abroad don't count; hidden once you're registered for VAT or while there's no local supply |
 | Payments page | A year at a time, newest month first: each month's payments, its income and tax, what's owed to UJP with the deadlines and where the calculation stands, the steps to mark it filed, approved and paid, and a flag (with a one-click fix for backfilled ones) on months where a rate isn't the National Bank's for its day. Above them, the year's totals and income by client; below, the year's tax deadlines |
 | Tax deadlines | UJP's deadlines for how you're registered for tax. Not registered for an activity (the default): for each month in which a client abroad or a private person in North Macedonia paid you, submit the calculation by the 10th and pay the tax by the 15th of the next month (companies in North Macedonia withhold the tax themselves), and for each year with income, confirm or correct UJP's annual tax return (ГДП) by 31 May and pay what it shows by 30 June of the next year (Art. 96(3), 100(2)). Registered self-employed: the monthly advance by the 15th for the previous month, the annual tax balance (ПДД-ДБ) by 15 March and any difference by 30 March |
-| Settings | Business profile (EDB, address, place of issue, signatory, bank, IBAN, BIC/SWIFT, local account number), how you're registered for tax (and the monthly advance if self-employed), and VAT registration with the VAT number; changing your password; deadline reminders on or off. The personal ID number (ЕМБГ) is never asked for, and is refused as a tax or VAT number |
+| Settings | Business profile (EDB, address, place of issue, signatory, bank, IBAN, BIC/SWIFT, local account number), how you're registered for tax (and the monthly advance if self-employed), and VAT registration with the VAT number; changing your password; deadline reminders on or off; deleting the account. The personal ID number (ЕМБГ) is never asked for, and is refused as a tax or VAT number |
+| Deleting an account | In Settings, with the password and a ticked box: the user and everything of theirs (clients, invoices, payments, credit notes, files) is deleted at once, every session ends, and the encrypted backups lose it within 14 days. Not for demo accounts |
+| Privacy and terms | `/privacy` and `/terms` in all three languages (`lib/legal/content.ts`): what's stored and why, the processors, how long things are kept, the two cookies, your rights, and that the figures are estimates, not tax advice. Linked from the landing page's footer and from sign-up |
+| Backups | Every night, the whole database, encrypted, to a private Vercel Blob store, kept 14 days; `npm run backup` lists, inspects and restores them (see [Backups](#backups)) |
 | Try it | "Try it with sample data" (on the landing page, the sign-in page and /demo) creates a sandbox: your own demo account with six months of sample clients, invoices and payments dated from today, in your language, signed in. It's deleted after 24 hours; at most 5 an hour from one IP and 300 at once |
 | How it works | /demo: the walkthrough video in your language with its chapters, and the same steps written out with a screenshot each |
 | Languages | Macedonian (default), Albanian and English |
@@ -66,9 +69,12 @@ is. Freelancr puts the invoices and the local tax picture in one place.
   record each step yourself.
 - **Email needs Resend.** Without `RESEND_API_KEY` and `MAIL_FROM` nothing
   is sent: the reset page, "Email to client" and the reminders toggle say
-  email isn't set up. Reminders go out once a day (07:00 UTC), at most 100 a
-  run; Resend's free plan sends 100 a day in all. Nothing tracks whether an
-  email was delivered or read.
+  email isn't set up. At most `EMAIL_DAILY_CAP` emails (100 by default, what
+  Resend's free plan sends a day) go out in any 24 hours, for all users
+  together; past it, "Email to client" says so, a reset request gives its
+  usual answer, and reminders wait for the next day's run. Reminders go out
+  once a day (07:00 UTC), at most 100 a run. Nothing tracks whether an email
+  was delivered or read.
 - **No refunds.** A credit note on an invoice that was already paid shows
   what was overpaid; paying it back isn't recorded, and income tax follows
   the payments received.
@@ -96,6 +102,13 @@ is. Freelancr puts the invoices and the local tax picture in one place.
   send email or get reminders, and keep at most 5 MB of files. A sandbox
   can't be signed into again once you sign out, and the daily cron deletes
   it after 24 hours.
+- **Backups are nightly and logical.** Up to a day of changes can be lost.
+  A backup is built in memory, which is fine up to a few hundred MB of data,
+  attachments included. A restore needs the database at the backup's
+  migration level. Nothing alerts on a failed backup: the cron's result in
+  the Vercel logs says `"backup": {"failed": 1}`.
+- **The legal pages aren't reviewed by a lawyer,** and the Macedonian and
+  Albanian need a native speaker's proofread.
 - **Emails match exactly.** Signing in and resetting a password look the
   email up as it was typed at sign-up, capitals included.
 
@@ -129,9 +142,11 @@ is. Freelancr puts the invoices and the local tax picture in one place.
    payments and credit notes (`lib/payments/write.ts`,
    `lib/credit-notes/write.ts`), so they never disagree; a credit note's
    number is worked out in the same statement, like an invoice's. Files are
-   stored as `bytea` and only the download route reads them back. Migrations only add
-   tables, columns and indexes, since preview deployments run them on the
-   production database while the old code is still live; the one that added
+   stored as `bytea` and only the download route reads them back. Production has its own
+   database; preview deployments and local development share another
+   (`freelancr-dev`), so a branch's migrations never touch production.
+   Migrations still only add tables, columns and indexes, since production
+   runs them in its build while the old code is still live; the one that added
    payments also created a payment for every invoice already marked paid.
 4. **Rates.** `lib/rates/nbrsm.ts` fetches and parses the National Bank's
    daily lists (every calendar day, 5-second timeout) and
@@ -183,7 +198,8 @@ npm run dev
 ```
 
 If the project is linked to Vercel, `vercel env pull .env.local` fills in
-`DATABASE_URL` instead. `SESSION_SECRET` is required in production; generate
+`DATABASE_URL` instead, for the development database (`freelancr-dev`, which
+previews use too), never production's. `SESSION_SECRET` is required in production; generate
 one with `openssl rand -base64 32`.
 
 After `npm run setup` you can sign in with the demo account,
@@ -203,6 +219,7 @@ the same data from `lib/demo/sample-data.ts`.
 | `npm run setup` | Both of the above |
 | `npm run db:generate` | Generate a migration from `lib/db/schema.ts` |
 | `npm run lint` | ESLint |
+| `npm run backup -- list` | List, make (`now`), look inside (`inspect`) or restore (`restore`) backups (see [Backups](#backups)) |
 | `npm run demo:record -- <url> --lang en` | Record the /demo walkthrough in one language (see below) |
 
 ### Recording the walkthrough
@@ -238,10 +255,49 @@ send something say so.
 | `MAIL_FROM` | The sender, `Name <address@your-domain>`. No address is built into the app. Invoice emails keep the address and show "<business name> via Freelancr" |
 | `APP_URL` | Optional: the base URL for links in emails. Defaults to `https://$VERCEL_PROJECT_PRODUCTION_URL`; links are never built from a request's host |
 | `CRON_SECRET` | The bearer token Vercel Cron sends to `/api/cron/daily`; anything else gets a 401 |
+| `EMAIL_DAILY_CAP` | Optional: at most this many emails in any 24 hours, for all users together (default 100) |
 
 `RESEND_API_BASE` exists only so tests can point the API at a local stub.
 To run the cron by hand:
 `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/daily`.
+
+### Backups
+
+The daily cron's last job (`lib/backup/`) copies every table in one
+read-only snapshot, gzips it, seals it with AES-256-GCM under `BACKUP_KEY`
+and stores it as `backups/<time>.flbk` in a private Vercel Blob store.
+Backups older than 14 days are deleted; the newest 3 always stay. It's
+skipped unless both variables are set:
+
+| Variable | What it's for |
+|----------|---------------|
+| `BACKUP_KEY` | 32 random bytes, base64 (`openssl rand -base64 32`). Without it no backup can be read: keep a copy outside Vercel. Production's is in the macOS Keychain as "Freelancr backup key (production)" |
+| `BLOB_READ_WRITE_TOKEN` | The Blob store's token, set by `vercel blob create-store ... --access private`. Production uses `freelancr-backups` (Frankfurt), development `freelancr-backups-dev` |
+
+```bash
+npm run backup -- list                       # what's there
+npm run backup -- now                        # make one now
+npm run backup -- inspect backups/<file>     # its tables and row counts
+npm run backup -- restore backups/<file> --into <database host> [--wipe]
+```
+
+The script reads `.env.local`, or the file in `BACKUP_ENV`. A restore runs
+in one transaction, so a failed one changes nothing; the target must be
+migrated to the backup's level (its migration count is in `inspect`),
+`--into` must name the target database's host, and a database with users
+needs `--wipe`. To restore production:
+
+1. `vercel env pull ~/freelancr-prod.env --environment production` (outside
+   the repo), and add `BACKUP_KEY` from the Keychain:
+   `security find-generic-password -s "Freelancr backup key (production)" -w`.
+2. `BACKUP_ENV=~/freelancr-prod.env npm run backup -- list`, then `inspect`
+   the one you want.
+3. Restore into a new Neon branch first: point `DATABASE_URL` and
+   `DATABASE_URL_UNPOOLED` in that file at it, run the migrations
+   (`node --env-file=$BACKUP_ENV --import tsx lib/db/migrate.ts`), restore,
+   and check it. Then do the same against production with `--wipe`, or
+   switch production to the branch.
+4. Delete `~/freelancr-prod.env`.
 
 ## Deploy
 
@@ -253,4 +309,7 @@ vercel deploy --prod
 
 On Vercel the `vercel-build` script runs the migrations before `next build`.
 For email, add `RESEND_API_KEY`, `MAIL_FROM` and `CRON_SECRET` (and
-`APP_URL` for a custom domain) with `vercel env add`.
+`APP_URL` for a custom domain) with `vercel env add`. For backups, create
+the private Blob store for production
+(`vercel blob create-store freelancr-backups --access private --region fra1 --environment production --yes`)
+and add `BACKUP_KEY` with `vercel env add BACKUP_KEY production --sensitive`.
