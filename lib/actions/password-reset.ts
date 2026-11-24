@@ -66,7 +66,10 @@ async function sendResetLink(email: string, ipHash: string) {
   const link = `${base}/reset-password?token=${encodeURIComponent(token)}`;
   const greeting = formatMessage(e.greeting, { name: user.name });
   const body = formatMessage(e.body, { minutes: RESET_TOKEN_MINUTES });
+  // Its result doesn't change the answer (the same for any email); over the
+  // app's daily cap nothing is sent.
   await sendEmail({
+    kind: "reset",
     from,
     to: user.email,
     subject: e.subject,

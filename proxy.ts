@@ -37,6 +37,10 @@ export async function proxy(request: NextRequest) {
     // The walkthrough page and its video, poster and screenshots.
     pathname === "/demo" ||
     pathname.startsWith("/demo/") ||
+    pathname === "/privacy" ||
+    pathname === "/terms" ||
+    // Where deleting an account lands, signed out.
+    pathname === "/account-deleted" ||
     // Vercel Cron: no session, a bearer secret (checked by the route).
     pathname.startsWith("/api/cron/");
 

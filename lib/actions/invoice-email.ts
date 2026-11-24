@@ -9,7 +9,7 @@ import { getInvoiceDetail } from "@/lib/invoices/queries";
 import { completeInvoiceEmail, reserveInvoiceEmail } from "@/lib/invoices/emails";
 import { renderInvoicePdf } from "@/lib/pdf/render";
 import { isEmailConfigured, mailFromAs } from "@/lib/email/config";
-import { sendEmail } from "@/lib/email/send";
+import { DAILY_CAP_ERROR, sendEmail } from "@/lib/email/send";
 import { emailHtml } from "@/lib/email/html";
 
 export type InvoiceEmailErrorKey =
@@ -19,7 +19,8 @@ export type InvoiceEmailErrorKey =
   | "dailyLimit"
   | "notConfigured"
   | "demo"
-  | "sendFailed";
+  | "sendFailed"
+  | "appDailyCap";
 
 // One address: no spaces, commas, semicolons, quotes or angle brackets.
 const ADDRESS = /^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]+$/;
@@ -57,6 +58,7 @@ export async function emailInvoice(
   }
   const pdf = await renderInvoicePdf(data);
   const result = await sendEmail({
+    kind: "invoice",
     from,
     to,
     subject,
@@ -69,5 +71,7 @@ export async function emailInvoice(
   await completeInvoiceEmail(getDb(), id, result.ok ? { providerId: result.id ?? id } : { error: result.error });
 
   revalidatePath(`/invoices/${invoiceId}`);
-  return result.ok ? { sent: true, to } : { errorKey: "sendFailed" };
+  if (result.ok) return { sent: true, to };
+  // Over the app's daily cap (all email, for every user) or a failed send.
+  return { errorKey: result.error === DAILY_CAP_ERROR ? "appDailyCap" : "sendFailed" };
 }

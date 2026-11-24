@@ -6,7 +6,7 @@ import { formatTaxDate, formatTaxPeriod } from "@/lib/tax/labels";
 import { getPaymentsReceived } from "@/lib/payments/queries";
 import { summarizeMonths } from "@/lib/tax/payments";
 import { appUrl, mailFrom } from "@/lib/email/config";
-import { sendEmail } from "@/lib/email/send";
+import { DAILY_CAP_ERROR, sendEmail } from "@/lib/email/send";
 import { emailHtml } from "@/lib/email/html";
 import { getDictionary } from "@/lib/i18n/server";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
@@ -47,6 +47,8 @@ export async function runReminders(now: Date): Promise<{ due: number; sent: numb
 
   const lastMonth = previousMonth(today);
   const lastYear = Number(today.slice(0, 4)) - 1;
+  // Once the app's daily cap is reached, the rest wait for a later run.
+  let capped = false;
   for (const user of recipients) {
     let summary = null;
     let hadPaymentsLastYear = false;
@@ -77,7 +79,7 @@ export async function runReminders(now: Date): Promise<{ due: number; sent: numb
     });
     for (const reminder of planned) {
       result.due++;
-      if (result.sent + result.failed >= REMINDERS_PER_RUN) continue;
+      if (capped || result.sent + result.failed >= REMINDERS_PER_RUN) continue;
       const logId = generateId();
       const inserted = await db.execute<{ id: string }>(sql`
         insert into reminder_log (id, user_id, kind, period)
@@ -86,11 +88,20 @@ export async function runReminders(now: Date): Promise<{ due: number; sent: numb
         returning id
       `);
       if (inserted.rows.length === 0) continue;
-      const sent = await sendEmail({ from, to: user.email, ...reminderEmail(user, reminder, today, base) });
+      const sent = await sendEmail({
+        kind: "reminder",
+        from,
+        to: user.email,
+        ...reminderEmail(user, reminder, today, base),
+      });
       if (sent.ok) result.sent++;
       else {
         result.failed++;
         await db.execute(sql`delete from reminder_log where id = ${logId}`);
+        if (sent.error === DAILY_CAP_ERROR) {
+          capped = true;
+          continue;
+        }
       }
       await new Promise((r) => setTimeout(r, PAUSE_MS));
     }

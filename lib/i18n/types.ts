@@ -358,6 +358,7 @@ export type Dictionary = {
         notConfigured: string;
         demo: string;
         sendFailed: string;
+        appDailyCap: string;
       };
     };
   };
@@ -711,6 +712,20 @@ export type Dictionary = {
         demo: string;
       };
     };
+    deleteAccount: {
+      title: string;
+      desc: string;
+      exportHint: string;
+      password: string;
+      confirm: string;
+      submit: string;
+      errors: {
+        required: string;
+        wrongPassword: string;
+        notConfirmed: string;
+        demo: string;
+      };
+    };
     errors: {
       nameRequired: string;
       advanceInvalid: string;
@@ -809,6 +824,19 @@ export type Dictionary = {
         body: string;
         bodyNoAmount: string;
       };
+    };
+  };
+  legal: {
+    privacy: string;
+    terms: string;
+    // "By creating an account, you accept the {terms} and the {privacy}."
+    agree: string;
+    termsLink: string;
+    privacyLink: string;
+    accountDeleted: {
+      title: string;
+      body: string;
+      home: string;
     };
   };
 };

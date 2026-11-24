@@ -13,7 +13,8 @@
     "db:migrate": "node --env-file=.env.local --import tsx lib/db/migrate.ts",
     "db:seed": "node --env-file=.env.local --import tsx scripts/seed-demo.ts",
     "setup": "npm run db:migrate && npm run db:seed",
-    "demo:record": "tsx scripts/record-demo.mts"
+    "demo:record": "tsx scripts/record-demo.mts",
+    "backup": "node --env-file=${BACKUP_ENV:-.env.local} --import tsx scripts/restore-backup.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -21,6 +22,7 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@react-pdf/renderer": "^4.3.0",
     "@types/bcryptjs": "^2.4.6",
+    "@vercel/blob": "^2.9.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

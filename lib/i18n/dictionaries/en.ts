@@ -410,6 +410,7 @@ export const en: Dictionary = {
         notConfigured: "Email isn't set up on this server yet.",
         demo: "Not available in the demo account.",
         sendFailed: "The email didn't go out. Try again in a moment.",
+        appDailyCap: "Freelancr has sent all its email for today. Try again tomorrow.",
       },
     },
   },
@@ -788,6 +789,21 @@ export const en: Dictionary = {
         demo: "Not available in the demo account.",
       },
     },
+    deleteAccount: {
+      title: "Delete account",
+      desc: "Deletes your account and everything in it: clients, invoices, payments, credit notes and files. It can't be undone.",
+      exportHint:
+        "The law may require you to keep invoices and tax records, so download the CSV exports first (on the Payments and Invoices pages).",
+      password: "Your password",
+      confirm: "I understand that everything in my account will be deleted.",
+      submit: "Delete my account",
+      errors: {
+        required: "Enter your password.",
+        wrongPassword: "That password isn't right.",
+        notConfirmed: "Tick the box to confirm.",
+        demo: "Not available in the demo account.",
+      },
+    },
     errors: {
       nameRequired: "Name is required",
       advanceInvalid: "Enter the monthly advance as an amount in MKD, or leave it empty.",
@@ -935,6 +951,18 @@ export const en: Dictionary = {
         bodyNoAmount:
           "Pay the income tax advance for {month} by {date}. Add its amount in Settings to see it here.",
       },
+    },
+  },
+  legal: {
+    privacy: "Privacy policy",
+    terms: "Terms of use",
+    agree: "By creating an account, you accept the {terms} and the {privacy}.",
+    termsLink: "terms of use",
+    privacyLink: "privacy policy",
+    accountDeleted: {
+      title: "Your account is deleted",
+      body: "Everything in it is gone from Freelancr. The encrypted backups lose it within 14 days.",
+      home: "Back to the home page",
     },
   },
 };

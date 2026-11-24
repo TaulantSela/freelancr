@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SettingsForm } from "@/components/dashboard/settings-form";
 import { ChangePasswordForm } from "@/components/dashboard/change-password-form";
+import { DeleteAccountForm } from "@/components/dashboard/delete-account-form";
 import { RemindersToggle } from "@/components/dashboard/reminders-toggle";
 import { isEmailConfigured } from "@/lib/email/config";
 import { getTranslations } from "@/lib/i18n/server";
@@ -103,6 +104,19 @@ export default async function SettingsPage() {
             <p className="text-sm text-muted-foreground">{t.common.demoUnavailable}</p>
           ) : (
             <ChangePasswordForm />
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="border-destructive/30">
+        <CardHeader>
+          <CardTitle className="text-sm">{t.settings.deleteAccount.title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {user.isDemo ? (
+            <p className="text-sm text-muted-foreground">{t.common.demoUnavailable}</p>
+          ) : (
+            <DeleteAccountForm />
           )}
         </CardContent>
       </Card>
