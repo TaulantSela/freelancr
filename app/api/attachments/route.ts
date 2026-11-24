@@ -2,6 +2,8 @@ import { getSession } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
 import { generateId } from "@/lib/utils";
 import {
+  ATTACHMENT_QUOTA_BYTES,
+  DEMO_ATTACHMENT_QUOTA_BYTES,
   MAX_ATTACHMENT_BYTES,
   detectAttachmentType,
   sanitizeFilename,
@@ -12,7 +14,7 @@ import { insertAttachment } from "@/lib/attachments/write";
 // Uploads a file for one of the user's payments (proof for е-ПДД) or
 // clients (contracts). A route handler, not a server action: those take at
 // most 1 MB. PDF, PNG or JPEG only, told from the first bytes; up to 4 MB
-// each and 100 MB in all.
+// each and 100 MB in all (5 MB for a demo account).
 
 function fail(errorKey: UploadErrorKey, status: number) {
   return Response.json({ errorKey }, { status });
@@ -59,8 +61,9 @@ export async function POST(request: Request) {
     filename: sanitizeFilename(file.name, type),
     contentType: type,
     bytes,
+    quotaBytes: session.isDemo ? DEMO_ATTACHMENT_QUOTA_BYTES : ATTACHMENT_QUOTA_BYTES,
   });
   if (result === "notFound") return fail("notFound", 404);
-  if (result === "overQuota") return fail("quota", 413);
+  if (result === "overQuota") return fail(session.isDemo ? "demoQuota" : "quota", 413);
   return Response.json({ id }, { status: 201 });
 }

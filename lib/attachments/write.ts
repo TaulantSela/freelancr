@@ -19,6 +19,8 @@ export async function insertAttachment(
     filename: string;
     contentType: string;
     bytes: Uint8Array;
+    // Their files' limit in all.
+    quotaBytes?: number;
   }
 ): Promise<InsertAttachmentResult> {
   const paymentId = "paymentId" in a.owner ? a.owner.paymentId : null;
@@ -37,7 +39,7 @@ export async function insertAttachment(
       select ${a.id}, ${a.userId}, ${paymentId}, ${clientId}, ${a.filename}, ${a.contentType},
         ${size}::int, decode(${Buffer.from(a.bytes).toString("base64")}, 'base64')
       from owner, usage
-      where usage.used + ${size}::bigint <= ${ATTACHMENT_QUOTA_BYTES}::bigint
+      where usage.used + ${size}::bigint <= ${a.quotaBytes ?? ATTACHMENT_QUOTA_BYTES}::bigint
       returning id
     )
     select (select count(*) from ins)::int as saved, (select count(*) from owner)::int as owned

@@ -96,6 +96,24 @@ export type Dictionary = {
     ctaButton: string;
     footerTagline: string;
   };
+  demo: {
+    tryButton: string;
+    preparing: string;
+    busy: string;
+    banner: string;
+    createOwn: string;
+    seeHow: string;
+    createAccount: string;
+    pageTitle: string;
+    pageIntro: string;
+    metaDescription: string;
+    chapters: string;
+    guide: string;
+    step: string;
+    videoFallback: string;
+    endTitle: string;
+    endText: string;
+  };
   dashboard: {
     title: string;
     welcome: string;
@@ -624,6 +642,7 @@ export type Dictionary = {
       tooLarge: string;
       type: string;
       quota: string;
+      demoQuota: string;
       notFound: string;
       invalid: string;
     };

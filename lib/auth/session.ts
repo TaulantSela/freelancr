@@ -26,6 +26,8 @@ export interface Session {
   name: string;
   // A shared account with a public password (users.is_demo).
   isDemo: boolean;
+  // A visitor's sandbox: when the daily cleanup deletes it (lib/demo).
+  demoExpiresAt: string | null;
 }
 
 export async function createSession(payload: SessionPayload) {
@@ -69,6 +71,7 @@ export const getSession = cache(async (): Promise<Session | null> => {
       email: users.email,
       name: users.name,
       isDemo: users.isDemo,
+      demoExpiresAt: users.demoExpiresAt,
       sessionVersion: users.sessionVersion,
     })
     .from(users)
@@ -76,7 +79,13 @@ export const getSession = cache(async (): Promise<Session | null> => {
     .limit(1);
   const version = typeof claims.sv === "number" ? claims.sv : 0;
   if (!user || user.sessionVersion !== version) return null;
-  return { userId: claims.userId, email: user.email, name: user.name, isDemo: user.isDemo };
+  return {
+    userId: claims.userId,
+    email: user.email,
+    name: user.name,
+    isDemo: user.isDemo,
+    demoExpiresAt: user.demoExpiresAt,
+  };
 });
 
 export async function deleteSession() {
