@@ -962,7 +962,7 @@ export const mk: Dictionary = {
   legal: {
     privacy: "Политика за приватност",
     terms: "Услови за користење",
-    agree: "Со создавање сметка ги прифаќате {terms} и {privacy}.",
+    agree: "Со креирање сметка ги прифаќате {terms} и {privacy}.",
     termsLink: "условите за користење",
     privacyLink: "политиката за приватност",
     accountDeleted: {
