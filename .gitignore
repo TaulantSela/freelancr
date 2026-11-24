@@ -28,6 +28,9 @@
 freelancr.db
 freelancr.db-*
 
+# the walkthrough recorder's frames (scripts/record-demo.mts)
+/.demo-recording/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
