@@ -7,7 +7,7 @@
 // 15th (Art. 93(1)). UJP's system converts the amount at the NBRSM middle
 // rate on the day the income was received (Art. 93(2)), which is the rate
 // each payment stores. For each payment:
-//   gross  = (amount credited + tax withheld at source) x rate
+//   gross  = (amount credited + fees + tax withheld at source) x rate
 //   base   = gross x (1 - deemed costs)        deemed costs: Art. 40, author's
 //                                               rights only; 0 for income from
 //                                               work (Art. 14)
@@ -16,8 +16,10 @@
 //                                               (Art. 8(4): tax paid in another
 //                                               state, up to the tax due here)
 //   owed   = tax - credit
-// Fees taken by banks or platforms are not in the base: the base is what was
-// credited plus what was withheld at source (an assumption the UI states).
+// The income is what the client paid: fees a bank or platform took on the
+// way (an Upwork or Payoneer fee) are part of it, like tax withheld at
+// source. An individual not registered for an activity has no deductible
+// costs (only Art. 40's deemed costs), so a fee doesn't lower the base.
 // For a "withheld" payment (a company in North Macedonia paid), the company
 // already paid the 10% for the user (Art. 80(1)): nothing to file, and the
 // withheld amount is "already paid for you". "business" payments (registered
@@ -45,7 +47,8 @@ export type TaxPayment = {
 export type PaymentTax = {
   // What reached the account, in MKD.
   receivedMKD: number;
-  // Credited plus withheld at source, in MKD: the income.
+  // What the client paid, in MKD: credited + fees + withheld at source. The
+  // income.
   grossMKD: number;
   baseMKD: number;
   taxMKD: number;
@@ -60,7 +63,7 @@ export function roundDeni(amount: number): number {
 
 export function paymentTax(p: TaxPayment): PaymentTax {
   const receivedMKD = roundDeni(p.amount * p.rateToMKD);
-  const grossMKD = roundDeni((p.amount + p.taxWithheld) * p.rateToMKD);
+  const grossMKD = roundDeni((p.amount + p.fees + p.taxWithheld) * p.rateToMKD);
   const withheldMKD = roundDeni(p.taxWithheld * p.rateToMKD);
   const none = { baseMKD: 0, taxMKD: 0, creditMKD: 0, owedMKD: 0, alreadyPaidForYouMKD: 0 };
 

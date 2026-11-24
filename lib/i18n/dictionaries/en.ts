@@ -471,7 +471,7 @@ export const en: Dictionary = {
     yearLabel: "Year",
     yearSummary: "{year} in total",
     received: "Received",
-    grossIncome: "Income (received plus tax withheld at source)",
+    grossIncome: "Income (received plus fees and tax withheld at source)",
     totalIncomeTax: "Income tax on it",
     owedPart: "You pay UJP",
     creditPart: "Paid abroad (credited)",
@@ -486,7 +486,7 @@ export const en: Dictionary = {
     conversionNote:
       "Each payment converts at the National Bank's middle rate on the day it reached your account, as UJP converts it.",
     feesNote:
-      "Fees banks or platforms took aren't income: the tax is on what was credited plus any tax withheld at source.",
+      "Fees a bank or platform took are part of your income: the tax is on what the client paid, that is what was credited plus fees plus any tax withheld at source.",
     byClient: "By client",
     paymentsCount: "{count} payment(s)",
     empty: "No payments recorded in {year}. Record each one when the money reaches your account.",
