@@ -1,5 +1,5 @@
 {
-  "duration": 105.4,
+  "duration": 106,
   "webm": true,
   "chapters": [
     {
@@ -30,32 +30,32 @@
     {
       "id": "tax",
       "title": "Sa i detyrohesh DAP-it",
-      "start": 56.2
+      "start": 56.8
     },
     {
       "id": "withheld",
       "title": "Tatimi i mbajtur për ty",
-      "start": 62.6
+      "start": 63.2
     },
     {
       "id": "filing",
       "title": "Dorëzimi në DAP",
-      "start": 67.9
+      "start": 68.5
     },
     {
       "id": "proof",
       "title": "Dëshmi dhe eksporte",
-      "start": 79.8
+      "start": 80.4
     },
     {
       "id": "dashboard",
       "title": "Paneli",
-      "start": 91.4
+      "start": 92
     },
     {
       "id": "end",
       "title": "Provoje",
-      "start": 101.2
+      "start": 101.8
     }
   ]
 }
