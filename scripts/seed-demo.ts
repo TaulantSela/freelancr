@@ -5,6 +5,7 @@ import { getDb, users } from "../lib/db";
 import { toSkopjeDate } from "../lib/tax/calculator";
 import { SAMPLE_PROFILE, insertSampleData } from "../lib/demo/sample-data";
 import { SHARED_DEMO_EMAIL } from "../lib/demo/shared";
+import { assertDisposableDatabase } from "./db-guard";
 
 const DEMO_EMAIL = SHARED_DEMO_EMAIL;
 const DEMO_PASSWORD = "demo1234";
@@ -14,6 +15,8 @@ const DEMO_PASSWORD = "demo1234";
 // doesn't expire; the daily cron seeds it again every day
 // (lib/demo/shared.ts).
 async function main() {
+  // Only on the dev database; production's demo account comes from the daily cron (db-guard.ts).
+  await assertDisposableDatabase();
   const db = getDb();
 
   const [existing] = await db
