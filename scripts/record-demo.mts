@@ -307,18 +307,26 @@ class Film {
   }
 }
 
-/** Marks the first element matching `selector` whose text includes `text`; returns a selector for it. */
+/**
+ * Marks the first element matching `selector` whose text includes `text`; returns a selector for it.
+ * Waits up to 10 s for it: a page can still be rendering after the network goes idle.
+ */
 async function mark(page: Page, selector: string, text: string, name: string, { last = false } = {}) {
-  const found = await page.evaluate(
-    ({ selector, text, name, last }) => {
-      const all = [...document.querySelectorAll(selector)].filter((e) => e.textContent?.includes(text));
-      const el = last ? all.at(-1) : all[0];
-      el?.setAttribute("data-demo", name);
-      return !!el;
-    },
-    { selector, text, name, last },
-  );
-  if (!found) throw new Error(`no ${selector} containing "${text}"`);
+  const deadline = Date.now() + 10_000;
+  for (;;) {
+    const found = await page.evaluate(
+      ({ selector, text, name, last }) => {
+        const all = [...document.querySelectorAll(selector)].filter((e) => e.textContent?.includes(text));
+        const el = last ? all.at(-1) : all[0];
+        el?.setAttribute("data-demo", name);
+        return !!el;
+      },
+      { selector, text, name, last },
+    );
+    if (found) break;
+    if (Date.now() > deadline) throw new Error(`no ${selector} containing "${text}"`);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
   return `[data-demo="${name}"]`;
 }
 
@@ -450,7 +458,8 @@ async function walkthrough(page: Page, film: Film) {
   await film.type('[data-demo="item-2"]', "1200");
   await film.shot(0.6);
   await film.click(await mark(page, 'main button[type="submit"]', t.invoices.form.submit, "create"));
-  await page.waitForFunction(() => /^\/invoices\/[^/]+$/.test(location.pathname), { timeout: 30_000 });
+  // The new invoice's page: /invoices/new matches /invoices/<x> too, so wait until it's not the form.
+  await page.waitForFunction(() => /^\/invoices\/(?!new$)[^/]+$/.test(location.pathname), { timeout: 30_000 });
   await page.waitForNetworkIdle({ idleTime: 300, timeout: 30_000 });
   const invoicePath = await page.evaluate(() => location.pathname);
   await film.shot(1.4);
