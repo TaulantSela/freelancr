@@ -9,7 +9,7 @@ import { generateId } from "@/lib/utils";
 
 type Db = ReturnType<typeof getDb>;
 
-export type EmailKind = "reset" | "invoice" | "reminder";
+export type EmailKind = "reset" | "invoice" | "reminder" | "alert";
 
 export async function sentInLast24Hours(db: Db): Promise<number> {
   const result = await db.execute<{ n: number }>(sql`

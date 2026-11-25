@@ -4,13 +4,15 @@ import { eq } from "drizzle-orm";
 import { getDb, users } from "../lib/db";
 import { toSkopjeDate } from "../lib/tax/calculator";
 import { SAMPLE_PROFILE, insertSampleData } from "../lib/demo/sample-data";
+import { SHARED_DEMO_EMAIL } from "../lib/demo/shared";
 
-const DEMO_EMAIL = "demo@freelancr.mk";
+const DEMO_EMAIL = SHARED_DEMO_EMAIL;
 const DEMO_PASSWORD = "demo1234";
 
 // The shared demo account, with the same sample data a visitor's sandbox
 // gets (lib/demo/sample-data.ts), dated from today. Unlike a sandbox it
-// doesn't expire.
+// doesn't expire; the daily cron seeds it again every day
+// (lib/demo/shared.ts).
 async function main() {
   const db = getDb();
 

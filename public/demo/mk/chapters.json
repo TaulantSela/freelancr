@@ -1,5 +1,5 @@
 {
-  "duration": 105.4,
+  "duration": 106,
   "webm": true,
   "chapters": [
     {
@@ -30,32 +30,32 @@
     {
       "id": "tax",
       "title": "Колку должите на УЈП",
-      "start": 56.2
+      "start": 56.8
     },
     {
       "id": "withheld",
       "title": "Данок задржан за вас",
-      "start": 62.6
+      "start": 63.2
     },
     {
       "id": "filing",
       "title": "Поднесување до УЈП",
-      "start": 67.9
+      "start": 68.5
     },
     {
       "id": "proof",
       "title": "Докази и извоз",
-      "start": 79.8
+      "start": 80.4
     },
     {
       "id": "dashboard",
       "title": "Контролна табла",
-      "start": 91.4
+      "start": 92
     },
     {
       "id": "end",
       "title": "Пробајте",
-      "start": 101.2
+      "start": 101.8
     }
   ]
 }
