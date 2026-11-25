@@ -225,6 +225,17 @@ the same data from `lib/demo/sample-data.ts`.
 | `npm run backup -- list` | List, make (`now`), look inside (`inspect`) or restore (`restore`) backups (see [Backups](#backups)) |
 | `npm run demo:record -- <url> --lang en` | Record the /demo walkthrough in one language (see below) |
 
+`db:migrate`, `db:push`, `db:seed` and `setup` only run on a database marked as
+a disposable dev database ([`scripts/db-guard.ts`](scripts/db-guard.ts)), so
+they can't change production from a laptop. `freelancr-dev` is marked;
+production never is, and gets its migrations from its own build. To mark a
+new dev database (never production), run this once against it, e.g. in Neon's
+SQL editor:
+
+```sql
+COMMENT ON DATABASE neondb IS 'freelancr:disposable';
+```
+
 ### Recording the walkthrough
 
 `scripts/record-demo.mts` drives the installed Google Chrome through the
