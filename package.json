@@ -15,7 +15,8 @@
     "db:seed": "node --env-file=.env.local --import tsx scripts/seed-demo.ts",
     "setup": "npm run db:migrate && npm run db:seed",
     "demo:record": "tsx scripts/record-demo.mts",
-    "backup": "node --env-file=${BACKUP_ENV:-.env.local} --import tsx scripts/restore-backup.ts"
+    "backup": "node --env-file=${BACKUP_ENV:-.env.local} --import tsx scripts/restore-backup.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -47,13 +48,25 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "eslint": "^10.15.0",
     "eslint-config-next": "16.4.6",
     "puppeteer-core": "^25.18.1",
     "shadcn": "^4.23.1",
     "sharp": "^0.34.5",
     "tailwindcss": "^4",
     "tsx": "^4.20.3",
-    "typescript": "^5"
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
+  },
+  "overrides": {
+    "eslint-plugin-react": {
+      "eslint": "$eslint"
+    },
+    "eslint-plugin-import": {
+      "eslint": "$eslint"
+    },
+    "eslint-plugin-jsx-a11y": {
+      "eslint": "$eslint"
+    }
   }
 }
